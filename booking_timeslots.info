@@ -1,0 +1,7 @@
+; $Id$
+name = "Booking Timeslots"
+description = "Booking timeslots module"
+package = Bookings
+core = 6.x
+dependencies[] = calendar
+
