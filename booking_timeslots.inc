@@ -11,12 +11,12 @@
 /*
  * Add specified time to datetime
  * @datetime
- * 	datetime in 'yyyy-mm-dd hh:mm:ss' or array format
+ *    datetime in 'yyyy-mm-dd hh:mm:ss' or array format
  * @rules
- * 	what should be changed
- *	E.g. array('hour' => 10) will add 10 hours to the datetime
- *	     array('minute' => -1) will deduct 1 minute from the datetime
- *	     array('mday' => 1, 'hour' => 12) will add day and an half
+ *    what should be changed
+ *   E.g. array('hour' => 10) will add 10 hours to the datetime
+ *        array('minute' => -1) will deduct 1 minute from the datetime
+ *        array('mday' => 1, 'hour' => 12) will add day and an half
  *
  * @version 11/12/2008
  * @author kenorb@gmail.com
@@ -81,9 +81,9 @@ function booking_timeslots_get_last_path_arg() {
  * i.e. _change_field_attr('field_somename', $form);
  *
  * @param $field_name (string)
- *	Name of the field in the form
+ *   Name of the field in the form
  * @param $form (array)
- *	Form to change
+ *   Form to change
  *
  * @author kenorb@gmail.com
  */
