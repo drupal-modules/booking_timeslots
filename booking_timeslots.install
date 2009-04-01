@@ -1,0 +1,12 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_install().
+ */
+function booking_timeslots_install() {
+   // Set the weight of booking_timeslots module to be one higher than calendars.
+   $weight = (int) db_result(db_query("SELECT weight FROM {system} WHERE name = 'calendar'"));
+   db_query("UPDATE {system} SET weight = %d WHERE name = 'booking_timeslots'", $weight + 1);
+}
+
