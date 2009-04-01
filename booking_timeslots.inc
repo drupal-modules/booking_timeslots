@@ -26,7 +26,7 @@ function booking_timeslots_add_time($datetime, $rules = array()) {
   foreach ($rules as $type => $how_much) {
     $arr[$type] += $how_much;
   }
-  $new_datetime = gmdate('Y-m-d H:i:s', mktime($arr['hour'], $arr['minute'], $arr['second'], $arr['month'], $arr['mday'], $arr['year']));
+  $new_datetime = date('Y-m-d H:i:s', mktime($arr['hour'], $arr['minute'], $arr['second'], $arr['month'], $arr['mday'], $arr['year']));
   return is_array($datetime) ? booking_timeslots_convert_date_to_arr($new_datetime) : $new_datetime;
 }
 
