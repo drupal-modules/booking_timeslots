@@ -1,8 +1,6 @@
 <?php
 // $Id$
 
-// author: kenorb@gmail.com
-
 /**
  * @file
  * Allows users to select an available calendar time slot to book.
@@ -13,12 +11,26 @@
  *
  */
 function booking_timeslots_menu() {
-  return array();
+  $items['admin/settings/booking_timeslots'] = array(
+    'title' => 'Booking Timeslots',
+    'description' => 'Manage booking timeslots.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('booking_timeslots_settings_form'),
+    'access arguments' => array('administer booking timeslots'),
+    'file' => 'booking_timeslots.admin.inc',
+  );
+
+  return $items;
 }
 
 
 function booking_timeslots_perm() {
-  return array('edit booking dates');
+  $permissions = array(
+    'administer booking timeslots',
+    'edit booking dates',
+  );
+  
+  return $permissions;
 }
 
 /**
@@ -41,7 +53,7 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
         }
       }
       if (!empty($datetime)) {
-        $date_after = booking_timeslots_add_time($datetime, array('hour' => 1, 'minute' => 30)); // TODO: move hardcoded time into settings page
+        $date_after = booking_timeslots_add_time($datetime, array('hour' => variable_get('booking_timeslot_interval_hours', 1), 'minute' => variable_get('booking_timeslot_interval_minutes', 30)));
         $form[$fieldname][0]['#default_value']['value2'] = $date_after;
       }
       $form['#validate'] = array('booking_timeslots_validate');
