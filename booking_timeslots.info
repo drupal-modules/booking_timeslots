@@ -1,7 +1,7 @@
 ; $Id$
 name = "Booking Timeslots"
 description = "Booking timeslots module"
-package = Bookings
+package = Date/Time
 core = 6.x
 dependencies[] = calendar
 
