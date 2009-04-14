@@ -8,7 +8,7 @@ function booking_timeslots_settings_form(&$form_state) {
 
   $form['timeslot_length'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Timeslot Length'),
+    '#title' => t('Timeslot settings'),
     '#description' => t('The default length of time of a timeslot.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
@@ -35,6 +35,18 @@ function booking_timeslots_settings_form(&$form_state) {
     '#default_value' => variable_get('booking_timeslot_length_minutes', 0),
     '#options' => $minute_options,
   );
+
+  for ($i = 1; $i < 10; $i++) {
+    $avaliable_slots[] = $i;
+  }
+
+  $form['timeslot_length']['avail_slots'] = array(
+    '#type' => 'select',
+    '#title' => t('Maximum avaliable slots'),
+    '#default_value' => variable_get('booking_timeslot_avaliable_slots', 0),
+    '#options' => $avaliable_slots,
+  );
+  
   
   $form['form_settings'] = array(
     '#type' => 'fieldset',
@@ -44,7 +56,6 @@ function booking_timeslots_settings_form(&$form_state) {
     '#collapsed' => FALSE,
   );
   
-
     $node_types = node_get_types('names'); // get content types
     $content_types = array_merge(array('' => t('<None>')), $node_types);
 
@@ -81,6 +92,7 @@ function booking_timeslots_settings_form_submit($form, &$form_state) {
   variable_set('booking_timeslot_length_minutes', $form_state['values']['minutes']);
   variable_set('booking_timeslot_form_id', $form_state['values']['ct_form_id']);
   variable_set('booking_timeslot_field_name', $form_state['values']['ct_field_name']);
+  variable_set('booking_timeslot_avaliable_slots', $form_state['values']['avail_slots']);
 
   drupal_set_message('The configuration has been saved.');
   $form_state['redirect'] = 'admin/settings/booking_timeslots';

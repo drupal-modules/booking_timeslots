@@ -15,15 +15,3 @@ If the templates will not appear under you calendar view, go to 'Theme: Informat
 
 TODO: Later those settings should be moved to some settings page.
 
-2. Edit following lines in booking_timeslots.module file:
-<code>
-function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
-    $my_form_id = 'party_node_form';
-...
-            $fieldname = 'field_party_datetime';
-...
-                $date_after = booking_timeslots_add_time($datetime,array('hour' => 1, 'minute' => 30));
-</code>
-and (a) change $my_form_id to your content type and (b) your datetime field $fieldname
-(c) and change your event time $date_after, then finish time it will be calculated automatically
-

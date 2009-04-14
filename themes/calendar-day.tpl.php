@@ -65,8 +65,10 @@
         </tr>
 
     <?php
-      define('AVAIL_SLOTS', 1); // CHANGE here to set limit if you have one or many slots available in the same time
-      define('EVENT_TIME', 1); // for HOW LONG each event should be booked (please put number of half hours, 2 = hour, 3 = hour and half, etc.)
+      define('AVAIL_SLOTS', variable_get('booking_timeslot_avaliable_slots', 1)+1); // CHANGE here to set limit if you have one or many slots available in the same time
+      $hours = ((variable_get('booking_timeslot_length_hours', 0)*60)+variable_get('booking_timeslot_length_minutes', 0))/60; // calculate how many hours have one event
+      
+      define('EVENT_TIME', ($hours/0.5)); // for HOW LONG each event should be booked (please put number of half hours, 2 = hour, 3 = hour and half, etc.)
       $slot_booked = t('Already booked');
       $slot_free = t('Book a party');
       $module_link = 'node/add/party'; // Change this to pass datetime values to the specified content type
