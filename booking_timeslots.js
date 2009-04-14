@@ -3,23 +3,20 @@ if (Drupal.jsEnabled) {
   
   $(document).ready(function() {
     // Start date
-    $("#edit-field-party-datetime-0-value-datepicker-popup-0").datepicker({ 
-	showStatus: true,
-	onSelect: function(date) { 
-	    $("#edit-field-party-datetime-0-value2-datepicker-popup-0").val(date) // TODO: change to some universal selector (XPath)
-	} 
+    $('.container-inline-date').find("input").eq(0).datepicker({ 
+        showStatus: true,
+        onSelect: function(date) { 
+            $('.container-inline-date').find("input").eq(2).val(date)
+        } 
     });
 
     // End date
-    $("#edit-field-party-datetime-0-value2-datepicker-popup-0").datepicker({ 
-	showStatus: true,
-	onSelect: function(date) { 
-	    $("#edit-field-party-datetime-0-value-datepicker-popup-0").val(date) // TODO: change to some universal selector (XPath)
-	} 
+    $('.container-inline-date').find("input").eq(2).datepicker({ 
+        showStatus: true,
+        onSelect: function(date) { 
+            $('.container-inline-date').find("input").eq(0).val(date)
+        } 
     });
-
-    $('.container-inline-date').parent().hide(); // hide input date form
-
 })
 };
 
