@@ -70,9 +70,6 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
             }
         break;
         }
-  } else {
-    $link = '/admin/settings/booking_timeslots'; // FIXME: change path to relative one (to support website prefixes)
-    drupal_set_message(t('Please choose content type on the <a href="@url">Settings page</a>.', array('@url' => $link)));
   }
 }
 
