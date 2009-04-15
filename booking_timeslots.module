@@ -41,34 +41,38 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
   if (!empty($my_form_id)) {
     module_load_include('inc', 'booking_timeslots');
     switch ($form_id) {
-      case $my_form_id.'_node_form': drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
-      if (!user_access('edit booking dates')) {
-        drupal_add_js("
-            $(document).ready(function() {
-                $('.container-inline-date').parent().hide();
-            })
-        ", 'inline'); // hide input date form
-      }
-      $fieldname = variable_get('booking_timeslot_field_name', '');
-      if (!empty($fieldname)) {
-        $last_arg = booking_timeslots_get_last_path_arg();
-        $datetime = $form[$fieldname][0]['#default_value']['value'];
-        if (!empty($last_arg)) {
-          if (booking_timeslots_valid_datetime($last_arg)) {
-            $form[$fieldname][0]['#default_value']['value'] = $datetime = $last_arg;
-          }
-        }
-        if (!empty($datetime)) {
-          $date_after = booking_timeslots_add_time($datetime, array('hour' => variable_get('booking_timeslot_interval_hours', 1), 'minute' => variable_get('booking_timeslot_interval_minutes', 30)));
-          $form[$fieldname][0]['#default_value']['value2'] = $date_after;
-        }
-        $form['#validate'] = array('booking_timeslots_validate');
+        case $my_form_id.'_node_form':
+            drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
+            if (!user_access('edit booking dates')) {
+            drupal_add_js("
+                $(document).ready(function() {
+                    $('.container-inline-date').parent().hide();
+                })
+            ", 'inline'); // hide input date form
+            }
+            $fieldname = variable_get('booking_timeslot_field_name', '');
+            if (!empty($fieldname)) {
+                $last_arg = booking_timeslots_get_last_path_arg();
+                $datetime = $form[$fieldname][0]['#default_value']['value'];
+                if (!empty($last_arg)) {
+                  if (booking_timeslots_valid_datetime($last_arg)) {
+                    $form[$fieldname][0]['#default_value']['value'] = $datetime = $last_arg;
+                  }
+                }
+                if (!empty($datetime)) {
+                  $date_after = booking_timeslots_add_time($datetime, array('hour' => variable_get('booking_timeslot_interval_hours', 1), 'minute' => variable_get('booking_timeslot_interval_minutes', 30)));
+                  $form[$fieldname][0]['#default_value']['value2'] = $date_after;
+                }
+                $form['#validate'] = array('booking_timeslots_validate');
+            } else if (user_access('administer booking timeslots')) {
+                $link = '/admin/settings/booking_timeslots'; // FIXME: change path to relative one (to support website prefixes)
+                drupal_set_message(t('Please choose the field on the <a href="@url">Settings page</a>.', array('@url' => $link)));
+            }
         break;
-      } else if (user_access('administer booking timeslots')) {
-        $link = '/admin/settings/booking_timeslots';
-        drupal_set_message(t('Please choose the field from the <a href="@url">Settings page</a>', array('@url' => $link)));
-      }
-    }
+        }
+  } else {
+    $link = '/admin/settings/booking_timeslots'; // FIXME: change path to relative one (to support website prefixes)
+    drupal_set_message(t('Please choose content type on the <a href="@url">Settings page</a>.', array('@url' => $link)));
   }
 }
 
