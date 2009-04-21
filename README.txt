@@ -1,17 +1,13 @@
 // $Id$
 
-This module is not fully finished.
-There are some pending tasks to do before there will be some official release.
+QUICK INSTALLATION:
 
-1.
-Copy theme files from theme directory into your theme folder.
-Change them as you wish.
-
-In calendar-day.tpl.php you need to change following lines:
-    define('AVAIL_SLOTS', 1); // CHANGE here to set limit if you have one or many slots available in the same time
-    define('EVENT_TIME', 1); // for HOW LONG each event should be booked (please put number of half hours, 2 = hour, 3 = hour and half, etc.)
-to define number of slots and time of each event
-If the templates will not appear under you calendar view, go to 'Theme: Information' section and rescan your files (or try to clear cache Views).
-
-TODO: Later those settings should be moved to some settings page.
+1. Enable the module.
+2. Copy theme files from booking_timeslots/theme/ to your theme directory.
+3. Create new Content Type with at least one date or datetime field (or make sure that you have already).
+4. Go to Settings Page and select your Content Type where do you have your date field and type the name of your field as well (i.e. field_datetime).
+5. Go to calendar, you should see booking timeslots.
+- If you still don't see booking timeslots, edit your Calendar View, click on 'Theme: Information' and choose 'Rescan template files'.
+- If you don't see booking timeslots, clear the cache in Performance.
+- If case if you still don't see booking timeslots, disable all external cache modules and make sure that you've done correctly everything step by step.
 
