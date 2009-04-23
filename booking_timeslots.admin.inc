@@ -66,11 +66,20 @@ function booking_timeslots_settings_form(&$form_state) {
     '#default_value' => variable_get('booking_timeslot_form_id', ''),
     '#options' => $content_types,
   );
-
+  
+  $field_list = array();
+  foreach( content_fields() as $field_name => $data )
+  {
+    if( $data['type'] == 'datetime' ) {
+      $field_list[$field_name] = $field_name;
+    }
+  }
+  
   $form['form_settings']['ct_field_name'] = array(
-    '#type' => 'textfield',
+    '#type' => 'select',
     '#title' => t('Field Name'),
     '#default_value' => variable_get('booking_timeslot_field_name', ''),
+    '#options' => $field_list,
   );
 
   $form['submit'] = array(
