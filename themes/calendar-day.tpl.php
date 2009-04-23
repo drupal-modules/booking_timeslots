@@ -71,7 +71,8 @@
       define('EVENT_TIME', ($hours/0.5)); // for HOW LONG each event should be booked (please put number of half hours, 2 = hour, 3 = hour and half, etc.)
       $slot_booked = t('Already booked');
       $slot_free = t('Book a party');
-      $module_link = 'node/add/party'; // Change this to pass datetime values to the specified content type
+      $my_form_id = variable_get('booking_timeslot_form_id', '');
+      $module_link = "node/add/$my_form_id";
 
       $booked = array();
       for ($h = 10; $h<=16; $h++) {
