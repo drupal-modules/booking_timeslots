@@ -21,7 +21,7 @@ function booking_timeslots_settings_form(&$form_state) {
   $form['timeslot_length']['hours'] = array(
     '#type' => 'select',
     '#title' => t('Hours'),
-    '#default_value' => variable_get('booking_timeslot_length_hours', 0),
+    '#default_value' => variable_get('booking_timeslot_length_hours', 1),
     '#options' => $hour_options,
   );
 
@@ -36,15 +36,16 @@ function booking_timeslots_settings_form(&$form_state) {
     '#options' => $minute_options,
   );
 
-  for ($i = 1; $i < 10; $i++) {
+  for ($i = 0; $i < 10; $i++) {
     $avaliable_slots[] = $i;
   }
 
   $form['timeslot_length']['avail_slots'] = array(
     '#type' => 'select',
     '#title' => t('Maximum avaliable slots'),
-    '#default_value' => variable_get('booking_timeslot_avaliable_slots', 0),
+    '#default_value' => variable_get('booking_timeslot_avaliable_slots', 1),
     '#options' => $avaliable_slots,
+    '#description' => t('Choose 0 to disable checking for slot availability'),
   );
   
   

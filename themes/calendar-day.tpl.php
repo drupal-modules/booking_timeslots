@@ -65,7 +65,8 @@
         </tr>
 
     <?php
-      define('AVAIL_SLOTS', variable_get('booking_timeslot_avaliable_slots', 1)+1); // CHANGE here to set limit if you have one or many slots available in the same time
+      $slots = variable_get('booking_timeslot_avaliable_slots', 0);
+      define('AVAIL_SLOTS', max(1,$slots)); // CHANGE here to set limit if you have one or many slots available in the same time
       $hours = ((variable_get('booking_timeslot_length_hours', 0)*60)+variable_get('booking_timeslot_length_minutes', 0))/60; // calculate how many hours have one event
       
       define('EVENT_TIME', ($hours/0.5)); // for HOW LONG each event should be booked (please put number of half hours, 2 = hour, 3 = hour and half, etc.)
@@ -126,7 +127,7 @@
            * Set content
            */
           for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) { // now check which slot is...
-            if (array_key_exists($slot, $booked) && $booked[$slot]>0) { // ...booked
+            if ((array_key_exists($slot, $booked)) && ($booked[$slot]>0) && ($slots != 0)) { // ...booked
               $content .= "<div class='slot_booked'>$slot_booked</div>";
             }
             else {
