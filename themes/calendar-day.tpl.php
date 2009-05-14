@@ -72,10 +72,10 @@
       define('EVENT_TIME', ($hours/0.5)); // for HOW LONG each event should be booked (please put number of half hours, 2 = hour, 3 = hour and half, etc.)
       $slot_booked = t('Already booked');
       $slot_free = t('Book now');
-      $my_forms = variable_get('booking_timeslot_forms', '');
-      $my_fields = variable_get('booking_timeslot_fields', '');
+      $my_forms = variable_get('booking_timeslot_forms', array());
+      $my_fields = variable_get('booking_timeslot_fields', array());
       $content_types = content_types();
-      if (!$my_form_id = $_SESSION['booking_timeslot_ct_'.arg(0)] && is_array($my_forms)) {
+      if ($my_form_id = $_SESSION['booking_timeslot_ct_'.arg(0)] !== FALSE) {
         foreach ($my_forms as $my_form_id => $value) {  // find associated content type with field
           foreach ($my_fields as $field_name) { // FIXME: later can be done by array_search() or something like that
             if (isset($content_types[$my_form_id]['fields'][$field_name]) && !empty($my_form_id)) { // if field exist in this content type...
