@@ -39,9 +39,10 @@
               <td id="<?php print $cell['id']; ?>" class="<?php print $cell['class']; ?>">
                 <?php print $cell['data']; ?>
                 <?php
-                  if (strpos($cell['class'], 'future')!==FALSE) {
-                    $link = str_replace('calendar-', 'calendar/', $cell['id']);
-                    print '<br /><center>' . l(t('Book a Party'), $link) . '</center>';
+                  if (strpos($cell['class'],'future')!==FALSE) {
+                    $cid = arg(0);
+                    $link = str_replace($cid.'-', $cid.'/',$cell['id']);
+                    print '<br><center>'.l(t('Book now'),$link).'</center>';
                   }
                 ?>
               </td>

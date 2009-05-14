@@ -2,7 +2,7 @@
 // $Id
 
 /**
- * Build the booking timeslots settings form.
+ *  Menu callback for the settings form.
  */
 function booking_timeslots_settings_form(&$form_state) {
 
@@ -18,7 +18,7 @@ function booking_timeslots_settings_form(&$form_state) {
     $hour_options[] = $i;
   }
 
-  $form['timeslot_length']['hours'] = array(
+  $form['timeslot_length']['booking_timeslot_length_hours'] = array(
     '#type' => 'select',
     '#title' => t('Hours'),
     '#default_value' => variable_get('booking_timeslot_length_hours', 1),
@@ -29,7 +29,7 @@ function booking_timeslots_settings_form(&$form_state) {
     $minute_options[] = $i;
   }
 
-  $form['timeslot_length']['minutes'] = array(
+  $form['timeslot_length']['booking_timeslot_length_minutes'] = array(
     '#type' => 'select',
     '#title' => t('Minutes'),
     '#default_value' => variable_get('booking_timeslot_length_minutes', 0),
@@ -40,7 +40,7 @@ function booking_timeslots_settings_form(&$form_state) {
     $avaliable_slots[] = $i;
   }
 
-  $form['timeslot_length']['avail_slots'] = array(
+  $form['timeslot_length']['booking_timeslot_avaliable_slots'] = array(
     '#type' => 'select',
     '#title' => t('Maximum avaliable slots'),
     '#default_value' => variable_get('booking_timeslot_avaliable_slots', 1),
@@ -57,53 +57,31 @@ function booking_timeslots_settings_form(&$form_state) {
     '#collapsed' => FALSE,
   );
   
-    $node_types = node_get_types('names'); // get content types
-    $content_types = array_merge(array('' => t('<None>')), $node_types);
-
-  // add node_form
-  $form['form_settings']['ct_form_id'] = array(
-    '#type' => 'select',
-    '#title' => t('Content Type'),
-    '#default_value' => variable_get('booking_timeslot_form_id', ''),
-    '#options' => $content_types,
+  $form['form_settings']['booking_timeslot_forms'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Content Types'),
+    '#default_value' => variable_get('booking_timeslot_forms', array()),
+    '#options' => node_get_types('names'),
   );
   
-  $field_list = array();
-  foreach( content_fields() as $field_name => $data )
-  {
-    if( $data['type'] == 'datetime' ) {
-      $field_list[$field_name] = $field_name;
+  if (module_exists('date')) {
+    $field_list = array();
+    foreach( content_fields() as $field_name => $data ) {
+      if( $data['type'] == 'datetime' ) {
+        $field_list[$field_name] = $field_name;
+      }
     }
+
+    $form['form_settings']['booking_timeslot_fields'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Field Names'),
+      '#default_value' => variable_get('booking_timeslot_fields', ''),
+      '#options' => $field_list,
+    );
+  } else {
+    drupal_set_message(t('Please activate %module module for fields settings.', array('%module' => 'Date')));
   }
-  
-  $form['form_settings']['ct_field_name'] = array(
-    '#type' => 'select',
-    '#title' => t('Field Name'),
-    '#default_value' => variable_get('booking_timeslot_field_name', ''),
-    '#options' => $field_list,
-  );
 
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save Configuration'),
-  );
-
-  return $form;
+  return system_settings_form($form);
 }
 
-/**
-* General submit handler for Booking Timeslots configuration form.
-*
-* Assign values to db variables.
-*
-*/
-function booking_timeslots_settings_form_submit($form, &$form_state) {
-  variable_set('booking_timeslot_length_hours', $form_state['values']['hours']);
-  variable_set('booking_timeslot_length_minutes', $form_state['values']['minutes']);
-  variable_set('booking_timeslot_form_id', $form_state['values']['ct_form_id']);
-  variable_set('booking_timeslot_field_name', $form_state['values']['ct_field_name']);
-  variable_set('booking_timeslot_avaliable_slots', $form_state['values']['avail_slots']);
-
-  drupal_set_message('The configuration has been saved.');
-  $form_state['redirect'] = 'admin/settings/booking_timeslots';
-}

@@ -52,8 +52,9 @@
              <?php print $day['datebox']; ?>
              <div class="calendar">
              <div class="inner">
-               <?php $link = str_replace('calendar-', 'calendar/', $cell['id']); ?>
-               <?php $content_slot = l(t('Book a Party'), $link); ?>
+               <?php $cid = arg(0); ?>
+               <?php $link = str_replace($cid.'-', $cid.'/',$cell['id']); ?>
+               <?php $content_slot = l(t('Book now'), $link); ?>
                <?php //var_dump($day);var_dump($cell); ?>
                <?php print array_key_exists('all_day', $day) && count($day['all_day']) ? implode($day['all_day']) : $content_slot;?>
              </div>

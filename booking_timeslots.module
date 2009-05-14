@@ -28,8 +28,8 @@ function booking_timeslots_perm() {
   $permissions = array(
     'administer booking timeslots',
     'edit booking dates',
+    'show booking dates',
   );
-  
   return $permissions;
 }
 
@@ -37,39 +37,36 @@ function booking_timeslots_perm() {
  * Implementation of hook_form_alter().
  */
 function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
-  $my_form_id = variable_get('booking_timeslot_form_id', ''); // get content type used for booking timeslots
-  if (!empty($my_form_id)) {
-    module_load_include('inc', 'booking_timeslots');
-    switch ($form_id) {
-        case $my_form_id.'_node_form':
-            drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
-            if (!user_access('edit booking dates')) {
-            drupal_add_js("
-                $(document).ready(function() {
-                    $('.container-inline-date').parent().hide();
-                })
-            ", 'inline'); // hide input date form
+  $enabled_forms = variable_get('booking_timeslot_forms', array()); // get content type used for booking timeslots
+  foreach ($enabled_forms as $my_form_id => $value) {
+    if ($form_id == $my_form_id . '_node_form') {
+      module_load_include('inc', 'booking_timeslots');
+      drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
+      if (!user_access('edit booking dates')) {
+      drupal_add_js("
+          $(document).ready(function() {
+              $('.container-inline-date').parent().hide();
+          })
+      ", 'inline'); // hide input date form
+      }
+      $fieldnames = variable_get('booking_timeslot_fields', '');
+      foreach ($fieldnames as $fieldname) {
+        if (isset($form[$fieldname])) {
+          $last_arg = booking_timeslots_get_last_path_arg(); // FIXME: any simpler way to get last arg?
+          $datetime = $form[$fieldname][0]['#default_value']['value'];
+          if (!empty($last_arg)) {
+          if (booking_timeslots_valid_datetime($last_arg)) {
+              $form[$fieldname][0]['#default_value']['value'] = $datetime = $last_arg;
             }
-            $fieldname = variable_get('booking_timeslot_field_name', '');
-            if (!empty($fieldname)) {
-                $last_arg = booking_timeslots_get_last_path_arg();
-                $datetime = $form[$fieldname][0]['#default_value']['value'];
-                if (!empty($last_arg)) {
-                  if (booking_timeslots_valid_datetime($last_arg)) {
-                    $form[$fieldname][0]['#default_value']['value'] = $datetime = $last_arg;
-                  }
-                }
-                if (!empty($datetime)) {
-                  $date_after = booking_timeslots_add_time($datetime, array('hour' => variable_get('booking_timeslot_interval_hours', 1), 'minute' => variable_get('booking_timeslot_interval_minutes', 30)));
-                  $form[$fieldname][0]['#default_value']['value2'] = $date_after;
-                }
-                $form['#validate'] = array('booking_timeslots_validate');
-            } else if (user_access('administer booking timeslots')) {
-                $link = '/admin/settings/booking_timeslots'; // FIXME: change path to relative one (to support website prefixes)
-                drupal_set_message(t('Please choose the field on the <a href="@url">Settings page</a>.', array('@url' => $link)));
-            }
-        break;
+          }
+          if (!empty($datetime)) {
+            $date_after = booking_timeslots_add_time($datetime, array('hour' => variable_get('booking_timeslot_interval_hours', 1), 'minute' => variable_get('booking_timeslot_interval_minutes', 30)));
+            $form[$fieldname][0]['#default_value']['value2'] = $date_after;
+          }
+          $form['#validate'] = array('booking_timeslots_validate');
         }
+      }
+    }
   }
 }
 
@@ -87,14 +84,4 @@ function booking_timeslots_validate($form, &$form_state) {
   /* TODO */
 }
 
-/**
- * Validate datetime
- *
- * @param $datetime
- *      datetime to check (in `yyyy-mm-dd hh-mm-ss` format)
- * @return
- *      TRUE if datetime is in valid format
- */
-function booking_timeslots_valid_datetime($datetime) {
-  return preg_match("/^([0-9]{2,4})-([0-1]?[0-9])-([0-3]?[0-9]) (?:([0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/", $datetime);
-}
+

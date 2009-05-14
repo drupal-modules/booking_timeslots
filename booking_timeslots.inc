@@ -1,11 +1,13 @@
 <?php
 // $Id$
 
-// author: kenorb@gmail.com
 
 /**
  * @file
  * Booking Timeslots Functions.
+ *
+ * @developers:
+ *   Rafal Wieczorek <kenorb@gmail.com>
  */
 
 /*
@@ -75,45 +77,15 @@ function booking_timeslots_get_last_path_arg() {
   return $arg[count($arg)-1]; // get last argument of URI path
 }
 
-/*
- * Disable selected field in the form
- * You can use this function using form_alter hook.
- * i.e. _change_field_attr('field_somename', $form);
+/**
+ * Validate datetime
  *
- * @param $field_name (string)
- *   Name of the field in the form
- * @param $form (array)
- *   Form to change
- *
- * @author kenorb@gmail.com
+ * @param $datetime
+ *      datetime to check (in `yyyy-mm-dd hh-mm-ss` format)
+ * @return
+ *      TRUE if datetime is in valid format
  */
-function _change_field_attr($field_name, &$form, $option = array('disabled' => 'disabled')) {
-  $keyname = '#attributes';
-
-  if (!isset($form[$field_name])) { // case: if field doesn't exists, put keyname in the main array
-    $form[$keyname] = $option;
-  }
-  elseif (!isset($form[$field_name]['#type']) && is_array($form[$field_name])) { // case: if type not exist, find type from inside of array
-    foreach ($form[$field_name] as $key => $value) {
-      if (is_array($form[$field_name][$key]) && isset($form[$field_name][$key]['#type'])) {
-        $curr_arr = &$form[$field_name][$key]; // set array as current
-        $type = $form[$field_name][$key]['#type'];
-        $curr_arr[$keyname] = $option;
-      }
-      elseif (is_array($form[$field_name][$key])) {
-        foreach ($form[$field_name][$key] as $key_in => $value_in) {
-          if (isset($form[$field_name][$key][$key_in]['#type'])) {
-            $curr_arr = &$form[$field_name][$key][$key_in]; // set array as current
-            $type = $form[$field_name][$key][$key_in]['#type'];
-            $curr_arr[$keyname] = $option;
-          }
-        } // end: foreach
-      } // end: else if
-    } // end: foreach
-  }
-  else {
-    $curr_arr = &$form[$field_name]; // set field array as current
-    $curr_arr[$keyname] = $option;
-  }
+function booking_timeslots_valid_datetime($datetime) {
+  return preg_match("/^([0-9]{2,4})-([0-1]?[0-9])-([0-3]?[0-9]) (?:([0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/", $datetime);
 }
 

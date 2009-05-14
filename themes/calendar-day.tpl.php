@@ -71,9 +71,21 @@
       
       define('EVENT_TIME', ($hours/0.5)); // for HOW LONG each event should be booked (please put number of half hours, 2 = hour, 3 = hour and half, etc.)
       $slot_booked = t('Already booked');
-      $slot_free = t('Book a party');
-      $my_form_id = variable_get('booking_timeslot_form_id', '');
-      $module_link = "node/add/$my_form_id";
+      $slot_free = t('Book now');
+      $my_forms = variable_get('booking_timeslot_forms', '');
+      $my_fields = variable_get('booking_timeslot_fields', '');
+      $content_types = content_types();
+      if (!$my_form_id = $_SESSION['booking_timeslot_ct_'.arg(0)] && is_array($my_forms)) {
+        foreach ($my_forms as $my_form_id => $value) {  // find associated content type with field
+          foreach ($my_fields as $field_name) { // FIXME: later can be done by array_search() or something like that
+            if (isset($content_types[$my_form_id]['fields'][$field_name]) && !empty($my_form_id)) { // if field exist in this content type...
+              $_SESSION['booking_timeslot_ct_'.arg(0)] = $my_form_id; /// associate this content type with base path for futher use
+              break 2;
+            }
+          }
+        }
+      }
+      $module_link = "node/add/" . $my_form_id;
 
       $booked = array();
       for ($h = 10; $h<=16; $h++) {
@@ -136,7 +148,7 @@
             }
           }
 
-          if (isset($_GET['show']) || user_access('edit any party content')) { // special functionality for testing purpose (add &show at the end of url)
+          if (isset($_GET['show']) || user_access('show booking dates')) { // special functionality for testing purpose (add &show at the end of url)
             $content .= isset($hour['values'][$column]) ? implode($hour['values'][$column]) : '&nbsp;'; // you can use it for debug, it will show you the events
           }
 
