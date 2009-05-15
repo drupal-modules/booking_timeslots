@@ -12,3 +12,20 @@ function booking_timeslots_install() {
    drupal_set_message(t("Configure your options on the <a href='@url'>Settings page</a>.", array('@url' => $link)));
 }
 
+/**
+ * Implementation of hook_update().
+ */
+function booking_timeslots_update_2() {
+    $old_form = variable_get('booking_timeslot_form_id', '');
+    if (!empty($old_form)) {
+        variable_set('booking_timeslot_forms', array($old_form));
+        variable_del('booking_timeslot_form_id');
+    }
+
+    $old_field = variable_get('booking_timeslot_field_name', '');
+    if (!empty($old_form)) {
+        variable_set('booking_timeslot_fields', array($old_field));
+        variable_del('booking_timeslot_field_name');
+    }
+}
+
