@@ -1,9 +1,14 @@
 <?php
-// $Id$
 
 /**
  * @file
- * Allows users to select an available calendar time slot to book.
+ *   Allows users to select an available calendar time slot to book.
+ *
+ * @version
+ *   $Id$
+ *
+ * @developers
+ *   Rafal Wieczorek <kenorb@gmail.com>
  */
 
 /**
@@ -12,11 +17,25 @@
  */
 function booking_timeslots_menu() {
   $items['admin/settings/booking_timeslots'] = array(
-    'title' => 'Booking Timeslots',
-    'description' => 'Manage booking timeslots.',
+    'title' => t('Booking Timeslots Settings'),
+    'description' => t('Manage booking timeslots.'),
+    'page callback' => 'drupal_get_form',
+    'access callback' => 'booking_timeslots_access',
+    'page arguments' => array('booking_timeslots_settings_timeslots_form'),
+    'file' => 'booking_timeslots.admin.inc',
+  );
+  $items['admin/settings/booking_timeslots/timeslots_settings'] = array(
+    'title' => t('Timeslot settings'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  ); 
+  $items['admin/settings/booking_timeslots/form_settings'] = array(
+    'title' => t('Form Settings'),
+    'description' => t('Manage form settings.'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('booking_timeslots_settings_form'),
     'access arguments' => array('administer booking timeslots'),
+    'type' => MENU_LOCAL_TASK,
     'file' => 'booking_timeslots.admin.inc',
   );
 
@@ -24,13 +43,24 @@ function booking_timeslots_menu() {
 }
 
 
+/**
+ * Implementation of hook_perm().
+ */
 function booking_timeslots_perm() {
   $permissions = array(
     'administer booking timeslots',
     'edit booking dates',
     'show booking dates',
+    'edit timeslot settings',
   );
   return $permissions;
+}
+
+/**
+ * Menu item access callback - only admin or user with proper privileges can access it
+ */
+function booking_timeslots_access() {
+  return user_access('administer booking timeslots') || user_access('edit timeslot settings');
 }
 
 /**

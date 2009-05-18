@@ -57,7 +57,12 @@
            <td class="calendar-agenda-items">
              <div class="calendar">
              <div class="inner">
-               <?php print isset($rows['all_day'][$column]) ? implode($rows['all_day'][$column]) : '&nbsp;';?>
+             <?php 
+               if (is_array($rows['all_day'][$column]) && strpos(implode($rows['all_day'][$column]), 'Available')!==FALSE) { // FIXME: http://drupal.org/node/455652#comment-1601448
+                 $notavailable = TRUE; // not available, because of whole day event
+               }
+               print isset($rows['all_day'][$column]) ? implode($rows['all_day'][$column]) : '&nbsp;';
+             ?>
              </div>
              </div>
            </td>
@@ -72,13 +77,14 @@
       define('EVENT_TIME', ($hours/0.5)); // for HOW LONG each event should be booked (please put number of half hours, 2 = hour, 3 = hour and half, etc.)
       $slot_booked = t('Already booked');
       $slot_free = t('Book now');
+      $slot_unavailable = t('Not Available');
       $my_forms = variable_get('booking_timeslot_forms', array());
       $my_fields = variable_get('booking_timeslot_fields', array());
       $content_types = content_types();
       if ($my_form_id = $_SESSION['booking_timeslot_ct_'.arg(0)] !== FALSE) {
-        foreach ($my_forms as $my_form_id => $value) {  // find associated content type with field
+        foreach ($my_forms as $my_form_key => $my_form_id) {  // find associated content type with field
           foreach ($my_fields as $field_name) { // FIXME: later can be done by array_search() or something like that
-            if (isset($content_types[$my_form_id]['fields'][$field_name]) && !empty($my_form_id)) { // if field exist in this content type...
+            if (isset($content_types[$my_form_key]['fields'][$field_name]) && !empty($my_form_key)) { // if field exist in this content type...
               $_SESSION['booking_timeslot_ct_'.arg(0)] = $my_form_id; /// associate this content type with base path for futher use
               break 2;
             }
@@ -88,7 +94,9 @@
       $module_link = "node/add/" . $my_form_id;
 
       $booked = array();
-      for ($h = 10; $h<=16; $h++) {
+      $hour_from = variable_get('booking_timeslot_hour_from', 8);
+      $hour_to = variable_get('booking_timeslot_hour_to', 18);
+      for ($h = $hour_from; $h<=$hour_to; $h++) {
         for ($half = 0; $half<= (int)($view->style_options['groupby_times'] === 'half'); $half++) { // half-hour style supported if enabled
           $hh = !$half ? $h . ':00:00' : $h . ':30:00'; // add minutes and second to the hour
           $hour = array_key_exists($hh, $rows['items']) ? $rows['items'][$hh] : array('hour' => substr($hh, 0, strlen($hh)-3), 'ampm' => ''); // prepare hour time slot
@@ -141,8 +149,9 @@
           for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) { // now check which slot is...
             if ((array_key_exists($slot, $booked)) && ($booked[$slot]>0) && ($slots != 0)) { // ...booked
               $content .= "<div class='slot_booked'>$slot_booked</div>";
-            }
-            else {
+            } elseif ($notavailable) {
+              $content .= "<div class='slot_unavailable'>$slot_unavailable</div>";
+            } else {
               $link = l($slot_free, $module_link . '/' . $rows['date'] . ' ' . $hh);
               $content .= "<div class='slot_free'>$link</div>"; // ...and which is free
             }

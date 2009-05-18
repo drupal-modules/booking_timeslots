@@ -4,7 +4,7 @@
 /**
  *  Menu callback for the settings form.
  */
-function booking_timeslots_settings_form(&$form_state) {
+function booking_timeslots_settings_timeslots_form(&$form_state) {
 
   $form['timeslot_length'] = array(
     '#type' => 'fieldset',
@@ -47,23 +47,42 @@ function booking_timeslots_settings_form(&$form_state) {
     '#options' => $avaliable_slots,
     '#description' => t('Choose 0 to disable checking for slot availability'),
   );
-  
-  
-  $form['form_settings'] = array(
+
+   $form['timeslot_length']['booking_timeslot_hour_from'] = array(
+    '#type' => 'select',
+    '#title' => t('Hour from'),
+    '#default_value' => variable_get('booking_timeslot_hour_from', 8),
+    '#options' => $hour_options,
+  );
+
+  $form['timeslot_length']['booking_timeslot_hour_to'] = array(
+    '#type' => 'select',
+    '#title' => t('Hour to'),
+    '#default_value' => variable_get('booking_timeslot_hour_to', 18),
+    '#options' => $hour_options,
+  );
+   
+   $form['#validate'][] = 'booking_timeslots_form_validate';
+
+  return system_settings_form($form);
+}
+
+function booking_timeslots_settings_form(&$form_state){
+   $form['form_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Form Settings'),
     '#description' => t('Form Settings'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
-  
+
   $form['form_settings']['booking_timeslot_forms'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Content Types'),
     '#default_value' => variable_get('booking_timeslot_forms', array()),
     '#options' => node_get_types('names'),
   );
-  
+
   if (module_exists('date')) {
     $field_list = array();
     foreach( content_fields() as $field_name => $data ) {
@@ -85,3 +104,14 @@ function booking_timeslots_settings_form(&$form_state) {
   return system_settings_form($form);
 }
 
+function booking_timeslots_form_validate($form, &$form_state){
+    $hour_from = $form['timeslot_length']['booking_timeslot_hour_from']['#value'];
+    $hour_to = $form['timeslot_length']['booking_timeslot_hour_to']['#value'];
+
+    if ($hour_from>=$hour_to){
+            form_set_error('booking_timeslot_hour_from', t('Hours from should be less than Hours to.'));
+            form_set_error('booking_timeslot_hour_to',t(' '));
+            
+    }
+
+}
