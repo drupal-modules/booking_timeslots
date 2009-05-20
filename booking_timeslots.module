@@ -68,7 +68,7 @@ function booking_timeslots_access() {
  */
 function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
   $enabled_forms = variable_get('booking_timeslot_forms', array()); // get content type used for booking timeslots
-  foreach ($enabled_forms as $my_form_id => $value) {
+  foreach ($enabled_forms as $key => $my_form_id) {
     if ($form_id == $my_form_id . '_node_form') {
       module_load_include('inc', 'booking_timeslots');
       drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
@@ -79,7 +79,7 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
           })
       ", 'inline'); // hide input date form
       }
-      $fieldnames = variable_get('booking_timeslot_fields', '');
+      $fieldnames = variable_get('booking_timeslot_fields', array());
       foreach ($fieldnames as $fieldname) {
         if (isset($form[$fieldname])) {
           $last_arg = booking_timeslots_get_last_path_arg(); // FIXME: any simpler way to get last arg?
