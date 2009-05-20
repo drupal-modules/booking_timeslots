@@ -8,8 +8,8 @@ function booking_timeslots_install() {
    // Set the weight of booking_timeslots module to be one higher than calendars.
    $weight = (int) db_result(db_query("SELECT weight FROM {system} WHERE name = 'calendar'"));
    db_query("UPDATE {system} SET weight = %d WHERE name = 'booking_timeslots'", $weight + 1);
-   $link = '/admin/settings/booking_timeslots'; // FIXME: change path to relative one (to support website prefixes)
-   drupal_set_message(t("Configure your options on the <a href='@url'>Settings page</a>.", array('@url' => $link)));
+   $link = '/'; // FIXME: change path to relative one (to support website prefixes)
+   drupal_set_message(t("Booking Timeslots module has been activated. You may wish to proceed to <a href='!url'>Settings Page</a>.", array('!url' => url('admin/settings/booking_timeslots'))));
 }
 
 /**
