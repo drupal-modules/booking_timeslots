@@ -73,11 +73,7 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
       module_load_include('inc', 'booking_timeslots');
       drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
       if (!user_access('edit booking dates')) {
-      drupal_add_js("
-          $(document).ready(function() {
-              $('.container-inline-date').parent().hide();
-          })
-      ", 'inline'); // hide input date form
+        drupal_add_js("$(document).ready(function() { $('.container-inline-date').parent().hide(); })", 'inline'); // hide input date form
       }
       $fieldnames = variable_get('booking_timeslot_fields', array());
       foreach ($fieldnames as $fieldname) {
@@ -105,6 +101,10 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
  */
 function booking_timeslots_validate($form, &$form_state) {
   module_load_include('inc', 'booking_timeslots');
+  drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
+  if (!user_access('edit booking dates')) {
+    drupal_add_js("$(document).ready(function() { $('.container-inline-date').parent().hide(); })", 'inline'); // hide input date form
+  }
   $fieldname = variable_get('booking_timeslot_field_name', '');
   $date1 = $form[$fieldname][0]['#value']['value']['date'];
   $time1 = $form[$fieldname][0]['#value']['value']['time'];
