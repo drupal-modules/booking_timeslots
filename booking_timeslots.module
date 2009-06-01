@@ -93,7 +93,7 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
             $date_after = booking_timeslots_add_time($datetime, array('hour' => variable_get('booking_timeslot_interval_hours', 1), 'minute' => variable_get('booking_timeslot_interval_minutes', 30)));
             $form[$fieldname][0]['#default_value']['value2'] = $date_after;
           }
-          $form['#validate'] = array('booking_timeslots_validate');
+          $form['#validate'][] = 'booking_timeslots_validate';
         }
       }
     }
@@ -113,5 +113,4 @@ function booking_timeslots_validate($form, &$form_state) {
   //form_set_value($form[$fieldname][0]['#value']['value2'], array('date' => $date2, 'time' => $time1), $form_state); // set the same date of end event
   /* TODO */
 }
-
 
