@@ -1,5 +1,16 @@
 <?php
-// $Id$
+
+/**
+ * @file
+ *   Installation file
+ *
+ * @version
+ *   $Id$
+ *
+ * @developers
+ *   Rafal Wieczorek <kenorb@gmail.com>
+ */
+
 
 /**
  * Implementation of hook_install().
@@ -16,6 +27,7 @@ function booking_timeslots_install() {
  * Implementation of hook_update().
  */
 function booking_timeslots_update_2() {
+    /* conversion from old to new format */
     $old_form = variable_get('booking_timeslot_form_id', '');
     if (!empty($old_form)) {
         variable_set('booking_timeslot_forms', array($old_form));

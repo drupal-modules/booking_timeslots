@@ -1,11 +1,21 @@
 <?php
-// $Id
+
+/**
+ * @file
+ *   Form settings include file
+ *
+ * @version
+ *   $Id$
+ *
+ * @developers
+ *   Rafal Wieczorek <kenorb@gmail.com>
+ */
+
 
 /**
  *  Menu callback for the settings form.
  */
 function booking_timeslots_settings_timeslots_form(&$form_state) {
-
   $form['timeslot_length'] = array(
     '#type' => 'fieldset',
     '#title' => t('Timeslot settings'),
@@ -67,6 +77,9 @@ function booking_timeslots_settings_timeslots_form(&$form_state) {
   return system_settings_form($form);
 }
 
+/**
+ *  Menu callback for the settings form.
+ */
 function booking_timeslots_settings_form(&$form_state){
    $form['form_settings'] = array(
     '#type' => 'fieldset',
@@ -90,6 +103,9 @@ function booking_timeslots_settings_form(&$form_state){
         $field_list[$field_name] = $field_name;
       }
     }
+    if (empty($field_list)) {
+      drupal_set_message(t('Please add at least one %type field.', array('%type' => 'datetime')), 'error');
+    }
 
     $form['form_settings']['booking_timeslot_fields'] = array(
       '#type' => 'checkboxes',
@@ -98,20 +114,22 @@ function booking_timeslots_settings_form(&$form_state){
       '#options' => $field_list,
     );
   } else {
-    drupal_set_message(t('Please activate %module module for fields settings.', array('%module' => 'Date')));
+    drupal_set_message(t('Please activate %module module for fields settings.', array('%module' => 'Date')), 'error');
   }
 
   return system_settings_form($form);
 }
 
+/**
+ *  Validation callback for the settings form.
+ */
 function booking_timeslots_form_validate($form, &$form_state){
-    $hour_from = $form['timeslot_length']['booking_timeslot_hour_from']['#value'];
-    $hour_to = $form['timeslot_length']['booking_timeslot_hour_to']['#value'];
+  $hour_from = $form['timeslot_length']['booking_timeslot_hour_from']['#value'];
+  $hour_to = $form['timeslot_length']['booking_timeslot_hour_to']['#value'];
 
-    if ($hour_from>=$hour_to){
-            form_set_error('booking_timeslot_hour_from', t('Hours from should be less than Hours to.'));
-            form_set_error('booking_timeslot_hour_to',t(' '));
-            
-    }
-
+  if ($hour_from>=$hour_to){
+    form_set_error('booking_timeslot_hour_from', t("Hour To should be greater than Hour From."));
+    form_set_error('booking_timeslot_hour_to',t(' '));
+  }
 }
+
