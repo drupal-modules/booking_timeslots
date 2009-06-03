@@ -70,16 +70,25 @@
         </tr>
 
     <?php
+      /* get configuration data */
+      $half_hour = ($view->style_options['groupby_times'] === 'half'); // get half-hour mode (0 - if it's hour mode, 1 - if it's half-hour mode)
       $slots = variable_get('booking_timeslot_avaliable_slots', 0);
+      $my_forms = variable_get('booking_timeslot_forms', array());
+      $my_fields = variable_get('booking_timeslot_fields', array());
+
+      /* calculate event length */
+      $hour_length = variable_get('booking_timeslot_length_hours', 1);
+      $minute_length = variable_get('booking_timeslot_length_minutes', 0);
+      $hours = $hour_length + $minute_length/60; // calculate how many hours have one event
+      define('EVENT_TIME', (bool)$half_hour ? $hours/0.5 : $hours ); // for HOW MANY SLOTS each event should be booked
+
+      /* set other constants */
       define('AVAIL_SLOTS', max(1,$slots)); // CHANGE here to set limit if you have one or many slots available in the same time
-      $hours = ((variable_get('booking_timeslot_length_hours', 0)*60)+variable_get('booking_timeslot_length_minutes', 0))/60; // calculate how many hours have one event
-      
-      define('EVENT_TIME', ($hours/0.5)); // for HOW LONG each event should be booked (please put number of half hours, 2 = hour, 3 = hour and half, etc.)
       $slot_booked = t('Already booked');
       $slot_free = t('Book now');
       $slot_unavailable = t('Not Available');
-      $my_forms = variable_get('booking_timeslot_forms', array());
-      $my_fields = variable_get('booking_timeslot_fields', array());
+
+      /* detect content type name */
       $content_types = content_types();
       if ($my_form_id = $_SESSION['booking_timeslot_ct_'.arg(0)] !== FALSE) {
         foreach ($my_forms as $my_form_key => $my_form_id) {  // find associated content type with field
@@ -97,7 +106,8 @@
       $hour_from = variable_get('booking_timeslot_hour_from', 8);
       $hour_to = variable_get('booking_timeslot_hour_to', 18);
       for ($h = $hour_from; $h<=$hour_to; $h++) {
-        for ($half = 0; $half<= (int)($view->style_options['groupby_times'] === 'half'); $half++) { // half-hour style supported if enabled
+        for ($half = 0; $half<= (int)$half_hour; $half++) { // half-hour style supported if enabled
+          strlen($h) == 1 ? $h = '0' . $h : NULL; // follow by zero if hour is in one-digit format
           $hh = !$half ? $h . ':00:00' : $h . ':30:00'; // add minutes and second to the hour
           $hour = array_key_exists($hh, $rows['items']) ? $rows['items'][$hh] : array('hour' => substr($hh, 0, strlen($hh)-3), 'ampm' => ''); // prepare hour time slot
           $content = '';
