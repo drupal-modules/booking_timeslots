@@ -41,3 +41,10 @@ function booking_timeslots_update_2() {
     }
 }
 
+/**
+ * Implementation of hook_uninstall().
+ */
+function booking_timeslots_uninstall() {
+  db_query("DELETE FROM {variable} WHERE name LIKE 'booking_timeslot_%%'");
+}
+
