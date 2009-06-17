@@ -81,6 +81,7 @@ function booking_timeslots_settings_timeslots_form(&$form_state) {
  *  Menu callback for the settings form.
  */
 function booking_timeslots_settings_form(&$form_state){
+
    $form['form_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Form Settings'),
@@ -89,18 +90,12 @@ function booking_timeslots_settings_form(&$form_state){
     '#collapsed' => FALSE,
   );
 
-  $form['form_settings']['booking_timeslot_forms'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Content Types'),
-    '#default_value' => variable_get('booking_timeslot_forms', array()),
-    '#options' => node_get_types('names'),
-  );
-
   if (module_exists('date')) {
     $field_list = array();
     foreach( content_fields() as $field_name => $data ) {
-      if( $data['type'] == 'datetime' ) {
-        $field_list[$field_name] = $field_name;
+      if( $data['type'] == 'datetime' || $data['type'] == 'date') { // TODO: 'date' field types are not tested yet
+        $field_list[$field_name] = $data['type_name'] . ' => ' . $field_name;
+        $content_types[$data['type_name']] = $data['type_name'];
       }
     }
     if (empty($field_list)) {
@@ -110,12 +105,23 @@ function booking_timeslots_settings_form(&$form_state){
     $form['form_settings']['booking_timeslot_fields'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Field Names'),
-      '#default_value' => variable_get('booking_timeslot_fields', ''),
+      '#description' => t('Select field names which are handled automatically by the module.'),
+      '#default_value' => variable_get('booking_timeslot_fields', array()),
       '#options' => $field_list,
+      '#required' => TRUE,
     );
   } else {
+    $content_types = node_get_types('names');
     drupal_set_message(t('Please activate %module module for fields settings.', array('%module' => 'Date')), 'error');
   }
+
+  $form['form_settings']['booking_timeslot_excluded_dates'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Content Types with non-available dates'),
+    '#description' => t('Optionally select content types which contain non-available dates.'),
+    '#default_value' => variable_get('booking_timeslot_excluded_dates', array()),
+    '#options' => $content_types,
+  );
 
   return system_settings_form($form);
 }

@@ -67,30 +67,28 @@ function booking_timeslots_access() {
  * Implementation of hook_form_alter().
  */
 function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
-  $enabled_forms = variable_get('booking_timeslot_forms', array()); // get content type used for booking timeslots
-  foreach ($enabled_forms as $key => $my_form_id) {
-    if ($form_id == $my_form_id . '_node_form') {
-      module_load_include('inc', 'booking_timeslots');
-      drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
-      if (!user_access('edit booking dates')) {
-        drupal_add_js("$(document).ready(function() { $('.container-inline-date').parent().hide(); })", 'inline'); // hide input date form
-      }
-      $fieldnames = variable_get('booking_timeslot_fields', array());
-      foreach ($fieldnames as $fieldname) {
-        if (isset($form[$fieldname])) {
-          $last_arg = end(arg());
-          $datetime = $form[$fieldname][0]['#default_value']['value'];
-          if (!empty($last_arg)) {
-          if (booking_timeslots_valid_datetime($last_arg)) {
-              $form[$fieldname][0]['#default_value']['value'] = $datetime = $last_arg;
-            }
+  if (strpos($form_id, '_node_form') !== FALSE) {
+    $content_type = str_replace('_node_form', '', $form_id); // convert name to plain content type name
+    $fieldnames = array_flip(variable_get('booking_timeslot_fields', array()));
+    module_load_include('inc', 'booking_timeslots');
+    drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
+    if (!user_access('edit booking dates')) {
+      drupal_add_js("$(document).ready(function() { $('.container-inline-date').parent().hide(); })", 'inline'); // hide input date form
+    }
+    foreach ($fieldnames as $fieldname => $value) {
+      if (isset($form[$fieldname])) {
+        $last_arg = end(arg());
+        $datetime = $form[$fieldname][0]['#default_value']['value'];
+        if (!empty($last_arg)) {
+        if (booking_timeslots_valid_datetime($last_arg)) {
+            $form[$fieldname][0]['#default_value']['value'] = $datetime = $last_arg;
           }
-          if (!empty($datetime)) {
-            $date_after = booking_timeslots_add_time($datetime, array('hour' => variable_get('booking_timeslot_interval_hours', 1), 'minute' => variable_get('booking_timeslot_interval_minutes', 30)));
-            $form[$fieldname][0]['#default_value']['value2'] = $date_after;
-          }
-          $form['#validate'][] = 'booking_timeslots_validate';
         }
+        if (!empty($datetime)) {
+          $date_after = booking_timeslots_add_time($datetime, array('hour' => variable_get('booking_timeslot_interval_hours', 1), 'minute' => variable_get('booking_timeslot_interval_minutes', 0)));
+          $form[$fieldname][0]['#default_value']['value2'] = $date_after;
+        }
+        $form['#validate'][] = 'booking_timeslots_validate';
       }
     }
   }
