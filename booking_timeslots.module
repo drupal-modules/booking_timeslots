@@ -78,7 +78,7 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
       $fieldnames = variable_get('booking_timeslot_fields', array());
       foreach ($fieldnames as $fieldname) {
         if (isset($form[$fieldname])) {
-          $last_arg = booking_timeslots_get_last_path_arg(); // FIXME: any simpler way to get last arg?
+          $last_arg = end(arg());
           $datetime = $form[$fieldname][0]['#default_value']['value'];
           if (!empty($last_arg)) {
           if (booking_timeslots_valid_datetime($last_arg)) {

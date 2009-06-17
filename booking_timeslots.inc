@@ -61,23 +61,6 @@ function booking_timeslots_convert_date_to_arr($datetime, $dt_sep = ' ', $d_sep 
   return $ret;
 }
 
-/*
- * Get the last argument from the path
- *
- * @version 11/12/2008
- * @author kenorb@gmail.com
- */
-function booking_timeslots_get_last_path_arg() {
-  $arg = arg(); // Default to standard argument
-
-  if (module_exists('path')) { // if path module exist, translate url from alias
-    $path = drupal_get_path_alias($_GET['q']);
-    $arg = explode('/', drupal_get_path_alias($path));
-  }
-
-  return $arg[count($arg)-1]; // get last argument of URI path
-}
-
 /**
  * Validate datetime
  *

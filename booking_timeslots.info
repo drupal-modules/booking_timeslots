@@ -5,4 +5,5 @@ package = Date/Time
 core = 6.x
 dependencies[] = calendar
 dependencies[] = content
+version = VERSION
 
