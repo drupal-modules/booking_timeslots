@@ -117,10 +117,10 @@ function booking_timeslots_settings_form(&$form_state){
 
   $form['form_settings']['booking_timeslot_excluded_dates'] = array(
     '#type' => 'checkboxes',
-    '#title' => t('Content Types with non-available dates'),
-    '#description' => t('Optionally select content types which contain non-available dates.'),
+    '#title' => t('Fields with non-available dates'),
+    '#description' => t('Select fields which contain non-available dates.'),
     '#default_value' => variable_get('booking_timeslot_excluded_dates', array()),
-    '#options' => $content_types,
+    '#options' => $field_list,
   );
 
   return system_settings_form($form);
