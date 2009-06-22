@@ -72,7 +72,12 @@
     <?php
       /* get configuration data */
       $half_hour = ($view->style_options['groupby_times'] === 'half'); // get half-hour mode (0 - if it's hour mode, 1 - if it's half-hour mode)
+      $parties_allday = count($rows['all_day']['Items']);
       $slots = variable_get('booking_timeslot_avaliable_slots', 0);
+
+      $unlimited = $slots == 0;
+
+
       $my_forms = variable_get('booking_timeslot_forms', array());
       $my_fields = variable_get('booking_timeslot_fields', array());
 
@@ -111,7 +116,7 @@
             list($date_from_unix,$date_to_unix) = array($date_to_unix,$date_from_unix); 
           }
 
-          if ($date_from_unix == $date_to_unix) {
+          if (($date_from_unix == $date_to_unix) && ($date_from == $date_to)) {
             $date_to_unix += 60*60*24; // add 24 hour
           }
 
@@ -126,7 +131,12 @@
       define('EVENT_TIME', (bool)$half_hour ? $hours/0.5 : $hours ); // for HOW MANY SLOTS each event should be booked
 
       /* set other constants */
-      define('AVAIL_SLOTS', max(1,$slots)); // CHANGE here to set limit if you have one or many slots available in the same time
+      if ($unlimited) {
+        define('AVAIL_SLOTS', 1);
+      } else {
+        if ($slots >= 2) $slots++;
+        define('AVAIL_SLOTS', max(0,max(1,max(1,$slots)-1)-$parties_allday)); // CHANGE here to set limit if you have one or many slots available in the same time
+      }
       $slot_booked = t('Already booked');
       $slot_free = t('Book now');
       $slot_unavailable = t('Not Available');
@@ -208,7 +218,7 @@
                 break;
               }
             }
-            if ((array_key_exists($slot, $booked)) && ($booked[$slot]>0) && ($slots != 0)) { // ...booked
+            if ((array_key_exists($slot, $booked)) && ($booked[$slot]>0) && (!$unlimited)) { // ...booked
               $content .= "<div class='slot_booked'>$slot_booked</div>";
             } elseif ($notavailable) {
               $content .= "<div class='slot_unavailable'>$slot_unavailable</div>";
@@ -218,9 +228,21 @@
             }
           }
 
+          if ($unlimited) {
+            for ($i=0;$i<$parties_allday;$i++) {
+              $content .= "<div class='slot_booked'>$slot_booked</div>";
+            }
+          } else {
+            for ($i=0;$i<(variable_get('booking_timeslot_avaliable_slots', 0)-AVAIL_SLOTS);$i++) {
+              $content .= "<div class='slot_booked'>$slot_booked</div>";
+            }
+          }
+
           if (isset($_GET['show']) || user_access('show booking dates')) { // special functionality for testing purpose (add &show at the end of url)
             $content .= isset($hour['values'][$column]) ? implode($hour['values'][$column]) : '&nbsp;'; // you can use it for debug, it will show you the events
           }
+
+          if (($content == '&nbsp;') || empty($content)) $content .= "<div class='slot_unavailable'>$slot_unavailable</div>";
 
           foreach ($columns as $column) {
         ?>
