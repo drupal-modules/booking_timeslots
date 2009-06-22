@@ -68,13 +68,10 @@ function booking_timeslots_access() {
  */
 function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
   if (strpos($form_id, '_node_form') !== FALSE) {
+    $booking_active = FALSE;
     $content_type = str_replace('_node_form', '', $form_id); // convert name to plain content type name
     $fieldnames = array_flip(variable_get('booking_timeslot_fields', array()));
     module_load_include('inc', 'booking_timeslots');
-    drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
-    if (!user_access('edit booking dates')) {
-      drupal_add_js("$(document).ready(function() { $('.container-inline-date').parent().hide(); })", 'inline'); // hide input date form
-    }
     foreach ($fieldnames as $fieldname => $value) {
       if (isset($form[$fieldname])) {
         $last_arg = end(arg());
@@ -89,6 +86,13 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
           $form[$fieldname][0]['#default_value']['value2'] = $date_after;
         }
         $form['#validate'][] = 'booking_timeslots_validate';
+        $booking_active = TRUE;
+      }
+    }
+    if ($booking_active) {
+      drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
+      if (!user_access('edit booking dates')) {
+        drupal_add_js("$(document).ready(function() { $('.container-inline-date').parent().hide(); })", 'inline'); // hide input date form
       }
     }
   }

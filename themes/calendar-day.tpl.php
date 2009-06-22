@@ -76,6 +76,49 @@
       $my_forms = variable_get('booking_timeslot_forms', array());
       $my_fields = variable_get('booking_timeslot_fields', array());
 
+      $exclude_dates = array_flip(variable_get('booking_timeslot_excluded_dates', array()));
+      $fields = content_fields();
+      $content_types = array();
+
+      foreach ($exclude_dates as $key => $value) {
+        if ($key == '0') {
+          unset($exclude_dates[$key]);
+          continue;
+        }
+
+        $content_types[] = $fields[$value]['type_name'];
+      }
+      $matches = array();
+      foreach ($content_types as $content_type) {
+        $q = db_query('SELECT * FROM {node} WHERE type = "'.$content_type.'";');
+        while ($row = db_fetch_array($q)) $matches[$row['nid']] = node_load(array('type' => $content_type, 'nid' => $row['nid'])); 
+      }
+      $holidays = array();
+      foreach ($matches as $node) {
+        foreach ($exclude_dates as $excluded_date) {
+          $date_from = $node->$excluded_date;
+          $date_from = $date_from[0]['value'];
+          $date_to = $node->$excluded_date;
+          $date_to = $date_to[0]['value2'];
+
+          if (empty($date_from) || empty($date_to)) 
+            continue;
+
+          $date_from_unix = strtotime($date_from . ' GMT');
+          $date_to_unix = strtotime($date_to . ' GMT');
+
+          if ($date_to_unix < $date_from_unix) {
+            list($date_from_unix,$date_to_unix) = array($date_to_unix,$date_from_unix); 
+          }
+
+          if ($date_from_unix == $date_to_unix) {
+            $date_to_unix += 60*60*24; // add 24 hour
+          }
+
+          $holidays[] = array($date_from_unix, $date_to_unix); // FIXME: Support for site's time zone instead of GMT
+        }
+      }
+
       /* calculate event length */
       $hour_length = variable_get('booking_timeslot_length_hours', 1);
       $minute_length = variable_get('booking_timeslot_length_minutes', 0);
@@ -157,6 +200,14 @@
            * Set content
            */
           for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) { // now check which slot is...
+            $date_unix = strtotime($rows['date'] . ' ' . $hh);
+            $notavailable = false;
+            foreach ($holidays as $holiday) {
+              if ($date_unix >= $holiday[0] && $date_unix < $holiday[1]) {
+                $notavailable = true;
+                break;
+              }
+            }
             if ((array_key_exists($slot, $booked)) && ($booked[$slot]>0) && ($slots != 0)) { // ...booked
               $content .= "<div class='slot_booked'>$slot_booked</div>";
             } elseif ($notavailable) {
