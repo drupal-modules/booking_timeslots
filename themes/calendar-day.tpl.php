@@ -109,8 +109,8 @@
           if (empty($date_from) || empty($date_to)) 
             continue;
 
-          $date_from_unix = strtotime($date_from . ' GMT');
-          $date_to_unix = strtotime($date_to . ' GMT');
+          $date_from_unix = strtotime($date_from . ' UTC');
+          $date_to_unix = strtotime($date_to . ' UTC');
 
           if ($date_to_unix < $date_from_unix) {
             list($date_from_unix,$date_to_unix) = array($date_to_unix,$date_from_unix); 
@@ -210,7 +210,7 @@
            * Set content
            */
           for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) { // now check which slot is...
-            $date_unix = strtotime($rows['date'] . ' ' . $hh);
+            $date_unix = strtotime($rows['date'] . ' ' . $hh . ' UTC'); // FIXME: Support for site's time zone instead of GMT
             $notavailable = false;
             foreach ($holidays as $holiday) {
               if ($date_unix >= $holiday[0] && $date_unix < $holiday[1]) {
@@ -218,6 +218,7 @@
                 break;
               }
             }
+            if ($date_unix-(60*60) <= time()) $notavailable = true;
             if ((array_key_exists($slot, $booked)) && ($booked[$slot]>0) && (!$unlimited)) { // ...booked
               $content .= "<div class='slot_booked'>$slot_booked</div>";
             } elseif ($notavailable) {
