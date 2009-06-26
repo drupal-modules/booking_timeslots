@@ -3,18 +3,22 @@ if (Drupal.jsEnabled) {
   
   $(document).ready(function() {
     // Start date
-    $('.container-inline-date').find("input").eq(0).datepicker({ 
+    input_obj = $('.container-inline-date').find("input");
+
+    if (!(input_obj.eq(0).datepicker === undefined))
+    input_obj.eq(0).datepicker({ 
         showStatus: true,
         onSelect: function(date) { 
-            $('.container-inline-date').find("input").eq(2).val(date)
+            input_obj.eq(2).val(date)
         } 
     });
 
-    // End date
-    $('.container-inline-date').find("input").eq(2).datepicker({ 
+    // Date To
+    if (!(input_obj.eq(2).datepicker === undefined))
+    input_obj.eq(2).datepicker({ 
         showStatus: true,
         onSelect: function(date) { 
-            $('.container-inline-date').find("input").eq(0).val(date)
+            input_obj.eq(0).val(date)
         } 
     });
 })
