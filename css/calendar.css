@@ -389,6 +389,7 @@ table.calendar-legend tr.even .stripe {
   border-bottom:1px solid #899daf;
 }
 
-.slot_booked {
-color: gray !important;
-}
+.slot_free { color: green !important; }
+.slot_booked { color: gray !important; }
+.slot_unavailable { color: gray !important; }
+

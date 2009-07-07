@@ -63,11 +63,14 @@ function booking_timeslots_access() {
   return user_access('administer booking timeslots') || user_access('edit timeslot settings');
 }
 
+
 /**
  * Implementation of hook_form_alter().
  */
 function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
+
   if (strpos($form_id, '_node_form') !== FALSE) {
+
     $booking_active = FALSE;
     $content_type = str_replace('_node_form', '', $form_id); // convert name to plain content type name
     $fieldnames = array_flip(variable_get('booking_timeslot_fields', array()));
@@ -99,7 +102,7 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
- * Validate callback.
+ * Form validate callback.
  */
 function booking_timeslots_validate($form, &$form_state) {
   module_load_include('inc', 'booking_timeslots');
@@ -107,12 +110,19 @@ function booking_timeslots_validate($form, &$form_state) {
   if (!user_access('edit booking dates')) {
     drupal_add_js("$(document).ready(function() { $('.container-inline-date').parent().hide(); })", 'inline'); // hide input date form
   }
-  $fieldname = variable_get('booking_timeslot_field_name', '');
-  $date1 = $form[$fieldname][0]['#value']['value']['date'];
-  $time1 = $form[$fieldname][0]['#value']['value']['time'];
-  $date2 = &$form[$fieldname][0]['#value']['value2']['date'];
-  $time2 = &$form[$fieldname][0]['#value']['value2']['time'];
-  //form_set_value($form[$fieldname][0]['#value']['value2'], array('date' => $date2, 'time' => $time1), $form_state); // set the same date of end event
-  /* TODO */
+
+  $fieldnames = array_flip(variable_get('booking_timeslot_fields', array()));
+    foreach ($fieldnames as $fieldname => $value) {
+      if (isset($form[$fieldname])) {
+        $date1 = &$form[$fieldname][0]['#value']['value']['date'];
+        $time1 = &$form[$fieldname][0]['#value']['value']['time'];
+        $date2 = &$form[$fieldname][0]['#value']['value2']['date'];
+        $time2 = &$form[$fieldname][0]['#value']['value2']['time'];
+        break;
+      }
+    }
+    if (!booking_timeslots_check_slot_availability()) {
+      form_set_error($fieldname, t('Sorry, this slot is unavailable.'));
+    }
 }
 

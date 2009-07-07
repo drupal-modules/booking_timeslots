@@ -77,58 +77,67 @@
 
       $unlimited = $slots == 0;
 
-
-      $my_forms = variable_get('booking_timeslot_forms', array());
-      $my_fields = variable_get('booking_timeslot_fields', array());
-
-      $exclude_dates = array_flip(variable_get('booking_timeslot_excluded_dates', array()));
-      $fields = content_fields();
-      $content_types = array();
-
-      foreach ($exclude_dates as $key => $value) {
-        if ($key == '0') {
-          unset($exclude_dates[$key]);
-          continue;
-        }
-
-        $content_types[] = $fields[$value]['type_name'];
-      }
-      $matches = array();
-      foreach ($content_types as $content_type) {
-        $q = db_query('SELECT * FROM {node} WHERE type = "'.$content_type.'";');
-        while ($row = db_fetch_array($q)) $matches[$row['nid']] = node_load(array('type' => $content_type, 'nid' => $row['nid'])); 
-      }
-      $holidays = array();
-      foreach ($matches as $node) {
-        foreach ($exclude_dates as $excluded_date) {
-          $date_from = $node->$excluded_date;
-          $date_from = $date_from[0]['value'];
-          $date_to = $node->$excluded_date;
-          $date_to = $date_to[0]['value2'];
-
-          if (empty($date_from) || empty($date_to)) 
-            continue;
-
-          $date_from_unix = strtotime($date_from . ' UTC');
-          $date_to_unix = strtotime($date_to . ' UTC');
-
-          if ($date_to_unix < $date_from_unix) {
-            list($date_from_unix,$date_to_unix) = array($date_to_unix,$date_from_unix); 
-          }
-
-          if (($date_from_unix == $date_to_unix) && ($date_from == $date_to)) {
-            $date_to_unix += 60*60*24; // add 24 hour
-          }
-
-          $holidays[] = array($date_from_unix, $date_to_unix); // FIXME: Support for site's time zone instead of GMT
-        }
-      }
-
       /* calculate event length */
       $hour_length = variable_get('booking_timeslot_length_hours', 1);
       $minute_length = variable_get('booking_timeslot_length_minutes', 0);
       $hours = $hour_length + $minute_length/60; // calculate how many hours have one event
       define('EVENT_TIME', (bool)$half_hour ? $hours/0.5 : $hours ); // for HOW MANY SLOTS each event should be booked
+
+      $my_forms = variable_get('booking_timeslot_forms', array());
+      $form_name = key(array_flip($my_forms));
+      $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
+      unset($my_fields[0]);
+      $my_fields = key($my_fields);
+
+      $fields = content_fields();
+
+      $non_available = array_flip(variable_get('booking_timeslot_fields', array()));
+      foreach ($non_available as $key => $value) {
+          if ($key != '0') unset($non_available[$key]);
+      }
+      $non_available = key(array_flip($non_available));
+
+      foreach (content_fields() as $key => $field) {
+         if ($field['field_name'] == $non_available) {
+           $non_available_type = $field['type_name'];
+         }
+       }
+
+      $view_type = arg(0); // get view name from uri
+      $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $form_name);
+      while ($row = db_fetch_array($q)) $matches[] = node_load(array('type' => $form_name, 'nid' => $row['nid'])); 
+
+      $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $non_available_type);
+      while ($row = db_fetch_array($q)) $matches[] = node_load(array('type' => $non_available_type, 'nid' => $row['nid'])); 
+
+      $holidays = array();
+      foreach ($matches as $node) {
+          $date_from = $node->$my_fields ? $node->$my_fields : $node->$non_available;
+          $date_from_value = $date_from[0]['value'];
+          $date_to = $node->$my_fields ? $node->$my_fields : $node->$non_available;
+          $date_to_value = $date_to[0]['value2'];
+
+          if (empty($date_from) || empty($date_to)) 
+            continue;
+
+          $date_from_unix = strtotime($date_from_value . ' ' . $date_from[0]['timezone_db']);
+          $date_to_unix = strtotime($date_to_value . ' ' . $date_to[0]['timezone_db']);
+
+          if ($node->type == $form_name) { 
+            $date_to_unix = $date_from_unix + (EVENT_TIME+1)*60*60;
+          }
+
+          if ($date_to_unix < $date_from_unix) {
+            list($date_from_unix,$date_to_unix) = array($date_to_unix,$date_from_unix); 
+          }
+
+          if ((($date_from_unix == $date_to_unix) && ($date_from == $date_to)) || ($node->type == $non_available_type)) {
+            $date_to_unix += 60*60*24; // add 24 hour
+          }
+
+          $holidays[] = array($date_from_unix, $date_to_unix, $node);
+      }
+
 
       /* set other constants */
       if ($unlimited) {
@@ -145,12 +154,10 @@
       $content_types = content_types();
       if ($my_form_id = $_SESSION['booking_timeslot_ct_'.arg(0)] !== FALSE) {
         foreach ($my_forms as $my_form_key => $my_form_id) {  // find associated content type with field
-          foreach ($my_fields as $field_name) { // FIXME: later can be done by array_search() or something like that
-            if (isset($content_types[$my_form_key]['fields'][$field_name]) && !empty($my_form_key)) { // if field exist in this content type...
+            if (isset($content_types[$my_form_key]['fields'][$my_fields]) && !empty($my_form_key)) { // if field exist in this content type...
               $_SESSION['booking_timeslot_ct_'.arg(0)] = $my_form_id; /// associate this content type with base path for futher use
               break 2;
             }
-          }
         }
       }
       $module_link = "node/add/" . $my_form_id;
@@ -209,33 +216,46 @@
           /*
            * Set content
            */
+
+          $available_slots[$hh] = false;
           for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) { // now check which slot is...
             $date_unix = strtotime($rows['date'] . ' ' . $hh . ' UTC'); // FIXME: Support for site's time zone instead of GMT
             $notavailable = false;
+            $conflict_num = 0;
             foreach ($holidays as $holiday) {
               if ($date_unix >= $holiday[0] && $date_unix < $holiday[1]) {
-                $notavailable = true;
-                break;
+                if (($holiday[2]->type == $form_name) && ($conflict_num < AVAIL_SLOTS)) {
+                  $conflict_num++;
+                } else {
+                  $notavailable = true;
+                  $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
+                  break;
+                }
               }
             }
             if ($date_unix-(60*60) <= time()) $notavailable = true;
             if ((array_key_exists($slot, $booked)) && ($booked[$slot]>0) && (!$unlimited)) { // ...booked
               $content .= "<div class='slot_booked'>$slot_booked</div>";
+              $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
             } elseif ($notavailable) {
               $content .= "<div class='slot_unavailable'>$slot_unavailable</div>";
+              $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
             } else {
               $link = l($slot_free, $module_link . '/' . $rows['date'] . ' ' . $hh);
               $content .= "<div class='slot_free'>$link</div>"; // ...and which is free
+              $available_slots[$hh] = true;
             }
           }
 
           if ($unlimited) {
             for ($i=0;$i<$parties_allday;$i++) {
               $content .= "<div class='slot_booked'>$slot_booked</div>";
+              $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
             }
           } else {
             for ($i=0;$i<(variable_get('booking_timeslot_avaliable_slots', 0)-AVAIL_SLOTS);$i++) {
               $content .= "<div class='slot_booked'>$slot_booked</div>";
+              $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
             }
           }
 

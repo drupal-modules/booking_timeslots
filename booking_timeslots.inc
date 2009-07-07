@@ -73,3 +73,62 @@ function booking_timeslots_valid_datetime($datetime) {
   return preg_match("/^([0-9]{2,4})-([0-1]?[0-9])-([0-3]?[0-9]) (?:([0-2]?[0-9]):([0-5][0-9]):([0-5][0-9]))?$/", $datetime);
 }
 
+/**
+ * Validate datetime
+ *
+ * @param string $date
+ *      date to check (format: yyyy-mm-dd hh:mm)
+ * @return
+ *      TRUE if date is available
+ */
+function booking_timeslots_check_slot_availability($date = NULL) {
+  if (empty($date)) {
+    $date = end(arg());
+  }
+
+  list($date, $time) = split(' ', $date);
+  $rows = array(
+    'date' => $date,
+    'datebox' => '',
+    'empty' => '',
+    'link' => '',
+    'all_day' => array(),
+    'items' => array(),
+  );
+
+  $page_name = arg(2);
+
+  $timeslot_fields = variable_get('booking_timeslot_fields', array());
+
+  $slots = db_query('SELECT nid FROM {node} WHERE type = "'.$page_name.'"');
+  while ($row = db_fetch_array($slots)) {
+    $slot = node_load($row['nid']);
+    foreach ($timeslot_fields as $func_name) {
+      if (!isset($slot->$func_name)) continue;
+
+      if (strtotime($slot->{$func_name}[0]['value'] . ' UTC') == strtotime($date . ' ' . $time)) {
+        $rows['items'][$time]['values']['Items'][] = '';
+        $rows['items'][$time]['hour'] = substr($time,0,-3);
+        $rows['items'][$time]['ampm'] = '';
+      }
+    }
+  }
+
+  $q = db_query("SELECT * FROM {variable} WHERE name LIKE 'booking_timeslot_view_%%'");
+  while ($row = db_fetch_array($q)) {
+    if (unserialize($row['value']) == $page_name) {
+      $view_name = substr($row['name'],strlen('booking_timeslot_view_'));
+      break;
+    }
+  }
+
+  $view = views_get_view($view_name);
+  $columns = array(0 => 'Items');
+
+  ob_start();
+  require_once(drupal_get_path('theme', variable_get('theme_default','none')) . '/calendar-day.tpl.php');
+  ob_end_clean();
+
+  return $available_slots[$time];
+}
+

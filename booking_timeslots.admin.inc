@@ -123,6 +123,28 @@ function booking_timeslots_settings_form(&$form_state){
     '#options' => $field_list,
   );
 
+
+  $options = array();
+
+  $views = views_get_all_views();
+
+  foreach ($views as $view) {
+    if (!empty($view->disabled)) continue;
+    if (strpos($view->display['default']->display_options['style_plugin'],'calendar') !== false) {
+      $list_views[$view->name] = $view->name; 
+    }
+  }
+
+  foreach ($list_views as $key => $value) {
+    $form['form_settings']['booking_timeslot_view_' . $key] = array(
+        '#type' => 'select',
+        '#title' => t('View: %view', array('%view' => $key)),
+        '#description' => t('Select field that is assigned with the view.'),
+        '#default_value' => variable_get('booking_timeslot_view_' . $key, ''),
+        '#options' => array_merge(array('' => t('- None -')), $content_types),
+      );
+  }
+  
   return system_settings_form($form);
 }
 
