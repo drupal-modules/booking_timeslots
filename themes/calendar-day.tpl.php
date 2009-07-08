@@ -135,7 +135,7 @@
             $date_to_unix += 60*60*24; // add 24 hour
           }
 
-          $holidays[] = array($date_from_unix, $date_to_unix, $node);
+          $holidays[] = array($date_from_unix, $date_to_unix, $node, $date_from);
       }
 
 
@@ -219,7 +219,7 @@
 
           $available_slots[$hh] = false;
           for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) { // now check which slot is...
-            $date_unix = strtotime($rows['date'] . ' ' . $hh . ' UTC'); // FIXME: Support for site's time zone instead of GMT
+            $date_unix = strtotime($rows['date'] . ' ' . $hh . ' ' . $holidays[0][3][0]['timezone_db']);
             $notavailable = false;
             $conflict_num = 0;
             foreach ($holidays as $holiday) {
