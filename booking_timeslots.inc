@@ -105,8 +105,7 @@ function booking_timeslots_check_slot_availability($date = NULL) {
     $slot = node_load($row['nid']);
     foreach ($timeslot_fields as $func_name) {
       if (!isset($slot->$func_name)) continue;
-
-      if (strtotime($slot->{$func_name}[0]['value'] . ' UTC') == strtotime($date . ' ' . $time)) {
+      if (strtotime($slot->{$func_name}[0]['value'] . ' ' . $slot->{$func_name}[0]['timezone_db']) == strtotime($date . ' ' . $time)) {
         $rows['items'][$time]['values']['Items'][] = '';
         $rows['items'][$time]['hour'] = substr($time,0,-3);
         $rows['items'][$time]['ampm'] = '';
@@ -125,10 +124,17 @@ function booking_timeslots_check_slot_availability($date = NULL) {
   $view = views_get_view($view_name);
   $columns = array(0 => 'Items');
 
-  ob_start();
-  require_once(drupal_get_path('theme', variable_get('theme_default','none')) . '/calendar-day.tpl.php');
-  ob_end_clean();
+$view = (object)$view->display['calendar_period_3']->display_options;
 
-  return $available_slots[$time];
+  if (
+    ($theme_file = drupal_get_path('theme', variable_get('theme_default','none')) . '/calendar-day.tpl.php')
+    || ($theme_file = drupal_get_path('module', 'booking_timeslots' . '/themes/calendar-day.tpl.php'))
+  ) {
+    ob_start();
+    require_once($theme_file);
+    ob_end_clean();
+  }
+
+  return $available_slots ? $available_slots[$time] : TRUE;
 }
 
