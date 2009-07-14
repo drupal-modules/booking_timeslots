@@ -149,7 +149,7 @@ function booking_timeslots_settings_form(&$form_state){
 }
 
 /**
- *  Validation callback for the settings form.
+ * Form API callback to validate the settings form.
  */
 function booking_timeslots_form_validate($form, &$form_state){
   $hour_from = $form['timeslot_length']['booking_timeslot_hour_from']['#value'];

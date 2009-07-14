@@ -121,6 +121,9 @@ function booking_timeslots_validate($form, &$form_state) {
         break;
       }
     }
+
+    // TODO: validate if the slot length is equal to settings (booking_timeslot_length_hours & booking_timeslot_length_minutes)
+
     if (!booking_timeslots_check_slot_availability()) {
       form_set_error($fieldname, t('Sorry, this slot is unavailable.'));
     }

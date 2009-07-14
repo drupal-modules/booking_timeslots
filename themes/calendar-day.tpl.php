@@ -31,6 +31,7 @@
 //dsm('Display: '. $display_type .': '. $min_date_formatted .' to '. $max_date_formatted);
 //dsm($columns);
 //dsm($rows);
+
 ?>
 
 <div class="calendar-calendar">
@@ -72,6 +73,8 @@
     <?php
       /* get configuration data */
       $half_hour = ($view->style_options['groupby_times'] === 'half'); // get half-hour mode (0 - if it's hour mode, 1 - if it's half-hour mode)
+      $custom = ($view->style_options['groupby_times'] === 'custom');
+      if ($custom) $custom_hours = $view->style_options['groupby_times_custom'];
       $parties_allday = count($rows['all_day']['Items']);
       $slots = variable_get('booking_timeslot_avaliable_slots', 0);
 
@@ -81,7 +84,12 @@
       $hour_length = variable_get('booking_timeslot_length_hours', 1);
       $minute_length = variable_get('booking_timeslot_length_minutes', 0);
       $hours = $hour_length + $minute_length/60; // calculate how many hours have one event
-      define('EVENT_TIME', (bool)$half_hour ? $hours/0.5 : $hours ); // for HOW MANY SLOTS each event should be booked
+      if ($custom) {
+        define('EVENT_TIME', $hours); // for HOW MANY SLOTS each event should be booked
+      } else {
+        define('EVENT_TIME', (bool)$half_hour ? $hours/0.5 : $hours ); // for HOW MANY SLOTS each event should be booked
+      }
+
 
       $my_forms = variable_get('booking_timeslot_forms', array());
       $form_name = key(array_flip($my_forms));
@@ -105,7 +113,9 @@
 
       $view_type = arg(0); // get view name from uri
       $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $form_name);
-      while ($row = db_fetch_array($q)) $matches[] = node_load(array('type' => $form_name, 'nid' => $row['nid'])); 
+      while ($row = db_fetch_array($q)) {
+        $matches[] = node_load(array('type' => $form_name, 'nid' => $row['nid'])); 
+      }
 
       $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $non_available_type);
       while ($row = db_fetch_array($q)) $matches[] = node_load(array('type' => $non_available_type, 'nid' => $row['nid'])); 
@@ -117,15 +127,14 @@
           $date_to = $node->$my_fields ? $node->$my_fields : $node->$non_available;
           $date_to_value = $date_to[0]['value2'];
 
+
           if (empty($date_from) || empty($date_to)) 
             continue;
 
           $date_from_unix = strtotime($date_from_value . ' ' . $date_from[0]['timezone_db']);
           $date_to_unix = strtotime($date_to_value . ' ' . $date_to[0]['timezone_db']);
 
-          if ($node->type == $form_name) { 
-            $date_to_unix = $date_from_unix + (EVENT_TIME+1)*60*60;
-          }
+
 
           if ($date_to_unix < $date_from_unix) {
             list($date_from_unix,$date_to_unix) = array($date_to_unix,$date_from_unix); 
@@ -165,10 +174,19 @@
       $booked = array();
       $hour_from = variable_get('booking_timeslot_hour_from', 8);
       $hour_to = variable_get('booking_timeslot_hour_to', 18);
-      for ($h = $hour_from; $h<=$hour_to; $h++) {
-        for ($half = 0; $half<= (int)$half_hour; $half++) { // half-hour style supported if enabled
-          strlen($h) == 1 ? $h = '0' . $h : NULL; // follow by zero if hour is in one-digit format
-          $hh = !$half ? $h . ':00:00' : $h . ':30:00'; // add minutes and second to the hour
+      if ($custom) {
+        $day_hours = split(',',$custom_hours);
+      } else {
+        for ($h = $hour_from; $h<=$hour_to; $h++) {
+          for ($half = 0; $half<= (int)$half_hour; $half++) { // half-hour style supported if enabled
+            strlen($h) == 1 ? $h = '0' . $h : NULL; // follow by zero if hour is in one-digit format
+            $hh = !$half ? $h . ':00:00' : $h . ':30:00'; // add minutes and second to the hour
+            $day_hours[] = $hh;
+          }
+        }
+      }
+
+      foreach ($day_hours as $hh) {
           $hour = array_key_exists($hh, $rows['items']) ? $rows['items'][$hh] : array('hour' => substr($hh, 0, strlen($hh)-3), 'ampm' => ''); // prepare hour time slot
           $content = '';
     ?>
@@ -218,32 +236,42 @@
            */
 
           $available_slots[$hh] = false;
-          for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) { // now check which slot is...
-            $date_unix = strtotime($rows['date'] . ' ' . $hh . ' ' . $holidays[0][3][0]['timezone_db']);
-            $notavailable = false;
-            $conflict_num = 0;
-            foreach ($holidays as $holiday) {
-              if ($date_unix >= $holiday[0] && $date_unix < $holiday[1]) {
-                if (($holiday[2]->type == $form_name) && ($conflict_num < AVAIL_SLOTS)) {
-                  $conflict_num++;
-                } else {
-                  $notavailable = true;
-                  $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
-                  break;
-                }
+
+          // 0 = free
+          // 1 = booked
+          // 2 = unavailable (holidays)
+
+          $hh_conflicts[$hh] = 0;
+          foreach ($holidays as $holiday) {
+            $date_unix = strtotime($rows['date'] . ' ' . $hh);
+            if ($date_unix >= $holiday[0] && $date_unix < $holiday[1]) {
+              if ($holiday[2]->type == $form_name) {
+                $hh_conflicts[$hh]++;
+              } else {
+                for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) $slot_info[$hh][$slot] = 2;
+                break;
               }
             }
+          }
+
+          for ($i=0;$i<$hh_conflicts[$hh];$i++) { // sum up conflicts
+            $slot_info[$hh][AVAIL_SLOTS-$i-1] = 1;
+          }
+
+          for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) { // now print out the slot information
+            $booked[$slot] = FALSE;
+
             if ($date_unix-(60*60) <= time()) $notavailable = true;
-            if ((array_key_exists($slot, $booked)) && ($booked[$slot]>0) && (!$unlimited)) { // ...booked
+            if ((array_key_exists($slot, $booked)) && ($slot_info[$hh][$slot]==1) && (!$unlimited)) { // ...booked
               $content .= "<div class='slot_booked'>$slot_booked</div>";
-              $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
-            } elseif ($notavailable) {
+              $available_slots[$hh] = FALSE; // set false if not true
+            } elseif (($notavailable) || ($slot_info[$hh][$slot]==2)) {
               $content .= "<div class='slot_unavailable'>$slot_unavailable</div>";
-              $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
+              $available_slots[$hh] = FALSE; // set false if not true
             } else {
               $link = l($slot_free, $module_link . '/' . $rows['date'] . ' ' . $hh);
               $content .= "<div class='slot_free'>$link</div>"; // ...and which is free
-              $available_slots[$hh] = true;
+              $available_slots[$hh] = TRUE;
             }
           }
 
@@ -278,7 +306,6 @@
           </tr>
      <?php
         }
-      }
     ?>
       </tbody>
     </table>
