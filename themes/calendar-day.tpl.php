@@ -77,8 +77,8 @@
       if ($custom) $custom_hours = $view->style_options['groupby_times_custom'];
       $parties_allday = count($rows['all_day']['Items']);
       $slots = variable_get('booking_timeslot_avaliable_slots', 0);
-
       $unlimited = $slots == 0;
+      
 
       /* calculate event length */
       $hour_length = variable_get('booking_timeslot_length_hours', 1);
@@ -111,11 +111,16 @@
          }
        }
 
+      $matches = array();
+
       $view_type = arg(0); // get view name from uri
       $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $form_name);
       while ($row = db_fetch_array($q)) {
-        $matches[] = node_load(array('type' => $form_name, 'nid' => $row['nid'])); 
+        $temp_node = node_load(array('type' => $form_name, 'nid' => $row['nid'])); 
+        if (node_access('view',$temp_node)) $matches[] = $temp_node; 
       }
+
+
 
       $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $non_available_type);
       while ($row = db_fetch_array($q)) $matches[] = node_load(array('type' => $non_available_type, 'nid' => $row['nid'])); 
@@ -146,7 +151,6 @@
 
           $holidays[] = array($date_from_unix, $date_to_unix, $node, $date_from);
       }
-
 
       /* set other constants */
       if ($unlimited) {
@@ -242,8 +246,11 @@
           // 2 = unavailable (holidays)
 
           $hh_conflicts[$hh] = 0;
+          for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) $slot_info[$hh][$slot] = 0; // set all slots free
+
+          $date_unix = strtotime($rows['date'] . ' ' . $hh);
+
           foreach ($holidays as $holiday) {
-            $date_unix = strtotime($rows['date'] . ' ' . $hh);
             if ($date_unix >= $holiday[0] && $date_unix < $holiday[1]) {
               if ($holiday[2]->type == $form_name) {
                 $hh_conflicts[$hh]++;
@@ -254,25 +261,39 @@
             }
           }
 
-          for ($i=0;$i<$hh_conflicts[$hh];$i++) { // sum up conflicts
-            $slot_info[$hh][AVAIL_SLOTS-$i-1] = 1;
+          if ($hh_conflicts[$hh] > 0) {
+            for ($i=0;$i<$hh_conflicts[$hh];$i++) { // sum up conflicts
+              $slot_info[$hh][AVAIL_SLOTS-$i-1] = 1;
+            }
           }
 
-          for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) { // now print out the slot information
-            $booked[$slot] = FALSE;
 
-            if ($date_unix-(60*60) <= time()) $notavailable = true;
-            if ((array_key_exists($slot, $booked)) && ($slot_info[$hh][$slot]==1) && (!$unlimited)) { // ...booked
-              $content .= "<div class='slot_booked'>$slot_booked</div>";
-              $available_slots[$hh] = FALSE; // set false if not true
+          if ($date_unix-(60*60) <= time()) $notavailable = true;
+
+          $available_slots[$hh] = false;
+
+          $free = false;
+          for ($slot=0; $slot<(AVAIL_SLOTS); $slot++) { // now print out the slot information
+            $booked[$slot] = false;
+            
+            if ((array_key_exists($slot, $booked)) && ($slot_info[$hh][$slot]==1)) { // ...booked
+              if (!$unlimited) $content .= "<div class='slot_booked'>$slot_booked</div>";
+              $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
             } elseif (($notavailable) || ($slot_info[$hh][$slot]==2)) {
               $content .= "<div class='slot_unavailable'>$slot_unavailable</div>";
-              $available_slots[$hh] = FALSE; // set false if not true
+              $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
             } else {
               $link = l($slot_free, $module_link . '/' . $rows['date'] . ' ' . $hh);
               $content .= "<div class='slot_free'>$link</div>"; // ...and which is free
-              $available_slots[$hh] = TRUE;
+              $available_slots[$hh] = true;
+              $free = true;
             }
+          }
+
+          if (!$free && $unlimited) {
+            $link = l($slot_free, $module_link . '/' . $rows['date'] . ' ' . $hh);
+            $content .= "<div class='slot_free'>$link</div>"; // ...and which is free
+            $available_slots[$hh] = true;
           }
 
           if ($unlimited) {
@@ -287,14 +308,17 @@
             }
           }
 
+
           if (isset($_GET['show']) || user_access('show booking dates')) { // special functionality for testing purpose (add &show at the end of url)
             $content .= isset($hour['values'][$column]) ? implode($hour['values'][$column]) : '&nbsp;'; // you can use it for debug, it will show you the events
           }
 
           if (($content == '&nbsp;') || empty($content)) $content .= "<div class='slot_unavailable'>$slot_unavailable</div>";
 
+
           foreach ($columns as $column) {
         ?>
+
             <td class="calendar-agenda-items">
               <div class="calendar">
                 <div class="inner">
