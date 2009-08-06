@@ -98,18 +98,20 @@ function booking_timeslots_settings_form(&$form_state){
         $content_types[$data['type_name']] = $data['type_name'];
       }
     }
-    if (empty($field_list)) {
-      drupal_set_message(t('Please add at least one %type field.', array('%type' => 'datetime')), 'error');
-    }
-
     $form['form_settings']['booking_timeslot_fields'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Field Names'),
       '#description' => t('Select field names which are handled automatically by the module.'),
-      '#default_value' => variable_get('booking_timeslot_fields', array()),
+      '#default_value' => $fields = variable_get('booking_timeslot_fields', array()),
       '#options' => $field_list,
       '#required' => TRUE,
     );
+    if (empty($field_list)) {
+      drupal_set_message(t('Please add at least one %type field.', array('%type' => 'datetime')), 'error');
+    } else if (empty($fields)) {
+      drupal_set_message(t('Please select at least one date field.'), 'warning');
+    }
+  
   } else {
     $content_types = node_get_types('names');
     drupal_set_message(t('Please activate %module module for fields settings.', array('%module' => 'Date')), 'error');
@@ -144,7 +146,7 @@ function booking_timeslots_settings_form(&$form_state){
         '#options' => array_merge(array('' => t('- None -')), $content_types),
       );
   }
-  
+
   return system_settings_form($form);
 }
 

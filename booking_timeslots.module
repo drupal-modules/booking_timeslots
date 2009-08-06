@@ -16,6 +16,11 @@
  *
  */
 function booking_timeslots_menu() {
+  $items['admin/settings/booking_timeslots/timeslots_settings'] = array(
+    'title' => t('Timeslot settings'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  ); 
   $items['admin/settings/booking_timeslots'] = array(
     'title' => t('Booking Timeslots Settings'),
     'description' => t('Manage booking timeslots.'),
@@ -24,11 +29,6 @@ function booking_timeslots_menu() {
     'page arguments' => array('booking_timeslots_settings_timeslots_form'),
     'file' => 'booking_timeslots.admin.inc',
   );
-  $items['admin/settings/booking_timeslots/timeslots_settings'] = array(
-    'title' => t('Timeslot settings'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  ); 
   $items['admin/settings/booking_timeslots/form_settings'] = array(
     'title' => t('Form Settings'),
     'description' => t('Manage form settings.'),
