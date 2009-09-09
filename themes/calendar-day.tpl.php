@@ -127,9 +127,9 @@
 
       $holidays = array();
       foreach ($matches as $node) {
-          $date_from = $node->$my_fields ? $node->$my_fields : $node->$non_available;
+          $date_from = !empty($node->$my_fields) ? $node->$my_fields : (!empty($node->$non_available) ? $node->$non_available : NULL);
           $date_from_value = $date_from[0]['value'];
-          $date_to = $node->$my_fields ? $node->$my_fields : $node->$non_available;
+          $date_to = !empty($node->$my_fields) ? $node->$my_fields : (!empty($node->$non_available) ? $node->$non_available : NULL);
           $date_to_value = $date_to[0]['value2'];
 
 
