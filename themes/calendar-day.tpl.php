@@ -91,6 +91,7 @@
       }
 
 
+      module_load_include('inc', 'booking_timeslots');
       $my_forms = variable_get('booking_timeslot_forms', array());
       $form_name = key(array_flip($my_forms));
       $my_field = booking_timeslots_get_field_name();
@@ -154,7 +155,6 @@
       $slot_free = t('Book now');
       $slot_unavailable = t('Not Available');
 
-      module_load_include('inc', 'booking_timeslots');
       $module_link = booking_timeslots_get_ctype_name(NULL, TRUE); /* generate content type link */
 
       $booked = array();
