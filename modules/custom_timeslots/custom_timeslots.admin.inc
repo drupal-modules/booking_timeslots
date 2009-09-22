@@ -159,7 +159,7 @@ function custom_timeslots_schedule_table() {
       $set_end_time = node_load($nid)->field_time_to[0]['value']; /* those fields should exist in our imported content type */
       $link = booking_timeslots_get_ctype_name(arg(2), TRUE) . '/' . $set_date . ' ' . $set_time . '/' .  $set_date . ' ' . $set_end_time; /* if arg 2 provided, then change default content type */
       if ($node = custom_timeslots_check_conflict($set_date, $set_time, booking_timeslots_get_ctype_name(arg(2)))) {
-        $slot_code = node_view($node, TRUE);
+        $slot_code = node_view($node, TRUE, TRUE);
       } else {
         $slot_code = "<a href='$link'>" . $slot_title . '</a>';
       }

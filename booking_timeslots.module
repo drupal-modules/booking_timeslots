@@ -68,9 +68,7 @@ function booking_timeslots_access() {
  * Implementation of hook_form_alter().
  */
 function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
-
   if (strpos($form_id, '_node_form') !== FALSE) {
-
     $booking_active = FALSE;
     $content_type = str_replace('_node_form', '', $form_id); // convert name to plain content type name
     $fieldnames = array_flip(variable_get('booking_timeslot_fields', array()));
@@ -78,17 +76,23 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
     foreach ($fieldnames as $fieldname => $value) {
       if (isset($form[$fieldname])) {
         $last_arg = end(arg());
+        $start_date = arg(3);
+        $end_date = arg(4);
         $datetime = $form[$fieldname][0]['#default_value']['value'];
-        if (!empty($last_arg)) {
-        if (booking_timeslots_valid_datetime($last_arg)) {
-            $form[$fieldname][0]['#default_value']['value'] = $datetime = $last_arg;
+        if (!empty($start_date)) {
+        if (booking_timeslots_valid_datetime($start_date)) {
+            $form[$fieldname][0]['#default_value']['value'] = $datetime = $start_date;
           }
         }
         if (!empty($datetime)) {
           $date_after = booking_timeslots_add_time($datetime, array('hour' => variable_get('booking_timeslot_length_hours', 1), 'minute' => variable_get('booking_timeslot_length_minutes', 0)));
           $form[$fieldname][0]['#default_value']['value2'] = $date_after;
         }
+        if (booking_timeslots_valid_datetime($end_date) && !empty($end_date)) {
+          $form[$fieldname][0]['#default_value']['value2'] = $end_date;
+        }
         $form['#validate'][] = 'booking_timeslots_validate';
+        $form['buttons']['submit']['#value'] = t('Book Now');
         $booking_active = TRUE;
       }
     }
@@ -124,8 +128,10 @@ function booking_timeslots_validate($form, &$form_state) {
 
     // TODO: validate if the slot length is equal to settings (booking_timeslot_length_hours & booking_timeslot_length_minutes)
     $nid = $form['nid']['#value'];
+    /*
     if (empty($nid) && !booking_timeslots_check_slot_availability()) {
       form_set_error($fieldname, t('Sorry, this slot is unavailable.'));
     }
+    */
 }
 

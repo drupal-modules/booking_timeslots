@@ -83,6 +83,7 @@ class BookingTimeslotsUnitTest extends DrupalWebTestCase {
         break;
       }
     }
+    if (empty($view_name)) $view_name = 'party_diary';
     /* detect content type name */
     /* TODO: fix content type detection */
     $content_types = content_types();

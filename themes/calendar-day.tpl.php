@@ -93,11 +93,7 @@
 
       $my_forms = variable_get('booking_timeslot_forms', array());
       $form_name = key(array_flip($my_forms));
-      $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
-      unset($my_fields[0]);
-      $my_fields = key($my_fields);
-
-      $fields = content_fields();
+      $my_field = booking_timeslots_get_field_name();
 
       $non_available = array_flip(variable_get('booking_timeslot_fields', array()));
       foreach ($non_available as $key => $value) {
@@ -117,29 +113,24 @@
       $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $form_name);
       while ($row = db_fetch_array($q)) {
         $temp_node = node_load(array('type' => $form_name, 'nid' => $row['nid'])); 
-        if (node_access('view',$temp_node)) $matches[] = $temp_node; 
+        if (node_access('view', $temp_node)) $matches[] = $temp_node; 
       }
-
-
 
       $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $non_available_type);
       while ($row = db_fetch_array($q)) $matches[] = node_load(array('type' => $non_available_type, 'nid' => $row['nid'])); 
 
       $holidays = array();
       foreach ($matches as $node) {
-          $date_from = !empty($node->$my_fields) ? $node->$my_fields : (!empty($node->$non_available) ? $node->$non_available : NULL);
+          $date_from = !empty($node->$my_field) ? $node->$my_field : (!empty($node->$non_available) ? $node->$non_available : NULL);
           $date_from_value = $date_from[0]['value'];
-          $date_to = !empty($node->$my_fields) ? $node->$my_fields : (!empty($node->$non_available) ? $node->$non_available : NULL);
+          $date_to = !empty($node->$my_field) ? $node->$my_field : (!empty($node->$non_available) ? $node->$non_available : NULL);
           $date_to_value = $date_to[0]['value2'];
-
 
           if (empty($date_from) || empty($date_to)) 
             continue;
 
           $date_from_unix = strtotime($date_from_value . ' ' . $date_from[0]['timezone_db']);
           $date_to_unix = strtotime($date_to_value . ' ' . $date_to[0]['timezone_db']);
-
-
 
           if ($date_to_unix < $date_from_unix) {
             list($date_from_unix,$date_to_unix) = array($date_to_unix,$date_from_unix); 
@@ -163,17 +154,8 @@
       $slot_free = t('Book now');
       $slot_unavailable = t('Not Available');
 
-      /* detect content type name */
-      $content_types = content_types();
-      if ($my_form_id = $_SESSION['booking_timeslot_ct_'.arg(0)] !== FALSE) {
-        foreach ($my_forms as $my_form_key => $my_form_id) {  // find associated content type with field
-            if (isset($content_types[$my_form_key]['fields'][$my_fields]) && !empty($my_form_key)) { // if field exist in this content type...
-              $_SESSION['booking_timeslot_ct_'.arg(0)] = $my_form_id; /// associate this content type with base path for futher use
-              break 2;
-            }
-        }
-      }
-      $module_link = "node/add/" . $my_form_id;
+      module_load_include('inc', 'booking_timeslots');
+      $module_link = booking_timeslots_get_ctype_name(NULL, TRUE); /* generate content type link */
 
       $booked = array();
       $hour_from = variable_get('booking_timeslot_hour_from', 8);
