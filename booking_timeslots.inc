@@ -65,12 +65,12 @@ function booking_timeslots_convert_date_to_arr($datetime, $dt_sep = ' ', $d_sep 
  * Validate datetime
  *
  * @param $datetime
- *      datetime to check (in `yyyy-mm-dd hh-mm-ss` format)
+ *      datetime to check (in `yyyy-mm-dd hh-mm-ss` or `yyyy-mm-dd hh-mmAM/PM` format)
  * @return
  *      TRUE if datetime is in valid format
  */
 function booking_timeslots_valid_datetime($datetime) {
-  return preg_match("/^([0-9]{2,4})-([0-1]?[0-9])-([0-3]?[0-9]) (?:([0-2]?[0-9]):([0-5][0-9]):([0-5][0-9]))?$/", $datetime);
+  return preg_match("/^([0-9]{2,4})-([0-1]?[0-9])-([0-3]?[0-9]) (?:([0-2]?[0-9]):([0-5][0-9]))?(:[0-9]{2}|[AP]M)?$/", $datetime);
 }
 
 /**
@@ -124,7 +124,7 @@ function booking_timeslots_check_slot_availability($date = NULL) {
   $view = views_get_view($view_name);
   $columns = array(0 => 'Items');
 
-$view = (object)$view->display['calendar_period_3']->display_options;
+  $view = (object)$view->display['calendar_period_3']->display_options;
 
   if (
     ($theme_file = drupal_get_path('theme', variable_get('theme_default','none')) . '/calendar-day.tpl.php')
@@ -136,5 +136,53 @@ $view = (object)$view->display['calendar_period_3']->display_options;
   }
 
   return $available_slots ? $available_slots[$time] : TRUE;
+}
+
+/**
+ * Get proper content type name or link for party booking
+ *
+ * @param string $content_type
+ *      name of content type which is related to booking timeslots
+ * @param bool $link
+ *      if TRUE, result will be as node link, otherwise it will be plain name of content type
+ * @return
+ *      name of the link
+ */
+function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
+  $my_forms = variable_get('booking_timeslot_forms', array());
+  $form_name = key(array_flip($my_forms));
+  $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
+  unset($my_fields[0]);
+  $my_fields = key($my_fields);
+  /* detect content type name */
+  $content_types = content_types();
+  if ($my_form_id = $_SESSION['booking_timeslot_ct_' . arg(0)] !== FALSE) {
+    foreach ($my_forms as $my_form_key => $my_form_id) {  // find associated content type with field
+        if (isset($content_types[$my_form_key]['fields'][$my_fields]) && !empty($my_form_key)) { // if field exist in this content type...
+          $_SESSION['booking_timeslot_ct_' . arg(0)] = $my_form_id; /// associate this content type with base path for futher use
+          break 2;
+        }
+    }
+  }
+  return $link ? "node/add/" . $my_form_id : $my_form_id;
+}
+
+/**
+ * Get field name used for booking timeslots
+ *
+ * TODO:
+ *   name support for multi-fields and filter only those who are related to specified content type
+ *
+ * @param string $content_type
+ *      name of content type which is related to booking timeslots
+ * @return
+ *      name of the field
+ */
+function booking_timeslots_get_field_name($content_type = NULL) {
+  // empty($content_type) ? $content_type = booking_timeslots_get_ctype_name() : NULL; /* not used for now */
+  //       $fields = content_fields(); /* not used for now */
+  $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
+  unset($my_fields[0]);
+  return key($my_fields);
 }
 
