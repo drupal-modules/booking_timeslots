@@ -20,6 +20,7 @@ function custom_timeslots_settings_form(&$form_state) {
   $form['custom_timeslot'] = array(
     '#type' => 'fieldset',
     '#title' => t('Custom timeslot settings'),
+    '#description' => t('Following configuration is related to <a target=_blank href="!url">Schedule Table</a>', array('!url' => url('timeslot_schedule'))),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
@@ -30,6 +31,14 @@ function custom_timeslots_settings_form(&$form_state) {
       unset($content_types[$key]);
     }
   }
+
+  $form['custom_timeslot']['timeslot_schedule_row_limit'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Row limit'),
+    '#description' => t('Type the maximum number of rows in one line in schedule table.'),
+    '#default_value' => variable_get('timeslot_schedule_row_limit', 5),
+  );
+
   $form['custom_timeslot']['timeslot_schedule_grouping_ct'] = array(
     '#type' => 'select',
     '#title' => t('Content Type for slot grouping'),
@@ -51,10 +60,11 @@ function custom_timeslots_settings_form(&$form_state) {
           '#title' => $group_name . t(" (nid: %nid)", array('%nid' => $nid)),
           '#type' => 'fieldset',
           '#collapsible' => TRUE,
-          '#collapsed' => FALSE,
+          '#collapsed' => variable_get('custom_timeslot_slots_' . $nid, FALSE) !== FALSE,
         );
         $form['custom_timeslot'][$group_name]['custom_timeslot_slots_' . $nid] = array(
           '#title' => t('Available slots for group: %group_name', array('%group_name' => $group_name)),
+          '#description' => t('View: ') . l($group_name, "node/$nid"),
           '#type' => 'checkboxes',
           '#options' => ($data_slots),
           '#default_value' => variable_get('custom_timeslot_slots_' . $nid, drupal_map_assoc($data_slots)),
@@ -156,26 +166,35 @@ function custom_timeslots_schedule_table() {
   if (!$data_groups = custom_timeslots_get_grouping_names()) {
     $data_groups[] = ''; /* set empty slot if there is no grouping */
   }
+  $limit = variable_get('timeslot_schedule_row_limit', 5);
   foreach ($data_groups as $gnid => $value) { /* for each group */
-    $data = array($value); /* 1st column - group name */
     $data_slots = custom_timeslots_get_timeslots($gnid, FALSE);
     if (empty($data_slots)) { /* remove empty groups */
       unset($data_groups[$gnid]);
       continue;
     }
-    foreach ($data_slots as $nid => $slot_title) { /* for each slot */
-      $set_date = $_GET['curr_date'] ? $_GET['curr_date'] : date_format(date_create(), 'Y-m-d');
-      $set_time = node_load($nid)->field_time_from[0]['value']; /* those fields should exist in our imported content type */
-      $set_end_time = node_load($nid)->field_time_to[0]['value']; /* those fields should exist in our imported content type */
-      if ($node = custom_timeslots_check_conflict($set_date, $set_time, booking_timeslots_get_ctype_name(arg(2)))) {
-        $slot_code = theme('custom_timeslots_slot_unavailable', $node, $link, $slot_title);
-      } else {
-        $link = booking_timeslots_get_ctype_name(arg(2), TRUE) . '/' . $set_date . ' ' . $set_time . '/' .  $set_date . ' ' . $set_end_time; /* if arg 2 provided, then change default content type */
-        $slot_code = theme('custom_timeslots_slot_available', $node, $link, $slot_title);
+    $count = 0;
+    while ($count < count($data_slots)) {
+      $data = array($value); /* 1st column - group name */
+      foreach ($data_slots as $nid => $slot_title) { /* for each slot */
+        $set_date = $_GET['curr_date'] ? $_GET['curr_date'] : date_format(date_create(), 'Y-m-d');
+        $set_time = node_load($nid)->field_time_from[0]['value']; /* those fields should exist in our imported content type */
+        $set_end_time = node_load($nid)->field_time_to[0]['value']; /* those fields should exist in our imported content type */
+        if ($node = custom_timeslots_check_conflict($set_date, $set_time, booking_timeslots_get_ctype_name(arg(2)))) {
+          $slot_code = theme('custom_timeslots_slot_unavailable', $node, $link, $slot_title);
+        } else {
+          $link = booking_timeslots_get_ctype_name(arg(2), TRUE) . '/' . $set_date . ' ' . $set_time . '/' .  $set_date . ' ' . $set_end_time; /* if arg 2 provided, then change default content type */
+          $slot_code = theme('custom_timeslots_slot_available', $node, $link, $slot_title);
+        }
+        $data = array_merge($data, array($slot_code));
+        unset($data_slots[$nid]); /* remove item which was already added */
+        if (++$count >= $limit) {
+          $count = 0;
+          break; /* break the table, if limit has been reached */
+        }
       }
-      $data = array_merge($data, array($slot_code));
-    } 
-    $data_groups[$gnid] = $data;
+      $data_groups[$gnid.':'.$nid] = $data;
+    }
   }
 
   $output .= theme('table', $headers, $data_groups, array('id' => 'custom_timeslots_schedule_table', 'border' => '1'));

@@ -31,4 +31,3 @@ function theme_custom_timeslots_list_sort_form($form) {
   return $output;
 }
 
-
