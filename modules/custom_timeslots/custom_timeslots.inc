@@ -19,7 +19,9 @@ function custom_timeslots_get_grouping_names() {
   if ($grouping_ct = variable_get('timeslot_schedule_grouping_ct', array())) {
     $result = db_query("SELECT nid, title FROM {node} WHERE type = '%s'", $grouping_ct);
     while ($row = db_fetch_object($result)) {
-      $rows[$row->nid] = $row->title;
+      if (node_access('view', node_load($row->nid)) == TRUE) {
+        $rows[$row->nid] = $row->title;
+      }
     }
   }
   return $rows;
@@ -27,19 +29,49 @@ function custom_timeslots_get_grouping_names() {
 
 /**
  *  Get available time slots from custom_timeslot content type
+ *
+ * @param integer $gnid
+ *      nid of group to filter, if empty - show all slots
+ * @param bool $show_nid
+ *      if TRUE, show additional information about nid
+ * @return
+ *      return list of the slots
  */
-function custom_timeslots_get_timeslots() {
+function custom_timeslots_get_timeslots($gnid = NULL, $show_nid = FALSE, $sort = TRUE) {
   $rows = array();
+  $slot_settings = array_flip(variable_get('custom_timeslot_slots_' . $gnid, NULL));
   $result = db_query("SELECT nid FROM {node} WHERE type = '%s'", 'custom_timeslot');
   while ($row = db_fetch_object($result)) {
-    $node = node_load($row->nid);
-    $rows[$row->nid] = $node->field_time_from[0]['value'] . ' - ' . $node->field_time_to[0]['value'];
+    if (empty($gnid) || empty($slot_settings) || array_key_exists($row->nid, $slot_settings)) {
+      $node = node_load($row->nid);
+      $rows[$row->nid] = $node->field_time_from[0]['value'] . ' - ' . $node->field_time_to[0]['value'] . ($show_nid == TRUE ? t(" (nid: %nid)", array('%nid' => $row->nid)) : '');
+    }
+  }
+  if ($sort) {
+    usort($rows, 'custom_timeslots_sort_timeslots');
   }
   return $rows;
 }
 
 /**
+ *  Implementation of sort callback
+ *
+ */
+function custom_timeslots_sort_timeslots($a, $b) {
+  return (strtotime(current(explode(' ', $a))) < strtotime(current(explode(' ', $b)))) ? -1 : 1;
+}
+
+/**
  *  Check datetime conflict between input values and nodes
+ *
+ * @param string $date
+ *      date (format: yyyy-mm-dd)
+ * @param string $time
+ *      time (format: hh:mm)
+ * @param string $ctype
+ *      name of the content type
+ * @return
+ *      return node object if there is a conflict, otherwise FALSE
  */
 function custom_timeslots_check_conflict($date, $time, $ctype) {
   $res = FALSE;

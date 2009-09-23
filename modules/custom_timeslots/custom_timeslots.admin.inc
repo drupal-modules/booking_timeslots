@@ -24,25 +24,31 @@ function custom_timeslots_settings_form(&$form_state) {
     '#collapsed' => FALSE,
   );
 
+  $content_types = node_get_types('names');
+  foreach($content_types as $key => $ctname) { /* remove content types to which user doesn't have access */
+    if (!user_access("create $key content") && !user_access("edit own $key content")) {
+      unset($content_types[$key]);
+    }
+  }
   $form['custom_timeslot']['timeslot_schedule_grouping_ct'] = array(
     '#type' => 'select',
     '#title' => t('Content Type for slot grouping'),
     '#description' => t('Optionally select which content types will be using for grouping.'),
     '#default_value' => variable_get('timeslot_schedule_grouping_ct', array()),
-    '#options' => array_merge(array('' => t('- None -')), node_get_types('names')), // get content types
+    '#options' => array_merge(array('' => t('- None -')), $content_types), // get content types
   );
 
   if (variable_get('timeslot_schedule_grouping_ct', array())) {
     $data_groups = custom_timeslots_get_grouping_names();
-    $data_slots = custom_timeslots_get_timeslots(); /* 2nd level */
+    $data_slots = custom_timeslots_get_timeslots(NULL, TRUE); /* 2nd level */
     if (empty($data_groups)) {
       drupal_set_message(t('Please add at least one timeslot group!'), 'warning');
     } else if (empty($data_slots)) {
       drupal_set_message(t('Please add at least one custom timeslot!'), 'warning');
     } else {
-      foreach ($data_groups as $nid => $group_name ) {
+      foreach ($data_groups as $nid => $group_name) {
         $form['custom_timeslot'][$group_name] = array(
-          '#title' => $group_name,
+          '#title' => $group_name . t(" (nid: %nid)", array('%nid' => $nid)),
           '#type' => 'fieldset',
           '#collapsible' => TRUE,
           '#collapsed' => FALSE,
@@ -50,7 +56,7 @@ function custom_timeslots_settings_form(&$form_state) {
         $form['custom_timeslot'][$group_name]['custom_timeslot_slots_' . $nid] = array(
           '#title' => t('Available slots for group: %group_name', array('%group_name' => $group_name)),
           '#type' => 'checkboxes',
-          '#options' => drupal_map_assoc($data_slots),
+          '#options' => ($data_slots),
           '#default_value' => variable_get('custom_timeslot_slots_' . $nid, drupal_map_assoc($data_slots)),
         );
       }
@@ -150,9 +156,9 @@ function custom_timeslots_schedule_table() {
   if (!$data_groups = custom_timeslots_get_grouping_names()) {
     $data_groups[] = ''; /* set empty slot if there is no grouping */
   }
-  foreach ($data_groups as $key => $value) {
+  foreach ($data_groups as $gnid => $value) {
     $data = array($value); /* 1st column - group name */
-    $data_slots = custom_timeslots_get_timeslots(); /* FIXME: each slot to each group */
+    $data_slots = custom_timeslots_get_timeslots($gnid, FALSE);
     foreach ($data_slots as $nid => $slot_title) {
       $set_date = $_GET['curr_date'] ? $_GET['curr_date'] : date_format(date_create(), 'Y-m-d');
       $set_time = node_load($nid)->field_time_from[0]['value']; /* those fields should exist in our imported content type */
@@ -165,7 +171,7 @@ function custom_timeslots_schedule_table() {
       }
       $data = array_merge($data, array($slot_code));
     } 
-    $data_groups[$key] = $data;
+    $data_groups[$gnid] = $data;
   }
 
   $output .= theme('table', $headers, $data_groups, array('id' => 'custom_timeslots_schedule_table', 'border' => '1'));
