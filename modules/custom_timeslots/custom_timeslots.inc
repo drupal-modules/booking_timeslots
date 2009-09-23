@@ -39,7 +39,7 @@ function custom_timeslots_get_grouping_names() {
  */
 function custom_timeslots_get_timeslots($gnid = NULL, $show_nid = FALSE, $sort = TRUE) {
   $rows = array();
-  $slot_settings = array_flip(variable_get('custom_timeslot_slots_' . $gnid, NULL));
+  $slot_settings = array_flip(variable_get('custom_timeslot_slots_' . $gnid, array()));
   $result = db_query("SELECT nid FROM {node} WHERE type = '%s'", 'custom_timeslot');
   while ($row = db_fetch_object($result)) {
     if (empty($gnid) || empty($slot_settings) || array_key_exists($row->nid, $slot_settings)) {
@@ -48,7 +48,7 @@ function custom_timeslots_get_timeslots($gnid = NULL, $show_nid = FALSE, $sort =
     }
   }
   if ($sort) {
-    usort($rows, 'custom_timeslots_sort_timeslots');
+    uksort($rows, 'custom_timeslots_sort_timeslots');
   }
   return $rows;
 }

@@ -59,6 +59,25 @@ function custom_timeslots_theme() {
       'arguments' => array('form' => NULL),
       'file' => 'custom_timeslots.theme.inc',
     ),
+    'custom_timeslots_slot_available' => array(
+      'template' => 'custom-timeslots-slot-available',
+      'arguments' => array('node' => NULL, 'link' => NULL, 'title' => NULL),
+    ),
+    'custom_timeslots_slot_unavailable' => array(
+      'template' => 'custom-timeslots-slot-unavailable',
+      'arguments' => array('node' => NULL, 'link' => NULL, 'title' => NULL),
+    ),
   );
+}
+
+/**
+ * Process variables to format the custom slot.
+ *
+ * $variables contains:
+ * - $node
+ *
+ * @see custom-timeslots-slot-available.tpl.php
+ */
+function template_preprocess_custom_timeslots_slot_available(&$variables, $hook) {
 }
 

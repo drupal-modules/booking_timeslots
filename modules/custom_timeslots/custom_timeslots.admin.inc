@@ -156,18 +156,22 @@ function custom_timeslots_schedule_table() {
   if (!$data_groups = custom_timeslots_get_grouping_names()) {
     $data_groups[] = ''; /* set empty slot if there is no grouping */
   }
-  foreach ($data_groups as $gnid => $value) {
+  foreach ($data_groups as $gnid => $value) { /* for each group */
     $data = array($value); /* 1st column - group name */
     $data_slots = custom_timeslots_get_timeslots($gnid, FALSE);
-    foreach ($data_slots as $nid => $slot_title) {
+    if (empty($data_slots)) { /* remove empty groups */
+      unset($data_groups[$gnid]);
+      continue;
+    }
+    foreach ($data_slots as $nid => $slot_title) { /* for each slot */
       $set_date = $_GET['curr_date'] ? $_GET['curr_date'] : date_format(date_create(), 'Y-m-d');
       $set_time = node_load($nid)->field_time_from[0]['value']; /* those fields should exist in our imported content type */
       $set_end_time = node_load($nid)->field_time_to[0]['value']; /* those fields should exist in our imported content type */
-      $link = booking_timeslots_get_ctype_name(arg(2), TRUE) . '/' . $set_date . ' ' . $set_time . '/' .  $set_date . ' ' . $set_end_time; /* if arg 2 provided, then change default content type */
       if ($node = custom_timeslots_check_conflict($set_date, $set_time, booking_timeslots_get_ctype_name(arg(2)))) {
-        $slot_code = node_view($node, TRUE, TRUE);
+        $slot_code = theme('custom_timeslots_slot_unavailable', $node, $link, $slot_title);
       } else {
-        $slot_code = "<a href='$link'>" . $slot_title . '</a>';
+        $link = booking_timeslots_get_ctype_name(arg(2), TRUE) . '/' . $set_date . ' ' . $set_time . '/' .  $set_date . ' ' . $set_end_time; /* if arg 2 provided, then change default content type */
+        $slot_code = theme('custom_timeslots_slot_available', $node, $link, $slot_title);
       }
       $data = array_merge($data, array($slot_code));
     } 
