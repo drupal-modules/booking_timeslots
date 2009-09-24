@@ -78,6 +78,7 @@ function custom_timeslots_theme() {
  *
  * @see custom-timeslots-slot-available.tpl.php
  */
+/*
 function template_preprocess_custom_timeslots_slot_available(&$variables, $hook) {
 }
-
+ */

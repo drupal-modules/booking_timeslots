@@ -48,7 +48,7 @@ function custom_timeslots_get_timeslots($gnid = NULL, $show_nid = FALSE, $sort =
     }
   }
   if ($sort) {
-    uksort($rows, 'custom_timeslots_sort_timeslots');
+    uasort($rows, 'custom_timeslots_sort_timeslots');
   }
   return $rows;
 }

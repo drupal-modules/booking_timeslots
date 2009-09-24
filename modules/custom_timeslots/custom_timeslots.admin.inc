@@ -99,25 +99,37 @@ function custom_timeslots_schedule_node_form(&$form_state) {
   $form['timeslot_schedule'] = array(
     '#type' => 'fieldset',
     '#title' => t('Timeslot schedule'),
+    '#prefix' => t('You can change time slots from <a href="!url">configuration page</a>.', array('!url' => url('admin/settings/booking_timeslots/custom_timeslots'))),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
 
-  $form['timeslot_schedule']['timeslot_schedule_prev_date'] = array(
+  $form['timeslot_schedule']['timeslot_schedule_prev_week'] = array(
+    '#value' => t('Previous week'),
+    '#type' => 'submit',
+    //'#attributes' => array('OnClick' => 'alert(1)'),
+  );
+
+  $form['timeslot_schedule']['timeslot_schedule_prev_day'] = array(
     '#value' => t('Previous day'),
     '#type' => 'submit',
     //'#attributes' => array('OnClick' => 'alert(1)'),
   );
 
-  $form['timeslot_schedule']['timeslot_schedule_next_date'] = array(
+  $form['timeslot_schedule']['timeslot_schedule_next_day'] = array(
     '#value' => t('Next day'),
+    '#type' => 'submit',
+  );
+
+  $form['timeslot_schedule']['timeslot_schedule_next_week'] = array(
+    '#value' => t('Next week'),
     '#type' => 'submit',
   );
 
   $form['timeslot_schedule']['timeslot_schedule_date'] = array(
     '#title' => t('Date'),
     '#type' => module_exists('date_popup') ? 'date_popup' : 'date_select',
-    '#default_value' => date_format(date_create(), 'Y-m-d'), 
+    '#default_value' => $_GET['curr_date'] ? $_GET['curr_date'] : date_format(date_create(), 'Y-m-d'),
     '#date_timezone' => date_default_timezone_name(), 
     '#date_format' => date_limit_format(variable_get('date_format_short', 'm/d/Y'), array('year', 'month', 'day')), 
   );
@@ -135,15 +147,22 @@ function custom_timeslots_schedule_node_form(&$form_state) {
  */
 function custom_timeslots_schedule_node_form_submit($form, &$form_state) {
   $date = $form['#post']['timeslot_schedule_date']['date'];
-  // $date = ; // FIXME: convert date to Y-m-d format
+  $date = getdate(strtotime($date));
   switch($form_state['values']['op']) {
     case t('Previous day'):
-      // $yesterday = ; // FIXME: set previous day than it's currently in date
+      $yesterday = date('Y-m-d', mktime(0, 0, 0, $date['mon']  , $date['mday']-1, $date['year']));
       drupal_goto(arg(0), 'curr_date=' . $yesterday);
-    break;
+      break;
     case t('Next day'):
-      // $tomorrow = ; // FIXME: set next day than it's currently in date
+      $tomorrow = date('Y-m-d', mktime(0, 0, 0, $date['mon']  , $date['mday']+1, $date['year']));
       drupal_goto(arg(0), 'curr_date=' . $tomorrow);
+    case t('Previous week'):
+      $lastweek = date('Y-m-d', mktime(0, 0, 0, $date['mon']  , $date['mday']-7, $date['year']));
+      drupal_goto(arg(0), 'curr_date=' . $lastweek);
+      break;
+    case t('Next week'):
+      $nextweek = date('Y-m-d', mktime(0, 0, 0, $date['mon']  , $date['mday']+7, $date['year']));
+      drupal_goto(arg(0), 'curr_date=' . $nextweek);
     break;
     case t('Apply'):
       drupal_goto(arg(0), 'curr_date='.$date);
@@ -166,6 +185,7 @@ function custom_timeslots_schedule_table() {
   if (!$data_groups = custom_timeslots_get_grouping_names()) {
     $data_groups[] = ''; /* set empty slot if there is no grouping */
   }
+  $rows = array();
   $limit = variable_get('timeslot_schedule_row_limit', 5);
   foreach ($data_groups as $gnid => $value) { /* for each group */
     $data_slots = custom_timeslots_get_timeslots($gnid, FALSE);
@@ -193,11 +213,11 @@ function custom_timeslots_schedule_table() {
           break; /* break the table, if limit has been reached */
         }
       }
-      $data_groups[$gnid.':'.$nid] = $data;
+      $rows[$gnid.':'.$nid] = $data;
     }
   }
 
-  $output .= theme('table', $headers, $data_groups, array('id' => 'custom_timeslots_schedule_table', 'border' => '1'));
+  $output .= theme('table', $headers, $rows, array('id' => 'custom_timeslots_schedule_table', 'border' => '1'));
 
   return $output;
 }
