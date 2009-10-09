@@ -17,6 +17,12 @@
  */
 ?>
 <?php
-print "<a href='$link'>" . $title . '</a>';
+$now_date = date("Y-n-d");
+$curr_date = $_GET['curr_date'];
+if ($curr_date && $curr_date < $now_date) {
+  print $title;
+} else {
+  print "<a href='$link'>" . $title . '</a>';
+}
 ?>
 

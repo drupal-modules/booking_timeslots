@@ -75,7 +75,7 @@ function booking_timeslots_settings_timeslots_form(&$form_state) {
   $form['timeslot_length']['booking_timeslot_not_avaliable'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Weekdays which are not available for booking'),    
-    '#default_value' => variable_get('booking_timeslot_not_avaliable',''),
+    '#default_value' => variable_get('booking_timeslot_not_avaliable', array()),
     '#options' => array(
         'monday' => t('Monday'),
         'tuesday'=> t('Tuesday'),

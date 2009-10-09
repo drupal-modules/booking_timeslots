@@ -165,7 +165,7 @@ function custom_timeslots_schedule_node_form_submit($form, &$form_state) {
       drupal_goto(arg(0), 'curr_date=' . $nextweek);
     break;
     case t('Apply'):
-      drupal_goto(arg(0), 'curr_date='.$date);
+      drupal_goto(arg(0), 'curr_date=' . "{$date['year']}-{$date['mon']}-{$date['mday']}");
     break;
   }
 }
