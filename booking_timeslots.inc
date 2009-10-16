@@ -160,7 +160,7 @@ function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
     foreach ($my_forms as $my_form_key => $my_form_id) {  // find associated content type with field
         if (isset($content_types[$my_form_key]['fields'][$my_fields]) && !empty($my_form_key)) { // if field exist in this content type...
           $_SESSION['booking_timeslot_ct_' . arg(0)] = $my_form_id; /// associate this content type with base path for futher use
-          break 2;
+          break;
         }
     }
   }
