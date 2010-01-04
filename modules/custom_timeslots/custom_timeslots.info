@@ -6,4 +6,5 @@ core = 6.x
 dependencies[] = booking_timeslots
 dependencies[] = content
 dependencies[] = cck_time
+dependencies[] = install_profile_api
 
