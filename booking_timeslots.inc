@@ -182,7 +182,6 @@ function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
   $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
 
   $arg0 = arg(0);
-  var_dump($content_type_cache);
   if (!isset($content_type_cache[$arg0])) {
     $view_name = booking_timeslot_detect_view(); // get view from URL
     $field_name = booking_timeslot_detect_field_from_view($view_name); // detect field name via View
