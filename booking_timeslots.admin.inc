@@ -122,14 +122,14 @@ function booking_timeslots_settings_form(&$form_state){
       '#required' => TRUE,
     );
     if (empty($field_list)) {
-      drupal_set_message(t('Please add at least one %type field.', array('%type' => 'datetime')), 'error');
+      drupal_set_message(t('Please add at least one CCK %type field into your content type.', array('%type' => 'datetime')), 'error');
     } else if (empty($fields)) {
       drupal_set_message(t('Please select at least one date field.'), 'warning');
     }
   
   } else {
     $content_types = node_get_types('names');
-    drupal_set_message(t('Please activate %module module for fields settings.', array('%module' => 'Date')), 'error');
+    drupal_set_message(t('Please install %module module for fields settings.', array('%module' => 'Date')), 'error');
   }
 
   $form['form_settings']['booking_timeslot_excluded_dates'] = array(
@@ -145,9 +145,10 @@ function booking_timeslots_settings_form(&$form_state){
 
   $views = views_get_all_views();
 
+  $list_views = array();
   foreach ($views as $view) {
     if (!empty($view->disabled)) continue;
-    if (strpos($view->display['default']->display_options['style_plugin'],'calendar') !== false) {
+    if (strpos($view->display['default']->display_options['style_plugin'], 'calendar') !== FALSE) {
       $list_views[$view->name] = $view->name; 
     }
   }

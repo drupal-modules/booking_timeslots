@@ -96,7 +96,6 @@ function booking_timeslots_check_slot_availability($date = NULL) {
     'items' => array(),
   );
 
-  $page_name = arg(2);
 
   $timeslot_fields = variable_get('booking_timeslot_fields', array());
 
@@ -113,13 +112,7 @@ function booking_timeslots_check_slot_availability($date = NULL) {
     }
   }
 
-  $q = db_query("SELECT * FROM {variable} WHERE name LIKE 'booking_timeslot_view_%%'");
-  while ($row = db_fetch_array($q)) {
-    if (unserialize($row['value']) == $page_name) {
-      $view_name = substr($row['name'],strlen('booking_timeslot_view_'));
-      break;
-    }
-  }
+  $view_name = booking_timeslot_detect_view();
 
   $view = views_get_view($view_name);
   $columns = array(0 => 'Items');
@@ -139,6 +132,42 @@ function booking_timeslots_check_slot_availability($date = NULL) {
 }
 
 /**
+ * Detect current view from URL
+ *
+ */
+function booking_timeslot_detect_view() {
+  $view_name = arg(0);
+  // $configured = db_result(db_query("SELECT COUNT(*) FROM {variable} WHERE name LIKE 'booking_timeslot_view_%s'", $view_name)) !== FALSE;
+  return views_get_view($view_name) ? $view_name : FALSE; // FIXME: any view_exists instead of views_get_view?
+}
+
+/**
+ * Detect configured Datetime field assosiated with specified View
+ *
+ */
+function booking_timeslot_detect_field_from_view($view) {
+  $field_name = FALSE;
+  if (!is_object($view)) {
+    $view = views_get_view($view);
+  }
+  $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
+  $handler = $view->display['default'];
+  $field_args = $handler->display_options['arguments']['date_argument']['date_fields'];
+  foreach ($field_args as $field) {
+    if (strpos($field, 'field_') !== FALSE) {
+      $view_field_name = next(explode('.', $field));
+      foreach ($my_fields as $key => $field_conf) {
+        if (strpos($view_field_name, $field_conf) !== FALSE) { // check if our field is in this view
+          $field_name = $field_conf;
+          break 2;
+        }
+      }
+    }
+  }
+  return $field_name;
+}
+
+/**
  * Get proper content type name or link for party booking
  *
  * @param string $content_type
@@ -149,29 +178,34 @@ function booking_timeslots_check_slot_availability($date = NULL) {
  *      name of the link
  */
 function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
-  $my_forms = variable_get('booking_timeslot_forms', array());
-  $form_name = key(array_flip($my_forms));
+  static $content_type_cache = array();
   $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
-  unset($my_fields[0]);
-  $my_fields = key($my_fields);
-  /* detect content type name */
-  $content_types = content_types();
-  if ($my_form_id = $_SESSION['booking_timeslot_ct_' . arg(0)] !== FALSE) {
-    foreach ($my_forms as $my_form_key => $my_form_id) {  // find associated content type with field
-        if (isset($content_types[$my_form_key]['fields'][$my_fields]) && !empty($my_form_key)) { // if field exist in this content type...
-          $_SESSION['booking_timeslot_ct_' . arg(0)] = $my_form_id; /// associate this content type with base path for futher use
-          break;
-        }
-    }
+
+  $arg0 = arg(0);
+  var_dump($content_type_cache);
+  if (!isset($content_type_cache[$arg0])) {
+    $view_name = booking_timeslot_detect_view(); // get view from URL
+    $field_name = booking_timeslot_detect_field_from_view($view_name); // detect field name via View
+    $content_type = booking_timeslot_content_type_via_field($field_name); // detect content type via field name
+    $content_type_cache[$view_name] = $content_type;
+  } else {
+    $content_type = $arg0;
   }
-  return $link ? "node/add/" . $my_form_id : $my_form_id;
+
+  return $link ? "node/add/" . $content_type : $content_type;
+}
+
+/**
+ * Detect content type via field
+ *
+ */
+function booking_timeslot_content_type_via_field($field_name) {
+  $field = content_fields($field_name);
+  return $field['type_name'];
 }
 
 /**
  * Get field name used for booking timeslots
- *
- * TODO:
- *   name support for multi-fields and filter only those who are related to specified content type
  *
  * @param string $content_type
  *      name of content type which is related to booking timeslots
@@ -179,10 +213,6 @@ function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
  *      name of the field
  */
 function booking_timeslots_get_field_name($content_type = NULL) {
-  // empty($content_type) ? $content_type = booking_timeslots_get_ctype_name() : NULL; /* not used for now */
-  //       $fields = content_fields(); /* not used for now */
-  $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
-  unset($my_fields[0]);
-  return key($my_fields);
+  return booking_timeslot_detect_field_from_view(booking_timeslot_detect_view());
 }
 
