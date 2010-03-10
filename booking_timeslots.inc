@@ -191,7 +191,7 @@ function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
     $content_type = $arg0;
   }
 
-  return $link ? "node/add/" . $content_type : $content_type;
+  return $link ? "node/add/" . str_replace('_', '-', $content_type) : $content_type;
 }
 
 /**
