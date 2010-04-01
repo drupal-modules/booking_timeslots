@@ -50,10 +50,10 @@ function booking_timeslots_settings_timeslots_form(&$form_state) {
     $avaliable_slots[] = $i;
   }
 
-  $form['timeslot_length']['booking_timeslot_avaliable_slots'] = array(
+  $form['timeslot_length']['booking_timeslot_available_slots'] = array(
     '#type' => 'select',
     '#title' => t('Maximum avaliable slots'),
-    '#default_value' => variable_get('booking_timeslot_avaliable_slots', 1),
+    '#default_value' => variable_get('booking_timeslot_available_slots', 1),
     '#options' => $avaliable_slots,
     '#description' => t('Choose 0 to disable checking for slot availability'),
   );

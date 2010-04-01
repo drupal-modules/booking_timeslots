@@ -153,16 +153,20 @@ function booking_timeslot_detect_field_from_view($view) {
   $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
   $handler = $view->display['default'];
   $field_args = $handler->display_options['arguments']['date_argument']['date_fields'];
-  foreach ($field_args as $field) {
-    if (strpos($field, 'field_') !== FALSE) {
-      $view_field_name = next(explode('.', $field));
-      foreach ($my_fields as $key => $field_conf) {
-        if (strpos($view_field_name, $field_conf) !== FALSE) { // check if our field is in this view
-          $field_name = $field_conf;
-          break 2;
+  if (!empty($field_args)) {
+    foreach ($field_args as $field) {
+      if (strpos($field, 'field_') !== FALSE) {
+        $view_field_name = next(explode('.', $field));
+        foreach ($my_fields as $key => $field_conf) {
+          if (strpos($view_field_name, $field_conf) !== FALSE) { // check if our field is in this view
+            $field_name = $field_conf;
+            break 2;
+          }
         }
       }
     }
+  } else if (user_access('administer booking timeslots')) {
+    drupal_set_message(t('Booking Timeslots: Your View has missing date arguments!'));
   }
   return $field_name;
 }
