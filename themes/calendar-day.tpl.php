@@ -76,7 +76,7 @@
       $custom = ($view->style_options['groupby_times'] === 'custom');
       if ($custom) $custom_hours = $view->style_options['groupby_times_custom'];
       $parties_allday = count($rows['all_day']['Items']);
-      $slots = variable_get('booking_timeslot_avaliable_slots', 0);
+      $slots = variable_get('booking_timeslot_available_slots', 1);
       $unlimited = $slots == 0;
       
 
@@ -284,7 +284,7 @@
               $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
             }
           } else {
-            for ($i=0;$i<(variable_get('booking_timeslot_avaliable_slots', 0)-AVAIL_SLOTS);$i++) {
+            for ($i=0;$i<(variable_get('booking_timeslot_available_slots', 1)-AVAIL_SLOTS);$i++) {
               $content .= "<div class='slot_booked'>$slot_booked</div>";
               $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
             }

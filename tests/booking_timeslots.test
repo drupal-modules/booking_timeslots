@@ -69,7 +69,7 @@ class BookingTimeslotsUnitTest extends DrupalWebTestCase {
     /* set test options */
     variable_set('booking_timeslot_length_hours', 1);
     variable_set('booking_timeslot_length_minutes', 0);
-    variable_set('booking_timeslot_avaliable_slots', 1);
+    variable_set('booking_timeslot_available_slots', 1);
     variable_set('booking_timeslot_hour_from', 8);
     variable_set('booking_timeslot_hour_to', 18);
 
