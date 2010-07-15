@@ -157,7 +157,7 @@ function booking_timeslots_settings_form(&$form_state){
     $form['form_settings']['booking_timeslot_view_' . $key] = array(
         '#type' => 'select',
         '#title' => t('View: %view', array('%view' => $key)),
-        '#description' => t('Select field that is assigned with the view.'),
+        '#description' => t('Choose which content type should be associated with your calendar view.'),
         '#default_value' => variable_get('booking_timeslot_view_' . $key, ''),
         '#options' => array_merge(array('' => t('- None -')), $content_types),
       );

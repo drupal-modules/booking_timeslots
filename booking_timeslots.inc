@@ -81,54 +81,43 @@ function booking_timeslots_valid_datetime($datetime) {
  * @return
  *      TRUE if date is available
  */
-function booking_timeslots_check_slot_availability($date = NULL) {
-  if (empty($date)) {
-    $date = end(arg());
-  }
+function booking_timeslots_check_slot_availability($date, $nodeType)
+{
+    $date = new DateTime($date['year']."-".$date['month']."-".$date['day']." ".$date['hour'].":".$date['minute']);
+    $date = date_format_date($date, 'custom', 'Y-m-d H:i');
+    $timeslot_fields = variable_get('booking_timeslot_fields', array());
 
-  list($date, $time) = split(' ', $date);
-  $rows = array(
-    'date' => $date,
-    'datebox' => '',
-    'empty' => '',
-    'link' => '',
-    'all_day' => array(),
-    'items' => array(),
-  );
+    $slots = db_query('SELECT nid FROM {node} WHERE type = "%s"', $nodeType);
+    while ($row = db_fetch_array($slots))
+    {
+        $slot = node_load($row['nid']);
+        foreach ($timeslot_fields as $func_name)
+        {
+            if (!isset($slot->$func_name))
+                    continue;
 
+            $slotDate = $slot->{$func_name}[0]['value'];
+            $curTimezone = $slot->{$func_name}[0]['timezone_db'];
+            $tarTimezone = $slot->{$func_name}[0]['timezone'];
 
-  $timeslot_fields = variable_get('booking_timeslot_fields', array());
+            // converting time
+            $utc_date = date_make_date(date_format_date(new DateTime($slotDate), 'custom', 'Y-m-d H:i'), $curTimezone, DATE_DATETIME);
+            date_timezone_set($utc_date, timezone_open($tarTimezone));
+            $utc_date_string = date_format_date($utc_date, 'custom', 'Y-m-d H:i');
+            $slotDate = $utc_date_string;
 
-  $slots = db_query('SELECT nid FROM {node} WHERE type = "'.$page_name.'"');
-  while ($row = db_fetch_array($slots)) {
-    $slot = node_load($row['nid']);
-    foreach ($timeslot_fields as $func_name) {
-      if (!isset($slot->$func_name)) continue;
-      if (strtotime($slot->{$func_name}[0]['value'] . ' ' . $slot->{$func_name}[0]['timezone_db']) == strtotime($date . ' ' . $time)) {
-        $rows['items'][$time]['values']['Items'][] = '';
-        $rows['items'][$time]['hour'] = substr($time,0,-3);
-        $rows['items'][$time]['ampm'] = '';
-      }
+            if(!isset($slotMap[$slotDate]))
+                $slotMap[$slotDate] = 1;
+            else
+                $slotMap[$slotDate]++;
+        }
     }
-  }
 
-  $view_name = booking_timeslot_detect_view();
-
-  $view = views_get_view($view_name);
-  $columns = array(0 => 'Items');
-
-  $view = (object)$view->display['calendar_period_3']->display_options;
-
-  if (
-    ($theme_file = drupal_get_path('theme', variable_get('theme_default','none')) . '/calendar-day.tpl.php')
-    || ($theme_file = drupal_get_path('module', 'booking_timeslots' . '/themes/calendar-day.tpl.php'))
-  ) {
-    ob_start();
-    require_once($theme_file);
-    ob_end_clean();
-  }
-
-  return $available_slots ? $available_slots[$time] : TRUE;
+    $slots = variable_get('booking_timeslot_available_slots', 1);
+    if(isset($slotMap[$date]) || $slotMap[$date] > $slots)
+        return false;
+    
+    return true;
 }
 
 /**

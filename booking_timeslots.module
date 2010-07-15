@@ -114,24 +114,22 @@ function booking_timeslots_validate($form, &$form_state) {
   if (!user_access('edit booking dates')) {
     drupal_add_js("$(document).ready(function() { $('.container-inline-date').parent().hide(); })", 'inline'); // hide input date form
   }
-
   $fieldnames = array_flip(variable_get('booking_timeslot_fields', array()));
     foreach ($fieldnames as $fieldname => $value) {
+        
       if (isset($form[$fieldname])) {
-        $date1 = &$form[$fieldname][0]['#value']['value']['date'];
-        $time1 = &$form[$fieldname][0]['#value']['value']['time'];
-        $date2 = &$form[$fieldname][0]['#value']['value2']['date'];
-        $time2 = &$form[$fieldname][0]['#value']['value2']['time'];
+        $date1 = $form[$fieldname][0]['#value']['value'];
+        $date2 = &$form[$fieldname][0]['#value']['value2'];
         break;
       }
     }
 
     // TODO: validate if the slot length is equal to settings (booking_timeslot_length_hours & booking_timeslot_length_minutes)
     $nid = $form['nid']['#value'];
-    /*
-    if (empty($nid) && !booking_timeslots_check_slot_availability()) {
-      form_set_error($fieldname, t('Sorry, this slot is unavailable.'));
+    
+    if (empty($nid) && !booking_timeslots_check_slot_availability($date1, $form['type']['#value'])) {
+      form_set_error('code', t('Sorry, this slot is unavailable.'));
     }
-    */
+    
 }
 
