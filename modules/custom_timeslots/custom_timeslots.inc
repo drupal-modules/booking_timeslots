@@ -81,9 +81,9 @@ function custom_timeslots_check_conflict($date, $time, $ctype) {
     foreach ($rows as $key => $nid){
       $node = node_load($nid);
       $field_name = booking_timeslots_get_field_name($ctype); /* get field name */
-      $date_start = $node->{$field_name}[0]['value']; /* before timezone conversion */ // FIXME: hardcoded fields
-      $date_end = $node->{$field_name}[0]['value']; /* before timezone conversion */ // FIXME: hardcoded fields
-      $date_timezone = $node->{$field_name}[0]['timezone_db']; // FIXME: hardcoded fields
+      $date_start = $node->{$field_name}[0]['value']; /* before timezone conversion */
+      $date_end = $node->{$field_name}[0]['value']; /* before timezone conversion */
+      $date_timezone = $node->{$field_name}[0]['timezone_db'];
       $datetime_node = strtotime($date_start . ' ' . $date_timezone);
       if ($datetime_check == $datetime_node) {
         $res = $node; 
