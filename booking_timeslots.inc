@@ -204,7 +204,7 @@ function booking_timeslot_content_type_via_field($field_name) {
  * @return
  *      name of the field
  */
-function booking_timeslots_get_field_name($content_type = NULL) {
-  return booking_timeslot_detect_field_from_view(booking_timeslot_detect_view());
+function booking_timeslots_get_field_name($view_name = NULL) {
+  return booking_timeslot_detect_field_from_view($view_name ? $view_name : booking_timeslot_detect_view());
 }
 
