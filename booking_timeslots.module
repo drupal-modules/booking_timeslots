@@ -127,9 +127,8 @@ function booking_timeslots_validate($form, &$form_state) {
     // TODO: validate if the slot length is equal to settings (booking_timeslot_length_hours & booking_timeslot_length_minutes)
     $nid = $form['nid']['#value'];
     
-    if (empty($nid) && is_array($date1) && !booking_timeslots_check_slot_availability($date1, $form['type']['#value'])) {
+    if (empty($nid) && is_array($date1) && !booking_timeslots_check_slot_availability($date1, $form['type']['#value'], array($form, $form_state))) {
       form_set_error('code', t('Sorry, this slot is unavailable.'));
     }
     
 }
-

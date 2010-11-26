@@ -81,9 +81,14 @@ function booking_timeslots_valid_datetime($datetime) {
  * @return
  *      TRUE if date is available
  */
-function booking_timeslots_check_slot_availability($date, $nodeType)
-{
-    $date = new DateTime($date['year']."-".$date['month']."-".$date['day']." ".$date['hour'].":".$date['minute']);
+function booking_timeslots_check_slot_availability($date, $nodeType, $forms = NULL) {
+    try {
+      $date = new DateTime($date['year']."-".$date['month']."-".$date['day']." ".$date['hour'].":".$date['minute']);
+    } catch (Exception $e) {
+        $err = $e->getMessage();
+        drupal_set_message('php', $e->getMessage(), 'error');
+        watchdog('php', $e->getMessage() . "<br>\n" . print_r($forms, TRUE), 'error');
+    }
     $date = date_format_date($date, 'custom', 'Y-m-d H:i');
     $timeslot_fields = variable_get('booking_timeslot_fields', array());
 
