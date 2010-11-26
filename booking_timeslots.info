@@ -1,7 +1,9 @@
 ; $Id$
-name = "Booking Timeslots"
-description = "Booking timeslots module"
-package = Bookings
+name = Booking Timeslots
+description = Booking timeslots module
+package = Date/Time
 core = 6.x
 dependencies[] = calendar
+dependencies[] = content
+version = VERSION
 

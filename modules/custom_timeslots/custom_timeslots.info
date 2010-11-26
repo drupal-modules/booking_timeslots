@@ -1,0 +1,10 @@
+; $Id$
+name = Custom Timeslots
+description = Provides schedule table with custom timeslots
+package = Date/Time
+core = 6.x
+dependencies[] = booking_timeslots
+dependencies[] = content_copy
+dependencies[] = cck_time
+dependencies[] = install_profile_api
+

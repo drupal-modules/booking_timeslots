@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * @file
+ *   Installation file
+ *
+ * @version
+ *   $Id$
+ *
+ * @developers
+ *   Rafal Wieczorek <kenorb@gmail.com>
+ */
+
+
+/**
+ * Implementation of hook_install().
+ */
+function booking_timeslots_install() {
+   // Set the weight of booking_timeslots module to be one higher than calendars.
+   $weight = (int) db_result(db_query("SELECT weight FROM {system} WHERE name = 'calendar'"));
+   db_query("UPDATE {system} SET weight = %d WHERE name = 'booking_timeslots'", $weight + 1);
+   drupal_set_message(t("Booking Timeslots module has been activated. Now you should configure it on <a href='!url'>Settings Page</a>.", array('!url' => url('admin/settings/booking_timeslots/form_settings'))));
+}
+
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function booking_timeslots_uninstall() {
+  db_query("DELETE FROM {variable} WHERE name LIKE 'booking_timeslot_%%'");
+}
+
+/**
+ * Implementation of hook_update().
+ */
+function booking_timeslots_update_2() {
+    /* conversion from old to new format */
+    $old_form = variable_get('booking_timeslot_form_id', '');
+    if (!empty($old_form)) {
+        variable_set('booking_timeslot_forms', array($old_form));
+        variable_del('booking_timeslot_form_id');
+    }
+
+    $old_field = variable_get('booking_timeslot_field_name', '');
+    if (!empty($old_form)) {
+        variable_set('booking_timeslot_fields', array($old_field));
+        variable_del('booking_timeslot_field_name');
+    }
+}
+
+/**
+ * Implementation of hook_update().
+ */
+function booking_timeslots_update_3() {
+    /* conversion from old to new format */
+    variable_set('booking_timeslot_available_slots', variable_get('booking_timeslot_avaliable_slots', 1));
+    variable_del('booking_timeslot_avaliable_slots');
+}
+
