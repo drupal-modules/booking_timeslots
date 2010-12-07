@@ -81,9 +81,14 @@ function booking_timeslots_valid_datetime($datetime) {
  * @return
  *      TRUE if date is available
  */
-function booking_timeslots_check_slot_availability($date, $nodeType)
-{
-    $date = new DateTime($date['year']."-".$date['month']."-".$date['day']." ".$date['hour'].":".$date['minute']);
+function booking_timeslots_check_slot_availability($date, $nodeType, $forms = NULL) {
+    try {
+      $date = new DateTime($date['year']."-".$date['month']."-".$date['day']." ".$date['hour'].":".$date['minute']);
+    } catch (Exception $e) {
+        $err = $e->getMessage();
+        drupal_set_message('php', $e->getMessage(), 'error');
+        watchdog('php', $e->getMessage() . "<br>\n" . print_r($forms, TRUE), 'error');
+    }
     $date = date_format_date($date, 'custom', 'Y-m-d H:i');
     $timeslot_fields = variable_get('booking_timeslot_fields', array());
 
@@ -177,9 +182,12 @@ function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
   $arg0 = arg(0);
   if (!isset($content_type_cache[$arg0])) {
     $view_name = booking_timeslot_detect_view(); // get view from URL
-    $field_name = booking_timeslot_detect_field_from_view($view_name); // detect field name via View
-    $content_type = booking_timeslot_content_type_via_field($field_name); // detect content type via field name
-    $content_type_cache[$view_name] = $content_type;
+    if ($field_name = booking_timeslot_detect_field_from_view($view_name)) { // detect field name via View
+      $content_type = booking_timeslot_content_type_via_field($field_name); // detect content type via field name
+      $content_type_cache[$view_name] = $content_type;
+    } else {
+      drupal_set_message(t("Booking time slots are not properly configured for this page, please contact your site administrator!"), 'error');
+    }
   } else {
     $content_type = $arg0;
   }
@@ -204,7 +212,7 @@ function booking_timeslot_content_type_via_field($field_name) {
  * @return
  *      name of the field
  */
-function booking_timeslots_get_field_name($content_type = NULL) {
-  return booking_timeslot_detect_field_from_view(booking_timeslot_detect_view());
+function booking_timeslots_get_field_name($view_name = NULL) {
+  return booking_timeslot_detect_field_from_view($view_name ? $view_name : booking_timeslot_detect_view());
 }
 
