@@ -182,9 +182,12 @@ function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
   $arg0 = arg(0);
   if (!isset($content_type_cache[$arg0])) {
     $view_name = booking_timeslot_detect_view(); // get view from URL
-    $field_name = booking_timeslot_detect_field_from_view($view_name); // detect field name via View
-    $content_type = booking_timeslot_content_type_via_field($field_name); // detect content type via field name
-    $content_type_cache[$view_name] = $content_type;
+    if ($field_name = booking_timeslot_detect_field_from_view($view_name)) { // detect field name via View
+      $content_type = booking_timeslot_content_type_via_field($field_name); // detect content type via field name
+      $content_type_cache[$view_name] = $content_type;
+    } else {
+      drupal_set_message(t("Booking time slots are not properly configured for this page, please contact your site administrator!"), 'error');
+    }
   } else {
     $content_type = $arg0;
   }

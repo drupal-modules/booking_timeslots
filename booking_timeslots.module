@@ -42,7 +42,6 @@ function booking_timeslots_menu() {
   return $items;
 }
 
-
 /**
  * Implementation of hook_perm().
  */
@@ -122,6 +121,7 @@ function booking_timeslots_validate($form, &$form_state) {
         $date2 = &$form[$fieldname][0]['#value']['value2'];
         break;
       }
+      // Form Data: field_timeslot%5B0%5D%5Bvalue%5D%5Bdate%5D:Dec 15 2010 - 11am
     }
 
     // TODO: validate if the slot length is equal to settings (booking_timeslot_length_hours & booking_timeslot_length_minutes)
@@ -132,3 +132,21 @@ function booking_timeslots_validate($form, &$form_state) {
     }
     
 }
+
+/**
+ * Implementation of hook_theme_registry_alter().
+ * Adds our own preprocess functions to some templates.
+ */
+function drupal_tweaks_theme_registry_alter(&$items) {
+  $items['calendar_month_node']['preprocess function'][] = 'template_preprocess_drupal_tweaks_month_node';
+  $items['calendar_month_node']['include files'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+
+  $items['calendar_week_node']['preprocess function'][] = 'template_preprocess_drupal_tweaks_week_node';
+  $items['calendar_week_node']['include files'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+
+  $items['calendar_day_node']['preprocess function'][] = 'template_preprocess_drupal_tweaks_day_node';
+  $items['calendar_day_node']['include files'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+  // Other theme callbacks:
+  //   calendar_month_multiple_node, calendar_week_multiple_node, calendar_datebox, calendar_date_combo, calendar_empty_day, calendar_stripe_legend, calendar_stripe_stripe, calendar_colorpicker, calendar_colorfield, calendar_time_row_heading
+}
+
