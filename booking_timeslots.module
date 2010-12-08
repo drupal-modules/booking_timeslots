@@ -136,7 +136,7 @@ function booking_timeslots_validate($form, &$form_state) {
  * Implementation of hook_theme_registry_alter().
  * Adds our own preprocess functions to some templates.
  */
-function drupal_tweaks_theme_registry_alter(&$items) {
+function booking_timeslots_theme_registry_alter(&$items) {
   $items['calendar_month_node']['preprocess function'][] = 'template_preprocess_drupal_tweaks_month_node';
   $items['calendar_month_node']['include files'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
 
