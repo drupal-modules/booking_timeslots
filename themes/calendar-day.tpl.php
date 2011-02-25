@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file
  * Template to display a view as a calendar day, grouped by time
