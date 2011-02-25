@@ -1,4 +1,3 @@
-; $Id$
 name = Custom Timeslots
 description = Provides schedule table with custom timeslots
 package = Date/Time

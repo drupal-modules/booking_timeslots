@@ -5,7 +5,6 @@
  *   Booking Timeslots Functions.
  *
  * @version
- *   $Id$
  *
  * @developers:
  *   Rafal Wieczorek <kenorb@gmail.com>

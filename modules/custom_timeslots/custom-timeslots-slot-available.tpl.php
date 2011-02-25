@@ -4,7 +4,6 @@
  *   Default theme implementation to format the available slot.
  * 
  * @version
- *   $Id$
  * 
  * Copy this file in your theme directory to create a custom themed footer.
  *
