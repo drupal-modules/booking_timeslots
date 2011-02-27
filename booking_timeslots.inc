@@ -129,9 +129,8 @@ function booking_timeslots_check_slot_availability($date, $nodeType, $forms = NU
  *
  */
 function booking_timeslot_detect_view() {
-  $view_name = arg(0);
-  // $configured = db_result(db_query("SELECT COUNT(*) FROM {variable} WHERE name LIKE 'booking_timeslot_view_%s'", $view_name)) !== FALSE;
-  return views_get_view($view_name) ? $view_name : FALSE; // FIXME: any view_exists instead of views_get_view?
+  $view = views_get_current_view();
+  return $view->name ? $view->name : FALSE; 
 }
 
 /**
@@ -177,7 +176,6 @@ function booking_timeslot_detect_field_from_view($view) {
 function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
   static $content_type_cache = array();
   $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
-
   $arg0 = arg(0);
   if (!isset($content_type_cache[$arg0])) {
     $view_name = booking_timeslot_detect_view(); // get view from URL
