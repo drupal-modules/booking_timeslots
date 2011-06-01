@@ -183,7 +183,10 @@ function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
       $content_type = booking_timeslot_content_type_via_field($field_name); // detect content type via field name
       $content_type_cache[$view_name] = $content_type;
     } else {
-      drupal_set_message(t("Booking time slots are not properly configured for this page, please contact your site administrator!"), 'error');
+      drupal_set_message(t("Booking time slots are not properly configured for this page, please contact your site administrator!"), 'warning');
+      if (user_access('administer booking timeslots')) {
+        drupal_set_message(t("Please <a href='!url'>configure Booking Timeslots</a>.", array('!url' => url('admin/settings/booking_timeslots/form_settings'))), 'error');
+      }
     }
   } else {
     $content_type = $arg0;

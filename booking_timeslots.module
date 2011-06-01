@@ -144,6 +144,7 @@ function booking_timeslots_theme_registry_alter(&$items) {
 
   $items['calendar_day_node']['preprocess function'][] = 'template_preprocess_drupal_tweaks_day_node';
   $items['calendar_day_node']['include files'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+  // var_dump($items['calendar_day_node']); exit;
   // Other theme callbacks:
   //   calendar_month_multiple_node, calendar_week_multiple_node, calendar_datebox, calendar_date_combo, calendar_empty_day, calendar_stripe_legend, calendar_stripe_stripe, calendar_colorpicker, calendar_colorfield, calendar_time_row_heading
 }
