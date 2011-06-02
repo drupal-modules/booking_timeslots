@@ -116,7 +116,7 @@ function booking_timeslots_settings_form(&$form_state) {
       '#type' => 'checkboxes',
       '#title' => t('Field Names'),
       '#description' => t('Select field names which are handled automatically by the module.'),
-      '#default_value' => $fields = variable_get('booking_timeslot_fields', array()),
+      '#default_value' => $fields = variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot')),
       '#options' => $field_list,
       '#required' => TRUE,
     );
@@ -142,7 +142,7 @@ function booking_timeslots_settings_form(&$form_state) {
   $form['views'] = array(
     '#type' => 'fieldset',
     '#title' => t('Views integration'),
-    '#description' => t('Here you can select which views are used for time slots. You have to choose at least one view to use booking time slots properly.'),
+    '#description' => t('Here you can associate content type used for booking with calendar view which is used for time slots. You have to choose at least one view to use booking time slots properly.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
@@ -150,7 +150,9 @@ function booking_timeslots_settings_form(&$form_state) {
   /* FIND ALL VIEWS WITH HAS CALENDAR AS A STYLE */
   $list_views = array();
   foreach (views_get_all_views() as $view) {
-    if (!empty($view->disabled)) continue;
+    if (!empty($view->disabled)) {
+      continue;
+    }
     if (strpos($view->display['default']->display_options['style_plugin'], 'calendar') !== FALSE) {
       $list_views[$view->name] = $view->name; 
     }
@@ -161,14 +163,18 @@ function booking_timeslots_settings_form(&$form_state) {
     drupal_set_message(t('Please enable at least one calendar based view i.e. <a href="@url">Calendar View.</a>', array('@url' => url('admin/build/views/list'))), 'warning');
   } else {
     foreach ($list_views as $key => $value) {
+      $view_path = booking_timeslots_calendar_view_path($key);
       $form['views']['booking_timeslot_view_' . $key] = array(
           '#type' => 'select',
           '#title' => t('View: %view', array('%view' => $key)),
-          '#description' => t('Choose which content type should be associated with your calendar view.'),
+          '#description' => t('Choose which content type should be associated with your <a target=_blank href="!url">calendar view</a>.', array('!url' => url($view_path))),
           '#default_value' => variable_get('booking_timeslot_view_' . $key, ''),
           '#options' => array_merge(array('' => t('- None -')), $content_types),
         );
     }
+  }
+  if (isset($form['views']['booking_timeslot_view_booking_calendar']) && empty($form['views']['booking_timeslot_view_booking_calendar']['#default_value'])) {
+    $form['views']['booking_timeslot_view_booking_calendar']['#default_value'] = array('booking_slot');
   }
 
   $form['other'] = array(
@@ -187,6 +193,14 @@ function booking_timeslots_settings_form(&$form_state) {
   !variable_get('booking_timeslot_show_warnings', FALSE) ?  booking_timeslots_check_admin_options() : NULL; // Check for configuration issues
   $form['#validate'][] = 'booking_timeslots_settings_form_validate';
   return system_settings_form($form);
+}
+
+/**
+ * Get calendar view path based on view name
+ */
+function booking_timeslots_calendar_view_path($view_name){
+  $view = views_get_view($view_name);
+  return $view->display['calendar_1']->display_options['path'];
 }
 
 /**

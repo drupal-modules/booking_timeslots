@@ -73,7 +73,7 @@ class BookingTimeslotsUnitTest extends DrupalWebTestCase {
     variable_set('booking_timeslot_hour_to', 18);
 
     /* get existing needed configuration */
-    $fields = variable_get('booking_timeslot_fields', array());
+    $fields = variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot'));
     $ex_dates = variable_get('booking_timeslot_excluded_dates', array());
     $q = db_query("SELECT * FROM {variable} WHERE name LIKE 'booking_timeslot_view_%%'");
     while ($row = db_fetch_array($q)) {

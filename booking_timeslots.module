@@ -69,7 +69,7 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
   if (strpos($form_id, '_node_form') !== FALSE) {
     $booking_active = FALSE;
     $content_type = str_replace('_node_form', '', $form_id); // convert name to plain content type name
-    $fieldnames = array_flip(variable_get('booking_timeslot_fields', array()));
+    $fieldnames = array_flip(variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot')));
     module_load_include('inc', 'booking_timeslots');
     foreach ($fieldnames as $fieldname => $value) {
       if (isset($form[$fieldname])) {
@@ -112,7 +112,7 @@ function booking_timeslots_validate($form, &$form_state) {
   if (!user_access('edit booking dates')) {
     drupal_add_js("$(document).ready(function() { $('.container-inline-date').parent().hide(); })", 'inline'); // hide input date form
   }
-  $fieldnames = array_flip(variable_get('booking_timeslot_fields', array()));
+  $fieldnames = array_flip(variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot')));
   foreach ($fieldnames as $fieldname => $value) {
       
     if (isset($form_state['values'][$fieldname])) {

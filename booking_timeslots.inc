@@ -89,16 +89,15 @@ function booking_timeslots_check_slot_availability($date, $nodeType, $forms = NU
         watchdog('php', $e->getMessage() . "<br>\n" . print_r($forms, TRUE), 'error');
     }
     $date = date_format_date($date, 'custom', 'Y-m-d H:i');
-    $timeslot_fields = variable_get('booking_timeslot_fields', array());
+    $timeslot_fields = variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot'));
 
     $slots = db_query('SELECT nid FROM {node} WHERE type = "%s"', $nodeType);
-    while ($row = db_fetch_array($slots))
-    {
+    while ($row = db_fetch_array($slots)) {
         $slot = node_load($row['nid']);
-        foreach ($timeslot_fields as $func_name)
-        {
-            if (!isset($slot->$func_name))
-                    continue;
+        foreach ($timeslot_fields as $func_name) {
+            if (!isset($slot->$func_name)) {
+              continue;
+            }
 
             $slotDate = $slot->{$func_name}[0]['value'];
             $curTimezone = $slot->{$func_name}[0]['timezone_db'];
@@ -134,36 +133,6 @@ function booking_timeslot_detect_view() {
 }
 
 /**
- * Detect configured Datetime field assosiated with specified View
- *
- */
-function booking_timeslot_detect_field_from_view($view) {
-  $field_name = FALSE;
-  if (!is_object($view)) {
-    $view = views_get_view($view);
-  }
-  $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
-  $handler = $view->display['default'];
-  $field_args = $handler->display_options['arguments']['date_argument']['date_fields'];
-  if (!empty($field_args)) {
-    foreach ($field_args as $field) {
-      if (strpos($field, 'field_') !== FALSE) {
-        $view_field_name = next(explode('.', $field));
-        foreach ($my_fields as $key => $field_conf) {
-          if (strpos($view_field_name, $field_conf) !== FALSE) { // check if our field is in this view
-            $field_name = $field_conf;
-            break 2;
-          }
-        }
-      }
-    }
-  } else if (user_access('administer booking timeslots')) {
-    drupal_set_message(t('Booking Timeslots: Your View has missing date arguments!'));
-  }
-  return $field_name;
-}
-
-/**
  * Get proper content type name or link for party booking
  *
  * @param string $content_type
@@ -175,7 +144,7 @@ function booking_timeslot_detect_field_from_view($view) {
  */
 function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
   static $content_type_cache = array();
-  $my_fields = array_flip(variable_get('booking_timeslot_fields', array()));
+  $my_fields = array_flip(variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot')));
   $arg0 = arg(0);
   if (!isset($content_type_cache[$arg0])) {
     $view_name = booking_timeslot_detect_view(); // get view from URL
@@ -193,6 +162,39 @@ function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
   }
 
   return $link ? "node/add/" . str_replace('_', '-', $content_type) : $content_type;
+}
+
+/**
+ * Detect configured Datetime field assosiated with specified View
+ *
+ */
+function booking_timeslot_detect_field_from_view($view) {
+  $field_name = FALSE;
+  if (!is_object($view)) {
+    $view_name = $view;
+    $view = views_get_view($view);
+  } else {
+    $view_name = $view->name;
+  }
+  $my_fields = array_flip(variable_get('booking_timeslot_fields', $view_name == 'booking_calendar' ? array('field_booking_slot' => 'field_booking_slot') : array()));
+  $handler = $view->display['default'];
+  $field_args = $handler->display_options['arguments']['date_argument']['date_fields'];
+  if (!empty($field_args)) {
+    foreach ($field_args as $field) {
+      if (strpos($field, 'field_') !== FALSE) {
+        $view_field_name = next(explode('.', $field));
+        foreach ($my_fields as $key => $field_conf) {
+          if (strpos($view_field_name, $field_conf) !== FALSE) { // check if our field is in this view
+            $field_name = $field_conf;
+            break 2;
+          }
+        }
+      }
+    }
+  } else if (user_access('administer booking timeslots')) {
+    drupal_set_message(t('Booking Timeslots: Your calendar view has missing date arguments!'), 'warning');
+  }
+  return $field_name;
 }
 
 /**
