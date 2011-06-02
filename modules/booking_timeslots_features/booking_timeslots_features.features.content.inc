@@ -58,7 +58,7 @@ function booking_timeslots_features_content_default_fields() {
       'text_parts' => array(),
       'year_range' => '-3:+3',
       'label_position' => 'above',
-      'label' => 'Booked datetime',
+      'label' => 'Booked slot',
       'weight' => '26',
       'description' => '',
       'type' => 'date_text',
@@ -68,7 +68,7 @@ function booking_timeslots_features_content_default_fields() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Booked datetime');
+  t('Booked slot');
 
   return $fields;
 }

@@ -28,7 +28,7 @@ function booking_timeslots_features_views_default_views() {
       'relationship' => 'none',
     ),
     'field_booking_slot_value' => array(
-      'label' => 'Booked datetime',
+      'label' => 'Booked slot',
       'alter' => array(
         'alter_text' => 0,
         'text' => '',
