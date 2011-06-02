@@ -156,7 +156,7 @@ function booking_timeslots_features_views_default_views() {
   $handler->override_option('cache', array(
     'type' => 'none',
   ));
-  $handler->override_option('title', 'Calendar');
+  $handler->override_option('title', 'Booking Calendar');
   $handler->override_option('header_empty', 1);
   $handler->override_option('items_per_page', 0);
   $handler->override_option('use_more', 0);
@@ -192,7 +192,7 @@ function booking_timeslots_features_views_default_views() {
   $handler->override_option('style_options', NULL);
   $handler->override_option('row_plugin', '');
   $handler->override_option('row_options', NULL);
-  $handler->override_option('block_description', 'Calendar');
+  $handler->override_option('block_description', 'Booking Calendar');
   $handler->override_option('block_caching', -1);
   $handler = $view->new_display('calendar_period', 'Year view', 'calendar_period_1');
   $handler->override_option('style_plugin', 'calendar_style');
