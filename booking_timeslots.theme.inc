@@ -14,10 +14,11 @@
  * Theme preprocess callback
  *
  * Format an calendar day node for display.
+ *  See: template_preprocess_calendar($vars);
  */
-function template_preprocess_booking_timeslots_day_node(&$vars) {
-  // TODO: placeholder for some preprocess code
-  // See: template_preprocess_calendar_node($vars);
+function template_preprocess_booking_timeslots_day(&$vars) {
+  extract($vars);
+  $vars['half_hour_mode'] = $half_hour = ($view->style_options['groupby_times'] === 'half'); // get half-hour mode (0 - if it's hour mode, 1 - if it's half-hour mode)
 }
 
 
@@ -25,19 +26,19 @@ function template_preprocess_booking_timeslots_day_node(&$vars) {
  * Theme preprocess callback
  *
  * Format an calendar month node for display.
+ *  See: template_preprocess_calendar($vars);
  */
-function template_preprocess_booking_timeslots_month_node(&$vars) {
-  // TODO: placeholder for some preprocess code
-  // See: template_preprocess_calendar_node($vars);
+function template_preprocess_booking_timeslots_month(&$vars) {
+  extract($vars);
 }
 
 /**
  * Theme preprocess callback
  *
  * Format an calendar week node for display.
+ *  See: template_preprocess_calendar($vars);
  */
-function template_preprocess_booking_timeslots_week_node(&$vars) {
-  // TODO: placeholder for some preprocess code
-  // See: template_preprocess_calendar_node($vars);
+function template_preprocess_booking_timeslots_week(&$vars) {
+  extract($vars);
 }
 

@@ -71,7 +71,6 @@
 
     <?php
       /* get configuration data */
-      $half_hour = ($view->style_options['groupby_times'] === 'half'); // get half-hour mode (0 - if it's hour mode, 1 - if it's half-hour mode)
       $custom = ($view->style_options['groupby_times'] === 'custom');
       if ($custom) $custom_hours = $view->style_options['groupby_times_custom'];
       $parties_allday = count($rows['all_day']['Items']);
@@ -86,7 +85,7 @@
       if ($custom) {
         define('EVENT_TIME', $hours); // for HOW MANY SLOTS each event should be booked
       } else {
-        define('EVENT_TIME', (bool)$half_hour ? $hours/0.5 : $hours ); // for HOW MANY SLOTS each event should be booked
+        define('EVENT_TIME', (bool)$half_hour_mode ? $hours/0.5 : $hours ); // for HOW MANY SLOTS each event should be booked
       }
 
 
@@ -163,7 +162,7 @@
         $day_hours = split(',',$custom_hours);
       } else {
         for ($h = $hour_from; $h<=$hour_to; $h++) {
-          for ($half = 0; $half<= (int)$half_hour; $half++) { // half-hour style supported if enabled
+          for ($half = 0; $half<= (int)$half_hour_mode; $half++) { // half-hour style supported if enabled
             strlen($h) == 1 ? $h = '0' . $h : NULL; // follow by zero if hour is in one-digit format
             $hh = !$half ? $h . ':00:00' : $h . ':30:00'; // add minutes and second to the hour
             $day_hours[] = $hh;

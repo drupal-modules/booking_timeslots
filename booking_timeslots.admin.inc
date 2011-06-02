@@ -248,11 +248,11 @@ function booking_timeslots_settings_form_validate($form, &$form_state){
 function booking_timeslots_check_admin_options(){
   /* CHECK IF TPL TEMPLATE HAS BEEN COPIED INTO THEME FOLDER */
   $theme_path = drupal_get_path('theme', variable_get('theme_default', NULL));
-  if (!file_exists($theme_path . "/calendar-month.tpl.php") || !file_exists($theme_path . "/calendar-day.tpl.php")) {
-    drupal_set_message(t('Please copy theme files from module themes/ folder into your theme path: @theme_path to see changes in calendar view and clear the cache.', array('@theme_path' => $theme_path)), 'error');
-  }
-  if ($registry = theme_get_registry() && (array_search('template_preprocess_booking_timeslots_day_node', (array)$registry['calendar_day_node']['preprocess functions']) !== FALSE)) { // check or preprocess function
+  if (($registry = theme_get_registry()) && (array_search('template_preprocess_booking_timeslots_day', (array)$registry['calendar_day']['preprocess functions']) === FALSE)) { // check or preprocess function
     drupal_set_message(t('Please <a href="@url">clear the cache</a> to reload preprocess hooks!', array('@url' => url('admin/settings/performance'))), 'warning');
+  }
+  if (!file_exists($theme_path . "/calendar-month.tpl.php") || !file_exists($theme_path . "/calendar-day.tpl.php")) { // TODO: do the better checking, instead of hardcoding the files (could be: calendar-day--booking-calendar.tpl.php instead)
+    drupal_set_message(t('Please copy theme files from module themes/ folder into your theme path: @theme_path to see changes in calendar view and clear the cache.', array('@theme_path' => $theme_path)), 'error');
   }
   if (module_exists('calendar_multiday')) {
     drupal_set_message(t("Currently Calendar Multiday module is not supported! <a href='!url'>Please disable it!</a> See: <a href='!issue'>#1005336</a>", array('!url' => url('admin/build/modules'), '!issue' => 'http://drupal.org/node/1005336')), 'error');

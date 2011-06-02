@@ -136,15 +136,14 @@ function booking_timeslots_validate($form, &$form_state) {
  * Adds our own preprocess functions to some templates.
  */
 function booking_timeslots_theme_registry_alter(&$items) {
-  $items['calendar_month_node']['preprocess function'][] = 'template_preprocess_booking_timeslots_month_node';
-  $items['calendar_month_node']['include files'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+  $items['calendar_month']['preprocess functions'][] = 'template_preprocess_booking_timeslots_month';
+  $items['calendar_month']['include files'][] = './' . drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
 
-  $items['calendar_week_node']['preprocess function'][] = 'template_preprocess_booking_timeslots_week_node';
-  $items['calendar_week_node']['include files'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+  $items['calendar_week']['preprocess functions'][] = 'template_preprocess_booking_timeslots_week';
+  $items['calendar_week']['include files'][] = './' . drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
 
-  $items['calendar_day_node']['preprocess function'][] = 'template_preprocess_booking_timeslots_day_node';
-  $items['calendar_day_node']['include files'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
-  // var_dump($items['calendar_day_node']); exit;
+  $items['calendar_day']['preprocess functions'][] = 'template_preprocess_booking_timeslots_day';
+  $items['calendar_day']['include files'][] = './' . drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
   // Other theme callbacks:
   //   calendar_month_multiple_node, calendar_week_multiple_node, calendar_datebox, calendar_date_combo, calendar_empty_day, calendar_stripe_legend, calendar_stripe_stripe, calendar_colorpicker, calendar_colorfield, calendar_time_row_heading
 }
