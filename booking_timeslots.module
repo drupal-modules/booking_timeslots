@@ -136,13 +136,13 @@ function booking_timeslots_validate($form, &$form_state) {
  * Adds our own preprocess functions to some templates.
  */
 function booking_timeslots_theme_registry_alter(&$items) {
-  $items['calendar_month_node']['preprocess function'][] = 'template_preprocess_drupal_tweaks_month_node';
+  $items['calendar_month_node']['preprocess function'][] = 'template_preprocess_booking_timeslots_month_node';
   $items['calendar_month_node']['include files'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
 
-  $items['calendar_week_node']['preprocess function'][] = 'template_preprocess_drupal_tweaks_week_node';
+  $items['calendar_week_node']['preprocess function'][] = 'template_preprocess_booking_timeslots_week_node';
   $items['calendar_week_node']['include files'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
 
-  $items['calendar_day_node']['preprocess function'][] = 'template_preprocess_drupal_tweaks_day_node';
+  $items['calendar_day_node']['preprocess function'][] = 'template_preprocess_booking_timeslots_day_node';
   $items['calendar_day_node']['include files'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
   // var_dump($items['calendar_day_node']); exit;
   // Other theme callbacks:

@@ -237,14 +237,9 @@ function booking_timeslots_check_admin_options(){
   if (!file_exists($theme_path . "/calendar-month.tpl.php") || !file_exists($theme_path . "/calendar-day.tpl.php")) {
     drupal_set_message(t('Please copy theme files from module themes/ folder into your theme path: @theme_path to see changes in calendar view and clear the cache.', array('@theme_path' => $theme_path)), 'error');
   }
-  /*
-  if ($registry = theme_get_registry()) {
-    // var_dump($registry); exit;
-      // && (array_search('template_preprocess_drupal_tweaks_day_node', (array)$registry['calendar_day_node']['preprocess functions']) !== FALSE)) { // check or preprocess function
-    // var_dump($registry); exit;
+  if ($registry = theme_get_registry() && (array_search('template_preprocess_booking_timeslots_day_node', (array)$registry['calendar_day_node']['preprocess functions']) !== FALSE)) { // check or preprocess function
     drupal_set_message(t('Please <a href="@url">clear the cache</a> to reload preprocess hooks!', array('@url' => url('admin/settings/performance'))), 'warning');
   }
-  */
   if (module_exists('calendar_multiday')) {
     drupal_set_message(t("Currently Calendar Multiday module is not supported! <a href='!url'>Please disable it!</a> See: <a href='!issue'>#1005336</a>", array('!url' => url('admin/build/modules'), '!issue' => 'http://drupal.org/node/1005336')), 'error');
   }
