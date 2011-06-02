@@ -1,0 +1,3 @@
+<?php
+
+include_once('booking_timeslots_features.features.inc');
