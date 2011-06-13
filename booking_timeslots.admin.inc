@@ -82,7 +82,7 @@ function booking_timeslots_settings_timeslots_form(&$form_state) {
         'thursday' => t('Thursday'),
         'friday' => t('Friday'),
         'saturday' => t('Saturday'),
-        'Sun' => t('Sunday')
+        'sunday' => t('Sunday')
     )
   );
    
