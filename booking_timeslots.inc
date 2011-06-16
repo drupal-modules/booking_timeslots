@@ -133,7 +133,7 @@ function booking_timeslot_detect_view() {
 }
 
 /**
- * Get proper content type name or link for party booking
+ * Get proper content type name or link for slot booking
  *
  * @param string $content_type
  *      name of content type which is related to booking timeslots
@@ -151,14 +151,16 @@ function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
     if ($field_name = booking_timeslot_detect_field_from_view($view_name)) { // detect field name via View
       $content_type = booking_timeslot_content_type_via_field($field_name); // detect content type via field name
       $content_type_cache[$view_name] = $content_type;
-    } else {
-      drupal_set_message(t("Booking time slots are not properly configured for this page, please contact your site administrator!"), 'warning');
-      if (user_access('administer booking timeslots')) {
-        drupal_set_message(t("Please <a href='!url'>configure Booking Timeslots</a>.", array('!url' => url('admin/settings/booking_timeslots/form_settings'))), 'error');
-      }
     }
   } else {
     $content_type = $arg0;
+  }
+
+  if (empty($content_type)) {
+    drupal_set_message(t("Booking time slots are not properly configured for this page, please contact your site administrator!"), 'warning');
+    if (user_access('administer booking timeslots')) {
+      drupal_set_message(t("Please <a href='!url'>configure Booking Timeslots</a>.", array('!url' => url('admin/settings/booking_timeslots/form_settings'))), 'error');
+    }
   }
 
   return $link ? "node/add/" . str_replace('_', '-', $content_type) : $content_type;
@@ -216,5 +218,29 @@ function booking_timeslot_content_type_via_field($field_name) {
  */
 function booking_timeslots_get_field_name($view_name = NULL) {
   return booking_timeslot_detect_field_from_view($view_name ? $view_name : booking_timeslot_detect_view());
+}
+
+/**
+ * Return name of content type which is used for non-available dates
+ *
+ */
+function booking_timeslots_non_avail_ctype() {
+  $non_available_type = FALSE;
+  $my_forms = variable_get('booking_timeslot_forms', array()); // FIXME
+  $form_name = key(array_flip($my_forms));
+  $my_field = booking_timeslots_get_field_name();
+
+  $non_available = array_flip(variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot')));
+  foreach ($non_available as $key => $value) {
+      if ($key != '0') unset($non_available[$key]);
+  }
+  $non_available = key(array_flip($non_available));
+
+  foreach (content_fields() as $key => $field) {
+     if ($field['field_name'] == $non_available) {
+       $non_available_type = $field['type_name'];
+     }
+   }
+  return $non_available_type;
 }
 

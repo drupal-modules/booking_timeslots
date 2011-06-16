@@ -5,8 +5,9 @@
  *   Form settings include file
  *
  * @version
+ *   $Id:$
  *
- * @developers
+ * @author
  *   Rafal Wieczorek <kenorb@gmail.com>
  */
 
