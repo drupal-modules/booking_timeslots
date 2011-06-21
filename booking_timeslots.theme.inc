@@ -80,6 +80,14 @@ function template_preprocess_booking_timeslots_day(&$vars) {
   $vars['bt_text']['book_now'] = t('Book now'); // Text for slot, which is available to book
   $vars['bt_text']['slot_booked'] = t('Already booked'); // Text for slot, which is already booked
   $vars['bt_text']['slot_unavailable'] = t('Not Available'); // Text for slot, which is unavailable
+
+  // TODO: render timeslots, see: calendar/theme/theme.inc
+  $grouping_field = $view->date_info->style_groupby_field;
+  $start_times = $view->date_info->style_groupby_times;
+  $show_empty_times = $view->date_info->style_show_empty_times;
+  $end_start_time = '23:59:59';
+  $start_time = array_shift($start_times);
+  $next_start_time = count($start_times) ? array_shift($start_times) : $end_start_time;
 }
 
 /**
