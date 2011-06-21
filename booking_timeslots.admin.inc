@@ -11,7 +11,6 @@
  *   Rafal Wieczorek <kenorb@gmail.com>
  */
 
-
 /**
  *  Menu callback for the settings form.
  */
@@ -52,10 +51,10 @@ function booking_timeslots_settings_timeslots_form(&$form_state) {
 
   $form['timeslot_length']['booking_timeslot_available_slots'] = array(
     '#type' => 'select',
-    '#title' => t('Maximum avaliable slots'),
+    '#title' => t('Maximum avaliable slots per timeframe'),
     '#default_value' => variable_get('booking_timeslot_available_slots', 1),
     '#options' => $avaliable_slots,
-    '#description' => t('Choose 0 to disable checking for slot availability'),
+    '#description' => t('How many slots are available to book at the same time. Choose 0 to disable checking for slot availability.'),
   );
 
    $form['timeslot_length']['booking_timeslot_hour_from'] = array(
@@ -63,6 +62,7 @@ function booking_timeslots_settings_timeslots_form(&$form_state) {
     '#title' => t('Hour from'),
     '#default_value' => variable_get('booking_timeslot_hour_from', 8),
     '#options' => $hour_options,
+    '#description' => t('Default starting hour.'),
   );
 
   $form['timeslot_length']['booking_timeslot_hour_to'] = array(
@@ -70,6 +70,7 @@ function booking_timeslots_settings_timeslots_form(&$form_state) {
     '#title' => t('Hour to'),
     '#default_value' => variable_get('booking_timeslot_hour_to', 18),
     '#options' => $hour_options,
+    '#description' => t('Default ending hour.'),
   );
   
   $form['timeslot_length']['booking_timeslot_not_avaliable'] = array(
@@ -121,24 +122,25 @@ function booking_timeslots_settings_form(&$form_state) {
       '#options' => $field_list,
       '#required' => TRUE,
     );
+
     if (empty($field_list)) {
       drupal_set_message(t('Please add at least one CCK %type field into your content type.', array('%type' => 'datetime')), 'error');
     } else if (empty($fields)) {
       drupal_set_message(t('Please select at least one date or datetime field where you want to store booking times.'), 'warning');
     }
+
+    $form['cck']['booking_timeslot_excluded_dates'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Fields with non-available dates (optional)'),
+      '#description' => t('Select fields which contain non-available dates. Note: Use this option only when you want to limit availability of your time slots.'),
+      '#default_value' => variable_get('booking_timeslot_excluded_dates', array()),
+      '#options' => $field_list,
+    );
   
   } else {
     $content_types = node_get_types('names');
     drupal_set_message(t('Please install %module module for fields settings.', array('%module' => 'Date')), 'error');
   }
-
-  $form['cck']['booking_timeslot_excluded_dates'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Fields with non-available dates (optional)'),
-    '#description' => t('Select fields which contain non-available dates. Note: Use this option only when you want to limit availability of your time slots.'),
-    '#default_value' => variable_get('booking_timeslot_excluded_dates', array()),
-    '#options' => $field_list,
-  );
 
   $form['views'] = array(
     '#type' => 'fieldset',
@@ -211,7 +213,7 @@ function booking_timeslots_form_validate($form, &$form_state){
   $hour_from = $form['timeslot_length']['booking_timeslot_hour_from']['#value'];
   $hour_to = $form['timeslot_length']['booking_timeslot_hour_to']['#value'];
 
-  if ($hour_from>=$hour_to){
+  if ($hour_from >= $hour_to){
     form_set_error('booking_timeslot_hour_from', t("Hour To should be greater than Hour From."));
     form_set_error('booking_timeslot_hour_to',t(' '));
   }
@@ -233,12 +235,20 @@ function booking_timeslots_settings_form_validate($form, &$form_state){
     if (!empty($content_name)) { // if view is associated with content type...
       module_load_include('inc', 'booking_timeslots');
       if (!($field_name = booking_timeslot_detect_field_from_view($view_name))) { // check if that view has proper configuration
-        form_set_error($vkey, t("Please configure <a href='@url'>%name view</a> by selecting proper fields which you chosen for time slots, before activating the view!", array('@url' => url("admin/build/views/nojs/config-item/$view_name/default/argument/date_argument"), '%name' => $view_name)));
+        form_set_error($vkey, t("Please configure <a target='_blank' href='@view_url'>%name view</a> by <a target='_blank' href='@view_arg_url'>selecting proper field</a> which you chosen for time slots and <a target='_blank' href='@view_fields_url'>adding it</a> to the list of fields, before activating the view!", array('@view_url' => url("admin/build/views/edit/$view_name"), '@view_arg_url' => url("admin/build/views/nojs/config-item/$view_name/default/argument/date_argument"), '@view_fields_url' => url("admin/build/views/nojs/add-item/$view_name/default/field"), '%name' => $view_name)));
       }
     }
   }
   $enabled_views = array_filter($enabled_views); // filter empty settings
   empty($enabled_views) && !variable_get('booking_timeslot_show_warnings', FALSE) ?  drupal_set_message("Proper configuration require at least one view associated with a content type!", 'warning') : NULL; // Check for configuration issues
+
+  /* CHECK PROPER CONFIGURATION OF FIELDS */
+  $field_names = array_flip($values['booking_timeslot_fields']);
+  $field_names_off = array_flip($values['booking_timeslot_excluded_dates']);
+  unset($field_names[0], $field_names_off[0]); // remove disabled checkboxes
+  if ($wrong_fields = array_intersect($field_names, $field_names_off)) { // search for fields, which are enabled in two places at the same time
+    form_set_error('booking_timeslot_excluded_dates', t("You can't use field %field for non-available dates, which is already used for time slots!", array('%field' => current($wrong_fields))));
+  }
 }
 
 /**
