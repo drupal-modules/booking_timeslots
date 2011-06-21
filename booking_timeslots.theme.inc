@@ -45,8 +45,8 @@ function template_preprocess_booking_timeslots_day(&$vars) {
   $vars['bt_day_of_week'] = $today = date("l", strtotime($rows['date'])); 
 
   // Check if current weekday is available for booking
-  $week_availability = variable_get('booking_timeslot_not_avaliable', 1);
-  $vars['bt_weekday_avail'] = $week_availability[strtolower($today)] != '0';
+  $week_availability = variable_get('booking_timeslot_not_avaliable', array());
+  $vars['bt_weekday_avail'] = $weekday_avail = !in_array(strtolower($today), $week_availability, TRUE);
 
   // for HOW MANY SLOTS each event should be booked
   $vars['bt_groupby_times_custom'] = ($view->style_options['groupby_times'] == 'custom' ? $view->style_options['groupby_times_custom'] : FALSE); 
@@ -60,9 +60,8 @@ function template_preprocess_booking_timeslots_day(&$vars) {
   // Maximum number of available slots per defined timeframe (hour, half-hour)
   $vars['bt_max_avail_slots'] = $bt_max_avail_slots = variable_get('booking_timeslot_available_slots', 1);
 
-  // Check how many slots are available that day
-  if ($bt_max_avail_slots >= 2) $bt_max_avail_slots++; // FIXME: I'm not sure what is the purpose of this
-  $vars['bt_no_of_slots_available'] = ($bt_max_avail_slots == 0 ? 1 : max(0,max(1,max(1,$bt_max_avail_slots)-1)-$bt_booked_all_day));
+  // Check how many slots are available that day per timeframe
+  $vars['bt_no_of_slots_available'] = $weekday_avail ? ($bt_max_avail_slots == 0 ? 1 : max(0, $bt_max_avail_slots - $bt_booked_all_day)) : 0;
 
   // Set starting and ending hours
   $vars['bt_hour']['start'] = variable_get('booking_timeslot_hour_from', 8); // from what hour day is starting (8 by default)
@@ -99,6 +98,8 @@ function template_preprocess_booking_timeslots_week(&$vars) {
   $vars['bt_text']['book_now'] = t('Book now'); // Text for slot, which is available to book
   $vars['bt_text']['slot_booked'] = t('Already booked'); // Text for slot, which is already booked
   $vars['bt_text']['slot_unavailable'] = t('Not Available'); // Text for slot, which is unavailable
+
+  // TODO: #863550 http://drupal.org/node/863550 - check weekday availability
 }
 
 
@@ -118,5 +119,7 @@ function template_preprocess_booking_timeslots_month(&$vars) {
   $vars['bt_text']['book_now'] = t('Book now'); // Text for slot, which is available to book
   $vars['bt_text']['slot_booked'] = t('Already booked'); // Text for slot, which is already booked
   $vars['bt_text']['slot_unavailable'] = t('Not Available'); // Text for slot, which is unavailable
+
+  // TODO: #863550 http://drupal.org/node/863550 - check weekday availability
 }
 

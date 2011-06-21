@@ -77,7 +77,7 @@
              <div class="calendar">
              <div class="inner">
              <?php 
-               if (is_array($rows['all_day'][$column]) && strpos(implode($rows['all_day'][$column]), 'Available')!==FALSE) { // FIXME: http://drupal.org/node/455652#comment-1601448
+               if (!$bt_no_of_slots_available) {
                  $notavailable = TRUE; // not available, because of the all day event
                }
                print isset($rows['all_day'][$column]) ? implode($rows['all_day'][$column]) : '&nbsp;';
@@ -275,7 +275,7 @@
                 }
             } else { // else check if there are any available slots...
                 for ($i=0; $i<($bt_max_avail_slots-$bt_no_of_slots_available); $i++) { // count available slots which are left...
-                    $content .= "<div class='slot_booked'>" . $bt_text['slot_booked'] . "</div>";
+                    $content .= "<div class='slot_unavailable'>" . $bt_text['slot_unavailable'] . "</div>";
                     $available_slots[$hh] = $available_slots[$hh] == true; // set false if not true
                 }
             }
