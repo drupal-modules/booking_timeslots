@@ -46,7 +46,7 @@ function template_preprocess_booking_timeslots_day(&$vars) {
 
   // Check if current weekday is available for booking
   $week_availability = variable_get('booking_timeslot_not_avaliable', array());
-  $vars['bt_weekday_avail'] = $weekday_avail = !in_array(strtolower($today), $week_availability, TRUE);
+  $vars['bt_weekday_avail'] = $bt_weekday_avail = !in_array(strtolower($today), $week_availability, TRUE);
 
   // for HOW MANY SLOTS each event should be booked
   $vars['bt_groupby_times_custom'] = ($view->style_options['groupby_times'] == 'custom' ? $view->style_options['groupby_times_custom'] : FALSE); 
@@ -61,7 +61,7 @@ function template_preprocess_booking_timeslots_day(&$vars) {
   $vars['bt_max_avail_slots'] = $bt_max_avail_slots = variable_get('booking_timeslot_available_slots', 1);
 
   // Check how many slots are available that day per timeframe
-  $vars['bt_no_of_slots_available'] = $weekday_avail ? ($bt_max_avail_slots == 0 ? 1 : max(0, $bt_max_avail_slots - $bt_booked_all_day)) : 0;
+  $vars['bt_no_of_slots_available'] = $bt_no_of_slots_available = $bt_weekday_avail ? ($bt_max_avail_slots == 0 ? 1 : max(0, $bt_max_avail_slots - $bt_booked_all_day)) : 0;
 
   // Set starting and ending hours
   $vars['bt_hour']['start'] = variable_get('booking_timeslot_hour_from', 8); // from what hour day is starting (8 by default)
@@ -82,12 +82,14 @@ function template_preprocess_booking_timeslots_day(&$vars) {
   $vars['bt_text']['slot_unavailable'] = t('Not Available'); // Text for slot, which is unavailable
 
   // TODO: render timeslots, see: calendar/theme/theme.inc
-  $grouping_field = $view->date_info->style_groupby_field;
-  $start_times = $view->date_info->style_groupby_times;
-  $show_empty_times = $view->date_info->style_show_empty_times;
-  $end_start_time = '23:59:59';
-  $start_time = array_shift($start_times);
-  $next_start_time = count($start_times) ? array_shift($start_times) : $end_start_time;
+  $times = booking_timeslots_get_day_availability($view->date_info->style_groupby_times, $bt_no_of_slots_available);
+  // var_dump($times, $rows); exit;
+  // do we need this?
+  // $show_empty_times = $view->date_info->style_show_empty_times;
+  // $grouping_field = $view->date_info->style_groupby_field;
+  // $end_start_time = '23:59:59';
+  // $start_time = array_shift($start_times);
+  // $next_start_time = count($start_times) ? array_shift($start_times) : $end_start_time;
 }
 
 /**

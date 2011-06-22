@@ -244,3 +244,48 @@ function booking_timeslots_non_avail_ctype() {
   return $non_available_type;
 }
 
+/**
+ * Generate timeslot availability for specified day
+ *
+ * @param string $content_type
+ *      name of content type which is related to booking timeslots
+ * @return
+ *      name of the field
+ */
+function booking_timeslots_get_day_availability($times, $bt_no_of_slots_available = 1) {
+  $times = array_flip(array_filter($times, '_bt_filter_times')); // filter and format to those which we configured
+  _bt_set_slot_avail(NULL, $bt_no_of_slots_available);
+  $times = array_map('_bt_set_slot_avail', $times); // fill with numbers of available slots
+  return $times;
+}
+
+/**
+ * Implementation of array_filter callback
+ *
+ *   Filter times array only to those which are configured
+ */
+function _bt_filter_times($var) {
+  list($hour, $minute, $second) = explode(':', $var);
+  return ($hour >= variable_get('booking_timeslot_hour_from', 8) && $hour <= variable_get('booking_timeslot_hour_to', 18));
+}
+
+/**
+ * Implementation of array_map callback
+ *
+ *   Fill array with number of available slots
+ *
+ * @param element $var
+ *      load element of the array (NULL if you need to init number of available slots)
+ * @param integer $set_no_slots
+ *      if set, change default number of available slots
+ * @return
+ *      return number of available slots per timeframe
+ */
+function _bt_set_slot_avail($var, $set_no_slots = NULL) {
+  static $no_slots = 1;
+  if ($set_no_slots) {
+    $no_slots = $set_no_slots;
+  }
+  return $no_slots;
+}
+
