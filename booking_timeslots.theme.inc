@@ -67,8 +67,8 @@ function template_preprocess_booking_timeslots_day(&$vars) {
   $vars['bt_hour']['start'] = variable_get('booking_timeslot_hour_from', 8); // from what hour day is starting (8 by default)
   $vars['bt_hour']['end'] = variable_get('booking_timeslot_hour_to', 18); // what hour day is finished (18 by default)
 
-  // Set array of available times in specified day (i.e. 08:00:00 - 18:00:00)
-  $vars['bt_day_times'] = booking_timeslots_get_day_availability($view->date_info->style_groupby_times, $bt_no_of_slots_available);
+  // Set array of available times of current day (i.e. 08:00:00 - 18:00:00)
+  $vars['bt_day_times'] = booking_timeslots_get_day_availability($view->date_info->style_groupby_times, $rows, $bt_no_of_slots_available);
 
   // Check if user has permission to see booking event details.
   $vars['bt_show_events'] = (user_access('show booking dates'));

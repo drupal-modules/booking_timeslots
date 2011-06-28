@@ -247,15 +247,25 @@ function booking_timeslots_non_avail_ctype() {
 /**
  * Generate timeslot availability for specified day
  *
- * @param string $content_type
- *      name of content type which is related to booking timeslots
+ * @param array $times
+ *      array of available times in view
+ * @param array $rows
+ *      array of preprocess rows
+ * @param integer $bt_no_of_slots_available (optional)
+ *      default number of available slots
  * @return
  *      name of the field
  */
-function booking_timeslots_get_day_availability($times, $bt_no_of_slots_available = 1) {
+function booking_timeslots_get_day_availability($times, $rows = array(), $bt_no_of_slots_available = 1) {
   $times = array_flip(array_filter($times, '_bt_filter_times')); // filter and format to those which we configured
   _bt_set_slot_avail(NULL, $bt_no_of_slots_available);
   $times = array_map('_bt_set_slot_avail', $times); // fill with numbers of available slots
+  if (isset($rows['items'])) {
+    foreach ($rows['items'] as $time => $slot_record) {
+      $times[$time]--;
+    }
+  }
+var_dump($times);
   return $times;
 }
 
