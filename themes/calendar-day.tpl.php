@@ -91,19 +91,8 @@
     <?php
 
       $booked = array();
-      if ($bt_groupby_times_custom) {
-        $day_hours = split(',', $bt_groupby_times_custom);
-      } else {
-        for ($h = $bt_hour['start']; $h <= $bt_hour['end']; $h++) {
-          for ($half = 0; $half<= (int)$bt_half_hour_mode; $half++) { // half-hour style supported if enabled
-            strlen($h) == 1 ? $h = '0' . $h : NULL; // follow by zero if hour is in one-digit format
-            $hh = !$half ? $h . ':00:00' : $h . ':30:00'; // add minutes and second to the hour
-            $day_hours[] = $hh;
-          }
-        }
-      }
 
-        foreach ($day_hours as $hh) {
+        foreach ($bt_day_times as $hh => $avail_slots) {
             $hour = array_key_exists($hh, $rows['items']) ? $rows['items'][$hh] : array('hour' => substr($hh, 0, strlen($hh)-3), 'ampm' => ''); // prepare hour time slot
             $content = '';
     ?>
