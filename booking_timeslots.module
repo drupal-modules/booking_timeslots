@@ -145,6 +145,7 @@ function booking_timeslots_theme_registry_alter(&$items) {
   $items['calendar_day']['preprocess functions'][] = 'template_preprocess_booking_timeslots_day';
   $items['calendar_day']['include files'][] = './' . drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
 
+
   /* TODO: Find the right template
         $plugin = $this->get_plugin();
         if ($plugin) {

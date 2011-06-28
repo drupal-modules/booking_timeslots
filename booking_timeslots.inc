@@ -289,3 +289,57 @@ function _bt_set_slot_avail($var, $set_no_slots = NULL) {
   return $no_slots;
 }
 
+
+/**
+ * Get the list of holidays
+ *
+ * @param ?
+ *      ?
+ * @return
+ *      array of holidays
+ */
+function booking_timeslots_get_holidays() {
+  $matches = array();
+
+  $my_forms = variable_get('booking_timeslot_forms', array()); // FIXME
+  $form_name = key(array_flip($my_forms));
+  $my_field = booking_timeslots_get_field_name();
+
+  $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $form_name);
+  while ($row = db_fetch_array($q)) {
+    $temp_node = node_load(array('type' => $form_name, 'nid' => $row['nid']));
+    if (node_access('view', $temp_node)) $matches[] = $temp_node;
+  }
+
+  $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $bt_ctype_non_avail);
+  while ($row = db_fetch_array($q)) {
+    $matches[] = node_load(array('type' => $bt_ctype_non_avail, 'nid' => $row['nid']));
+  }
+
+  $holidays = array();
+  foreach ($matches as $node) {
+      $date_from = !empty($node->$my_field) ? $node->$my_field : (!empty($node->$non_available) ? $node->$non_available : NULL);
+      $date_from_value = $date_from[0]['value'];
+      $date_to = !empty($node->$my_field) ? $node->$my_field : (!empty($node->$non_available) ? $node->$non_available : NULL);
+      $date_to_value = $date_to[0]['value2'];
+
+      if (empty($date_from) || empty($date_to))
+        continue;
+
+      $date_from_unix = strtotime($date_from_value . ' ' . $date_from[0]['timezone_db']);
+      $date_to_unix = strtotime($date_to_value . ' ' . $date_to[0]['timezone_db']);
+
+      if ($date_to_unix < $date_from_unix) {
+        list($date_from_unix,$date_to_unix) = array($date_to_unix,$date_from_unix);
+      }
+
+      if ((($date_from_unix == $date_to_unix) && ($date_from == $date_to)) || ($node->type == $bt_ctype_non_avail)) {
+        $date_to_unix += 60*60*24; // add 24 hour
+      }
+
+      $holidays[] = array($date_from_unix, $date_to_unix, $node, $date_from);
+  }
+
+  return $holidays;
+}
+

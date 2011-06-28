@@ -89,42 +89,6 @@
         </tr>
 
     <?php
-      $matches = array();
-
-      $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $form_name);
-      while ($row = db_fetch_array($q)) {
-        $temp_node = node_load(array('type' => $form_name, 'nid' => $row['nid'])); 
-        if (node_access('view', $temp_node)) $matches[] = $temp_node; 
-      }
-
-      $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $bt_ctype_non_avail);
-      while ($row = db_fetch_array($q)) {
-        $matches[] = node_load(array('type' => $bt_ctype_non_avail, 'nid' => $row['nid'])); 
-      }
-
-      $holidays = array();
-      foreach ($matches as $node) {
-          $date_from = !empty($node->$my_field) ? $node->$my_field : (!empty($node->$non_available) ? $node->$non_available : NULL);
-          $date_from_value = $date_from[0]['value'];
-          $date_to = !empty($node->$my_field) ? $node->$my_field : (!empty($node->$non_available) ? $node->$non_available : NULL);
-          $date_to_value = $date_to[0]['value2'];
-
-          if (empty($date_from) || empty($date_to)) 
-            continue;
-
-          $date_from_unix = strtotime($date_from_value . ' ' . $date_from[0]['timezone_db']);
-          $date_to_unix = strtotime($date_to_value . ' ' . $date_to[0]['timezone_db']);
-
-          if ($date_to_unix < $date_from_unix) {
-            list($date_from_unix,$date_to_unix) = array($date_to_unix,$date_from_unix); 
-          }
-
-          if ((($date_from_unix == $date_to_unix) && ($date_from == $date_to)) || ($node->type == $bt_ctype_non_avail)) {
-            $date_to_unix += 60*60*24; // add 24 hour
-          }
-
-          $holidays[] = array($date_from_unix, $date_to_unix, $node, $date_from);
-      }
 
       $booked = array();
       if ($bt_groupby_times_custom) {
@@ -212,7 +176,7 @@
 
             $date_unix = strtotime($rows['date'] . ' ' . $hh);
 
-            foreach ($holidays as $holiday) {
+            foreach ($bt_holidays as $holiday) {
                 if ($date_unix >= $holiday[0] && $date_unix < $holiday[1]) {
                     if ($holiday[2]->type == $form_name) {
                         $hh_conflicts[$hh]++;

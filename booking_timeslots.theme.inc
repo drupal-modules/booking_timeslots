@@ -81,6 +81,9 @@ function template_preprocess_booking_timeslots_day(&$vars) {
   $vars['bt_text']['slot_booked'] = t('Already booked'); // Text for slot, which is already booked
   $vars['bt_text']['slot_unavailable'] = t('Not Available'); // Text for slot, which is unavailable
 
+  // Get all holidays
+  $vars['bt_holidays'] = booking_timeslots_get_holidays();
+
   // TODO: render timeslots, see: calendar/theme/theme.inc
   $date = $rows['date'];
   $times = booking_timeslots_get_day_availability($view->date_info->style_groupby_times, $bt_no_of_slots_available);
