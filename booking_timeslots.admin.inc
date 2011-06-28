@@ -180,6 +180,19 @@ function booking_timeslots_settings_form(&$form_state) {
     $form['views']['booking_timeslot_view_booking_calendar']['#default_value'] = array('booking_slot');
   }
 
+  $form['config'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Other Settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['config']['booking_timeslot_past_booking'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Allow to book in the past."),
+    '#description' => t('If enabled, slots in the past are available to book.'),
+    '#default_value' => variable_get('booking_timeslot_past_booking', FALSE),
+  );
+
   $form['other'] = array(
     '#type' => 'fieldset',
     '#title' => t('Other Settings'),

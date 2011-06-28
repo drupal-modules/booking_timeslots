@@ -258,15 +258,39 @@ function booking_timeslots_non_avail_ctype() {
  */
 function booking_timeslots_get_day_availability($times, $rows = array(), $bt_no_of_slots_available = 1) {
   $times = array_flip(array_filter($times, '_bt_filter_times')); // filter and format to those which we configured
+  if (!booking_timeslots_day_not_available($rows['date'])) {
+    $bt_no_of_slots_available = -1;
+  }
   _bt_set_slot_avail(NULL, $bt_no_of_slots_available);
   $times = array_map('_bt_set_slot_avail', $times); // fill with numbers of available slots
-  if (isset($rows['items'])) {
+  // parse booked slots and deduct available slots
+  if ($bt_no_of_slots_available > 0 && isset($rows['items'])) {
     foreach ($rows['items'] as $time => $slot_record) {
       $times[$time]--;
     }
   }
-var_dump($times);
   return $times;
+}
+
+/**
+ * Check if specified day is available
+ *  Not available days are:
+ *    - in the past (configurable)
+ *    - holidays (configurable)
+ *
+ * @param string $date
+ *      date to check (in format: yyyy-mm-dd)
+ * @return
+ *      return TRUE if day is available, otherwise FALSE
+ */
+function booking_timeslots_day_not_available($date) {
+  // TODO: var_dump(booking_timeslots_get_holidays()); exit;
+  $avail = TRUE;
+  if (!variable_get('booking_timeslot_past_booking', FALSE) && strtotime($date) < strtotime("now")) {
+    $avail = FALSE; // not available if it's in the past
+    // TODO: http://drupal.org/node/869418 - close bookings xxx hours in advance
+  }
+  return $avail;
 }
 
 /**
@@ -298,7 +322,6 @@ function _bt_set_slot_avail($var, $set_no_slots = NULL) {
   }
   return $no_slots;
 }
-
 
 /**
  * Get the list of holidays
