@@ -289,6 +289,8 @@ function booking_timeslots_day_not_available($date) {
   if (!variable_get('booking_timeslot_past_booking', FALSE) && strtotime($date) < strtotime("now")) {
     $avail = FALSE; // not available if it's in the past
     // TODO: http://drupal.org/node/869418 - close bookings xxx hours in advance
+  } else if (!in_array(strtolower($date), variable_get('booking_timeslot_not_avaliable', array()), TRUE)) {
+    $avail = FALSE; // current weekday is not available for booking (configurable)
   }
   return $avail;
 }

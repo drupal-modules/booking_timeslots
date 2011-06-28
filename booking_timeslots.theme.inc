@@ -106,6 +106,13 @@ function template_preprocess_booking_timeslots_day(&$vars) {
  */
 function template_preprocess_booking_timeslots_week(&$vars) {
   extract($vars);
+  /*
+   * Variables available:
+   * $view: The view.
+   * $columns: an array of column names.
+   * $min_date_formatted: The minimum date for this calendar in the format YYYY-MM-DD HH:MM:SS.
+   * $max_date_formatted: The maximum date for this calendar in the format YYYY-MM-DD HH:MM:SS.
+   */
 
   // name of current day of the week
   $vars['bt_day_of_week'] = $today = date("l", strtotime($rows['date'])); 
@@ -126,16 +133,43 @@ function template_preprocess_booking_timeslots_week(&$vars) {
  *  See: template_preprocess_calendar($vars);
  */
 function template_preprocess_booking_timeslots_month(&$vars) {
+  // initialize 
+  module_load_include('inc', 'booking_timeslots'); // load additional functions
   extract($vars);
+  /*
+   * Variables available:
+   * $view: The view.
+   * $columns: an array of column names.
+   * $min_date_formatted: The minimum date for this calendar in the format YYYY-MM-DD HH:MM:SS.
+   * $max_date_formatted: The maximum date for this calendar in the format YYYY-MM-DD HH:MM:SS.
+   */
 
   // name of current day of the week
   $vars['bt_day_of_week'] = $today = date("l", strtotime($rows['date'])); 
+
+  // link to booking node creation page
+  $vars['bt_node_add_link'] = $bt_node_add_link = booking_timeslots_get_ctype_name(NULL, TRUE);
 
   // Contains text for slots, which are booked, not available or already booked
   $vars['bt_text']['book_now'] = t('Book now'); // Text for slot, which is available to book
   $vars['bt_text']['slot_booked'] = t('Already booked'); // Text for slot, which is already booked
   $vars['bt_text']['slot_unavailable'] = t('Not Available'); // Text for slot, which is unavailable
 
-  // TODO: #863550 http://drupal.org/node/863550 - check weekday availability
+  $cid = arg(0);
+  foreach ($vars['rows'] as $weekno => $row) {
+    foreach ($row as $day => $data) {
+      $cell = $data['data'];
+      $date = str_replace($cid.'-', $cid.'/',$data['id']);
+      if (!is_array($cell) && $data['class'] != 'week' && strpos($data['class'], 'empty') === FALSE) {
+        // FIXME: && booking_timeslots_day_not_available($date)) { // If this cell is already rendered...
+        $link = l($vars['bt_text']['book_now'], $date);
+        $vars['rows'][$weekno][$day]['data'] .= "<div class='slot_free'>$link</div>"; // ...and which is free
+      }
+    }
+  }
+  // var_dump($rows); exit;
+  // $vars['bt_day_times'] = booking_timeslots_get_day_availability($view->date_info->style_groupby_times, $rows, $bt_no_of_slots_available);
+
+  // TODO: #863550 http://drupal.org/node/863550 - check weekday availability - booking_timeslots_day_not_available - booking_timeslots_get_day_availability
 }
 

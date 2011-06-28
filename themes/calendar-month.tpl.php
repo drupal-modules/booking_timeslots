@@ -37,13 +37,6 @@
             <?php foreach ($row as $cell): ?>
               <td id="<?php print $cell['id']; ?>" class="<?php print $cell['class']; ?>">
                 <?php print $cell['data']; ?>
-                <?php
-                  if (strpos($cell['data'], 'All') === FALSE && strpos($cell['class'], 'future') !== FALSE) {
-                    $cid = arg(0);
-                    $link = str_replace($cid.'-', $cid.'/',$cell['id']);
-                    print '<br><center>'.l(t('Book now'),$link).'</center>';
-                  }
-                ?>
               </td>
             <?php endforeach; ?>
           </tr>

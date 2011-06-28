@@ -182,7 +182,7 @@ function booking_timeslots_settings_form(&$form_state) {
 
   $form['config'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Other Settings'),
+    '#title' => t('Settings'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
