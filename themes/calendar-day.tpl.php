@@ -101,19 +101,19 @@
               <span class="calendar-ampm"><?php print $hour['ampm']; ?></span>
             </td>
     <?php
-            for ($i = $bt_no_of_slots_available; $i > 0; $i--) {
-              // 0 >= free
-              // 0 = booked
-              // 0 < unavailable (holidays)
-              if ($avail_slots >= $i) {
-                $link = l($bt_text['book_now'], $bt_node_add_link . '/' . $rows['date'] . ' ' . $hh);
-                $content .= "<div class='slot_free'>$link</div>"; // ...and which is free
-              } else if ($avail_slots < 0) {
-                $content .= "<div class='slot_unavailable'>" . $bt_text['slot_unavailable'] . "</div>";
-              } else {
-                $content .= "<div class='slot_booked'>" . $bt_text['slot_booked'] . "</div>";
-              }
+          for ($i = $bt_max_avail_slots; $i > 0; $i--) {
+            // 0 >= free
+            // 0 = booked
+            // 0 < unavailable (holidays)
+            if ($avail_slots >= $i) {
+              $link = l($bt_text['book_now'], $bt_node_add_link . '/' . $rows['date'] . ' ' . $hh);
+              $content .= "<div class='slot_free'>$link</div>"; // ...and which is free
+            } else if ($avail_slots < 0) {
+              $content .= "<div class='slot_unavailable'>" . $bt_text['slot_unavailable'] . "</div>";
+            } else {
+              $content .= "<div class='slot_booked'>" . $bt_text['slot_booked'] . "</div>";
             }
+          }
 
             if ($bt_show_events) { // show events, if user have the right permissions
                 $content .= isset($hour['values'][$column]) ? implode($hour['values'][$column]) : '&nbsp;'; // you can use it for debug, it will show you the events

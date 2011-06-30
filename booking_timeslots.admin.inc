@@ -205,6 +205,12 @@ function booking_timeslots_settings_form(&$form_state) {
     '#description' => t('If you configured module correctly or you customized already some settings, some warnings are no longer necessary. Check to disable them.'),
     '#default_value' => variable_get('booking_timeslot_show_warnings', FALSE),
   );
+  $form['other']['booking_timeslot_show_debug_messages'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Show debug messages."),
+    '#description' => t('Show additional debug messages (administration permission required).'),
+    '#default_value' => variable_get('booking_timeslot_show_debug_messages', FALSE),
+  );
 
   !variable_get('booking_timeslot_show_warnings', FALSE) ?  booking_timeslots_check_admin_options() : NULL; // Check for configuration issues
   $form['#validate'][] = 'booking_timeslots_settings_form_validate';

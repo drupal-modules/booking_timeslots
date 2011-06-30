@@ -269,6 +269,7 @@ function booking_timeslots_get_day_availability($times, $rows = array(), $bt_no_
       $times[$time]--;
     }
   }
+  // var_dump($times); exit; // use it for debugging
   return $times;
 }
 
@@ -286,10 +287,17 @@ function booking_timeslots_get_day_availability($times, $rows = array(), $bt_no_
 function booking_timeslots_day_not_available($date) {
   // TODO: var_dump(booking_timeslots_get_holidays()); exit;
   $avail = TRUE;
+  $dayofweek = date("l", strtotime($date));
   if (!variable_get('booking_timeslot_past_booking', FALSE) && strtotime($date) < strtotime("now")) {
+    if (user_access('administer booking timeslots') && variable_get('booking_timeslot_show_debug_messages', FALSE)) {
+      drupal_set_message(__FUNCTION__ . t("(): Date %date is not available, because it's in the past.", array('%date' => $date)), 'status');
+    }
     $avail = FALSE; // not available if it's in the past
     // TODO: http://drupal.org/node/869418 - close bookings xxx hours in advance
-  } else if (!in_array(strtolower($date), variable_get('booking_timeslot_not_avaliable', array()), TRUE)) {
+  } else if (in_array(strtolower($dayofweek), variable_get('booking_timeslot_not_avaliable', array()), TRUE)) {
+    if (user_access('administer booking timeslots') && variable_get('booking_timeslot_show_debug_messages', FALSE)) {
+      drupal_set_message(__FUNCTION__ . t("(): Date %date is not available, because %dayofweek is on non-available list.", array('%date' => $date, '%dayofweek' => $dayofweek)), 'status');
+    }
     $avail = FALSE; // current weekday is not available for booking (configurable)
   }
   return $avail;
