@@ -132,8 +132,16 @@ function booking_timeslots_settings_form(&$form_state) {
     $form['cck']['booking_timeslot_excluded_dates'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Fields with non-available dates (optional)'),
-      '#description' => t('Select fields which contain non-available dates. Note: Use this option only when you want to limit availability of your time slots.'),
+      '#description' => t('Select fields which contains non-available dates. Note: Use this option only when you want to limit availability of your time slots.'),
       '#default_value' => variable_get('booking_timeslot_excluded_dates', array()),
+      '#options' => $field_list,
+    );
+  
+    $form['cck']['booking_timeslot_limited_dates'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Fields with limited dates (optional)'),
+      '#description' => t('If selected, limit booking availability only to configured dates within selected fields. Use this option only when you want to limit availability within specified periods.'),
+      '#default_value' => variable_get('booking_timeslot_limited_dates', array()),
       '#options' => $field_list,
     );
   
@@ -264,9 +272,16 @@ function booking_timeslots_settings_form_validate($form, &$form_state){
   /* CHECK PROPER CONFIGURATION OF FIELDS */
   $field_names = array_flip($values['booking_timeslot_fields']);
   $field_names_off = array_flip($values['booking_timeslot_excluded_dates']);
-  unset($field_names[0], $field_names_off[0]); // remove disabled checkboxes
-  if ($wrong_fields = array_intersect($field_names, $field_names_off)) { // search for fields, which are enabled in two places at the same time
-    form_set_error('booking_timeslot_excluded_dates', t("You can't use field %field for non-available dates, which is already used for time slots!", array('%field' => current($wrong_fields))));
+  $field_names_limited = array_flip($values['booking_timeslot_limited_dates']);
+  unset($field_names[0], $field_names_off[0], $field_names_limited[0]); // remove disabled checkboxes
+  if (($wrong_fields = array_intersect($field_names, $field_names_off)) && !empty($wrong_fields)) { // search for fields, which are enabled in two places at the same time
+    form_set_error('booking_timeslot_excluded_dates', t("You can't use the same field %field for non-available dates, which is already used for time slots!", array('%field' => current($wrong_fields))));
+  }
+  if (($wrong_fields = array_intersect($field_names, $field_names_limited)) && !empty($wrong_fields)) { // search for fields, which are enabled in two places at the same time
+    form_set_error('booking_timeslot_limited_dates', t("You can't use the same field %field for limiting dates, which is already used for time slots!", array('%field' => current($wrong_fields))));
+  }
+  if (($wrong_fields = array_intersect($field_names_off, $field_names_limited)) && !empty($wrong_fields)) { // search for fields, which are enabled in two places at the same time
+    form_set_error('booking_timeslot_limited_dates', t("You can't use the same field %field for limiting dates, which is already used for non-available dates!", array('%field' => current($wrong_fields))));
   }
 }
 
