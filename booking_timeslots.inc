@@ -300,6 +300,7 @@ function booking_timeslots_day_not_available($date) {
     }
     $avail = FALSE; // current weekday is not available for booking (configurable)
   }
+  $limited_dates = booking_timeslots_generate_limited_dates();
   return $avail;
 }
 
@@ -384,5 +385,87 @@ function booking_timeslots_get_holidays() {
   }
 
   return $holidays;
+}
+
+
+/**
+ * Wrapper function to generate array of limited dates
+ *
+ * @param ?
+ *      ?
+ * @return
+ *      array of dates
+ */
+function booking_timeslots_generate_limited_dates() {
+  // load fields used for limited dates
+  $fields_limited = variable_get('booking_timeslot_limited_dates', array());
+  $fields_limited = array_flip($fields_limited);
+  unset($fields_limited[0]);
+
+  return booking_timeslots_generate_field_dates($fields_limited);
+}
+
+/**
+ * Generate array of dates from field within specified content type
+ *
+ * @param ?
+ *      ?
+ * @return
+ *      array of dates
+ */
+function booking_timeslots_generate_field_dates($field_names = array(), $perm_req = 'view') {
+  $res = array();
+  foreach ($field_names as $field_name => $value) {
+    $ctype = booking_timeslot_content_type_via_field($field_name);
+    $res[$ctype][$field_name] = array();
+  }
+
+  foreach ($res as $ctype => $field_data) {
+    $q = db_query('SELECT nid FROM {node} WHERE type = "%s"', $ctype);
+    while ($row = db_fetch_object($q)) {
+      $node = node_load($row->nid);
+      if (node_access($perm_req, $node)) {
+        foreach ($field_data as $field_name => $value) {
+          if ($node->$field_name) {
+            list($datetime_start, $datetime_end) = booking_timeslots_load_date_field($node, $field_name);
+            $res[$ctype][$field_name][$node->nid] = array($datetime_start, $datetime_end);
+          }
+        }
+      }
+    }
+  }
+  // var_dump($res); exit; // TODO
+  return $res;
+}
+
+
+/**
+ * Generate array of dates from field within specified content type
+ *
+ * @param ?
+ *      ?
+ * @return
+ *      array of dates
+ */
+function booking_timeslots_load_date_field($node, $field_name) {
+  $field_conf = content_fields($field_name); // load configuration of fields
+  $res = array();
+  // TODO: multiple
+  // TODO: todate: optional, required
+  switch ($field_conf['type']) {
+    case 'datetime':
+        $start = $node->{$field_name}[0]['value'] ? $node->{$field_name}[0]['value'] : 0;
+        $end = $node->{$field_name}[0]['value2'] ? $node->{$field_name}[0]['value2'] : 0;
+        $res = array($start, $end);
+      break;
+    case 'date':
+        $start = $node->{$field_name}[0]['value'] ? $node->{$field_name}[0]['value'] : 0;
+        $end = $node->{$field_name}[0]['value2'] ? $node->{$field_name}[0]['value2'] : 0;
+        // $start = explode('T', $node->{$field_name}[0]['value']);
+        // $end = explode('T', $node->{$field_name}[0]['value2']);
+        $res = array($start, $end);
+      break;
+  }
+  return $res;
 }
 
