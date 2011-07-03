@@ -256,7 +256,7 @@ function booking_timeslots_non_avail_ctype() {
  * @return
  *      name of the field
  */
-function booking_timeslots_get_day_availability($times, $rows = array(), $bt_no_of_slots_available = 1) {
+function booking_timeslots_get_day_availability($times, $rows = array(), $bt_no_of_slots_available = 1, $debug = TRUE) {
   $date = $rows['date'];
   $times = array_flip(array_filter($times, '_bt_filter_times')); // filter and format to those which we configured
   if (!booking_timeslots_day_not_available($date)) {
@@ -270,12 +270,22 @@ function booking_timeslots_get_day_availability($times, $rows = array(), $bt_no_
       $unixtime = strtotime("$date $time"); // convert current slot to unixtime
       $avail_slots = booking_timeslots_unixtime_within_ranges($unixtime, $available_times['all']); // check if current slot is within available dates
       $times[$time] = min($bt_no_of_slots_available, $avail_slots == 0 ? -1 : $avail_slots); // set the number of slots (otherwise set to -1 as unavailable)
+      if ($times[$time] == -1 && user_access('administer booking timeslots') && variable_get('booking_timeslot_show_debug_messages', FALSE)) {
+        drupal_set_message(__FUNCTION__ . t("(): Slot %date %time is not available, because is not added to available list.", array('%date' => $date, '%time' => $time)), 'status');
+      }
     }
   }
+  $slot_length = variable_get('booking_timeslot_length_hours', 1) * 3600 + variable_get('booking_timeslot_length_minutes', 0) * 60;
   // parse booked slots and deduct available slots
   if ($bt_no_of_slots_available > 0 && isset($rows['items'])) {
-    foreach ($rows['items'] as $time => $slot_record) {
-      $times[$time]--;
+    foreach ($rows['items'] as $item_time => $slot_record) {
+      foreach ($times as $slot_time => $avail) {
+        $slot_unixtime = strtotime("$date $slot_time"); // convert current slot time to unixtime
+        $item_unixtime = strtotime("$date $item_time"); // convert current item time to unixtime
+        if ($slot_unixtime >= $item_unixtime && $slot_unixtime < $item_unixtime + $slot_length) {
+          $times[$slot_time]--;
+        }
+      }
     }
   }
   // var_dump($date, $times); exit; // use it for debugging
@@ -501,9 +511,6 @@ function booking_timeslots_unixtime2timeslots($unixstart, $unixend) {
 function booking_timeslots_load_date_field($node, $field_name) {
   $field_conf = content_fields($field_name); // load configuration of fields
   $res = array();
-  $endtime = '23:59:59';
-  // TODO: multiple
-  // TODO: todate: optional, required
   switch ($field_conf['type']) {
     case 'datetime':
       foreach ($node->{$field_name} as $key => $value) {
