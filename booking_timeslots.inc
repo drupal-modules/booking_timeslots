@@ -257,20 +257,50 @@ function booking_timeslots_non_avail_ctype() {
  *      name of the field
  */
 function booking_timeslots_get_day_availability($times, $rows = array(), $bt_no_of_slots_available = 1) {
+  $date = $rows['date'];
   $times = array_flip(array_filter($times, '_bt_filter_times')); // filter and format to those which we configured
-  if (!booking_timeslots_day_not_available($rows['date'])) {
+  if (!booking_timeslots_day_not_available($date)) {
     $bt_no_of_slots_available = -1;
   }
   _bt_set_slot_avail(NULL, $bt_no_of_slots_available);
   $times = array_map('_bt_set_slot_avail', $times); // fill with numbers of available slots
+  // check if time slots are limited by configured times
+  if ($available_times = booking_timeslots_generate_limited_dates()) {
+    foreach ($times as $time => $avail) { // for each time slot...
+      $unixtime = strtotime("$date $time"); // convert current slot to unixtime
+      $avail_slots = booking_timeslots_unixtime_within_ranges($unixtime, $available_times['all']); // check if current slot is within available dates
+      $times[$time] = min($bt_no_of_slots_available, $avail_slots == 0 ? -1 : $avail_slots); // set the number of slots (otherwise set to -1 as unavailable)
+    }
+  }
   // parse booked slots and deduct available slots
   if ($bt_no_of_slots_available > 0 && isset($rows['items'])) {
     foreach ($rows['items'] as $time => $slot_record) {
       $times[$time]--;
     }
   }
-  // var_dump($times); exit; // use it for debugging
+  // var_dump($date, $times); exit; // use it for debugging
   return $times;
+}
+
+/**
+ * Count how many times specified unixtime is within array of unixtime ranges
+ *
+ * @param integer $unixtime
+ *      unixtime to check
+ * @param array $unixtime_ranges
+ *      array of unixtime ranges
+ * @return
+ *      return how many times specified unixtime is within array of unixtime ranges, otherwise 0
+ */
+function booking_timeslots_unixtime_within_ranges($unixtime, $unixtime_ranges) {
+  $within_range = 0;
+  foreach ($unixtime_ranges as $key => $unixtime_range) {
+    list($unixstart, $unixend) = $unixtime_range;
+    if ($unixtime >= $unixstart && $unixtime < $unixend) {
+      $within_range++;
+    }
+  }
+  return $within_range;
 }
 
 /**
@@ -402,11 +432,12 @@ function booking_timeslots_generate_limited_dates() {
   $fields_limited = array_flip($fields_limited);
   unset($fields_limited[0]);
 
-  return booking_timeslots_generate_field_dates($fields_limited);
+  return !empty($fields_limited) ? booking_timeslots_generate_field_dates($fields_limited) : array();
 }
 
 /**
  * Generate array of dates from field within specified content type
+ *   TODO: static caching
  *
  * @param ?
  *      ?
@@ -414,30 +445,50 @@ function booking_timeslots_generate_limited_dates() {
  *      array of dates
  */
 function booking_timeslots_generate_field_dates($field_names = array(), $perm_req = 'view') {
-  $res = array();
+  $res = array('all' => array());
   foreach ($field_names as $field_name => $value) {
     $ctype = booking_timeslot_content_type_via_field($field_name);
     $res[$ctype][$field_name] = array();
   }
 
   foreach ($res as $ctype => $field_data) {
-    $q = db_query('SELECT nid FROM {node} WHERE type = "%s"', $ctype);
+    $q = db_query('SELECT nid FROM {node} WHERE type = "%s"', $ctype); // get all nodes from specified type
     while ($row = db_fetch_object($q)) {
       $node = node_load($row->nid);
-      if (node_access($perm_req, $node)) {
+      if (node_access($perm_req, $node)) { // add date if user has specified permission ('view' by default)
         foreach ($field_data as $field_name => $value) {
           if ($node->$field_name) {
-            list($datetime_start, $datetime_end) = booking_timeslots_load_date_field($node, $field_name);
-            $res[$ctype][$field_name][$node->nid] = array($datetime_start, $datetime_end);
+            // convert dates from the field to unixtime and insert in specified format: [content_type_name][field_name][nid][key] => 'unixtimestart-unixtimeend'
+            $unixtime_field = booking_timeslots_load_date_field($node, $field_name); // get array of unixtime ranges separated by '-'
+            $res[$ctype][$field_name][$node->nid] = $unixtime_field; // add to the array
+
+            // merge as well with 'all' section
+            foreach ($unixtime_field as $key => $unixtime_range) {
+              $res['all'][] = explode('-', $unixtime_range);
+            }
           }
         }
       }
     }
   }
-  // var_dump($res); exit; // TODO
   return $res;
 }
 
+/**
+ * Convert unixtime into array of time slots
+ *
+ * @param integer $unixstart
+ *      Start unixtime
+ * @param integer $unixend
+ *      End unixtime
+ * @return
+ *      array of time slots
+ */
+function booking_timeslots_unixtime2timeslots($unixstart, $unixend) {
+  $DateTime_start = date("Y-m-d H:i:s", $unixstart); 
+  $DateTime_end = date("Y-m-d H:i:s", $unixend); 
+  var_dump($DateTime_start, $DateTime_end); 
+}
 
 /**
  * Generate array of dates from field within specified content type
@@ -450,20 +501,33 @@ function booking_timeslots_generate_field_dates($field_names = array(), $perm_re
 function booking_timeslots_load_date_field($node, $field_name) {
   $field_conf = content_fields($field_name); // load configuration of fields
   $res = array();
+  $endtime = '23:59:59';
   // TODO: multiple
   // TODO: todate: optional, required
   switch ($field_conf['type']) {
     case 'datetime':
-        $start = $node->{$field_name}[0]['value'] ? $node->{$field_name}[0]['value'] : 0;
-        $end = $node->{$field_name}[0]['value2'] ? $node->{$field_name}[0]['value2'] : 0;
-        $res = array($start, $end);
+      foreach ($node->{$field_name} as $key => $value) {
+        if ($node->{$field_name}[$key]['value']) {
+          $start = $node->{$field_name}[$key]['value'] ? strtotime($node->{$field_name}[$key]['value']) : 0;
+          $end = $node->{$field_name}[$key]['value2'] ? strtotime($node->{$field_name}[$key]['value2']) : $start;
+          if ($start == $end) {
+            $hours = variable_get('booking_timeslot_length_hours', 1);
+            $mins = variable_get('booking_timeslot_length_minutes', 0);
+            $unix_slot = $hours * 3600 + $mins * 60;
+            $end+= $unix_slot;
+          }
+          $res[] = implode('-', array($start, $end));
+        }
+      }
       break;
     case 'date':
-        $start = $node->{$field_name}[0]['value'] ? $node->{$field_name}[0]['value'] : 0;
-        $end = $node->{$field_name}[0]['value2'] ? $node->{$field_name}[0]['value2'] : 0;
-        // $start = explode('T', $node->{$field_name}[0]['value']);
-        // $end = explode('T', $node->{$field_name}[0]['value2']);
-        $res = array($start, $end);
+      foreach ($node->{$field_name} as $key => $value) {
+        if ($node->{$field_name}[$key]['value']) {
+          $start = $node->{$field_name}[$key]['value'] ? strtotime($node->{$field_name}[$key]['value']) : 0;
+          $end = $node->{$field_name}[$key]['value2'] ? strtotime($node->{$field_name}[$key]['value2'])+86400-60 : $start;
+          $res[] = implode('-', array($start, $end));
+        }
+      }
       break;
   }
   return $res;
