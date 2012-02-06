@@ -75,7 +75,7 @@ function custom_timeslots_sort_timeslots($a, $b) {
 function custom_timeslots_check_conflict($date, $time, $ctype) {
   $res = FALSE;
   $datetime_check = strtotime($date . ' ' . $time); /* convert input date to unixtime */
-  $result = db_query("SELECT nid FROM node WHERE type= '%s' AND status = %d", $ctype, 1); 
+  $result = db_query("SELECT nid FROM {node} WHERE type= '%s' AND status = %d", $ctype, 1); 
   while ($rows = db_fetch_object($result)){
     foreach ($rows as $key => $nid){
       $node = node_load($nid);
