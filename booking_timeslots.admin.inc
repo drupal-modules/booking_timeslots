@@ -317,9 +317,9 @@ function booking_timeslots_check_admin_options() {
     drupal_set_message(t('Please copy theme files from module themes/ folder into your theme path: @theme_path to see changes in calendar view and clear the cache.', array('@theme_path' => $theme_path)), 'error');
   }
   if (module_exists('calendar_multiday')) {
-    drupal_set_message(t("Currently Calendar Multiday module is not supported! <a href='@url'>Please disable it!</a> See: <a href='!issue'>#1005336</a>", array(
+    drupal_set_message(t("Currently Calendar Multiday module is not supported! <a href='@url'>Please disable it!</a> See: <a href='@issue'>#1005336</a>", array(
       '@url' => url('admin/build/modules'),
-      '!issue' => 'http://drupal.org/node/1005336')), 'error');
+      '@issue' => 'http://drupal.org/node/1005336')), 'error');
   }
 }
 
