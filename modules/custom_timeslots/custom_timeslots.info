@@ -1,0 +1,16 @@
+name = Custom Timeslots
+description = Provides schedule table with custom timeslots
+package = Date/Time
+core = 6.x
+dependencies[] = booking_timeslots
+dependencies[] = content_copy
+dependencies[] = cck_time
+dependencies[] = install_profile_api
+
+
+; Information added by drupal.org packaging script on 2012-02-06
+version = "6.x-1.2+39-dev"
+core = "6.x"
+project = "booking_timeslots"
+datestamp = "1328529868"
+

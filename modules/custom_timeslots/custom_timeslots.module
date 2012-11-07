@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * @file
+ *   Allows users to book timeslots on custom schedule table.
+ *
+ * @version
+ *
+ * @developers
+ *   Rafal Wieczorek <kenorb@gmail.com>
+ */
+
+/**
+ * Implementation of hook_menu().
+ *
+ */
+function custom_timeslots_menu() {
+  $items['admin/settings/booking_timeslots/custom_timeslots'] = array(
+    'title' => t('Custom Timeslots Settings'),
+    'description' => t('Manage custom timeslots.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('custom_timeslots_settings_form'),
+    'access arguments' => array('administer custom timeslots'),
+    'file' => 'custom_timeslots.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['timeslot_schedule'] = array(
+    'title' => t('Timeslot Schedule'),
+    'page callback' => 'custom_timeslots_schedule_table',
+    'access arguments' => array('access custom timeslots'),
+    'file' => 'custom_timeslots.admin.inc',
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implementation of hook_perm().
+ */
+function custom_timeslots_perm() {
+  return array('administer custom timeslots', 'access custom timeslots');
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function custom_timeslots_form_alter(&$form, $form_state, $form_id) {
+  module_load_include('inc', 'custom_timeslots');
+}
+
+/**
+* Implementation of hook_theme
+*/
+function custom_timeslots_theme() {
+  return array(
+    'custom_timeslots_list_sort_form' => array(
+      'arguments' => array('form' => NULL),
+      'file' => 'custom_timeslots.theme.inc',
+    ),
+    'custom_timeslots_slot_available' => array(
+      'template' => 'custom-timeslots-slot-available',
+      'arguments' => array('node' => NULL, 'link' => NULL, 'title' => NULL),
+    ),
+    'custom_timeslots_slot_unavailable' => array(
+      'template' => 'custom-timeslots-slot-unavailable',
+      'arguments' => array('node' => NULL, 'link' => NULL, 'title' => NULL),
+    ),
+  );
+}
+
+/**
+ * Process variables to format the custom slot.
+ *
+ * $variables contains:
+ * - $node
+ *
+ * @see custom-timeslots-slot-available.tpl.php
+ */
+/*
+function template_preprocess_custom_timeslots_slot_available(&$variables, $hook) {
+}
+ */

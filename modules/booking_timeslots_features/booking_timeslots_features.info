@@ -1,0 +1,15 @@
+core = 7.x
+dependencies[] = "booking_timeslots"
+dependencies[] = "calendar"
+dependencies[] = "date"
+dependencies[] = "features"
+description = "Provides configured content type and calendar view for Booking Timeslots for easier configuration"
+features[content][] = "booking_slot-field_booking_slot"
+features[views][] = "booking_calendar"
+features[views_api][] = "api:2"
+project = "booking_timeslots"
+name = "Booking Timeslots Features"
+package = Date/Time
+version = "7.x-1.0"
+files [] = booking_timeslots_features.module
+

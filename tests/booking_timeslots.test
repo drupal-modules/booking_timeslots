@@ -1,0 +1,141 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Test plan for Booking Timeslots module
+ */
+class BookingTimeslotsUnitTest extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Booking Timeslots Test'),
+      'description' => t('Test booking slot functionality.'),
+      'group' => t('Booking Timeslots'),
+    );
+  }
+
+  function setUp() {
+    parent::setUp('booking_timeslots');
+  }
+
+  /**
+   * Create three different users and make sure they see what they're supposed to.
+   */
+  function testSettingsAccess() {
+    $web_user = $this->drupalCreateUser(array('access content'));
+    $this->drupalLogin($web_user);
+    $this->drupalGet('admin/settings/booking_timeslots');
+    $this->assertResponse(403, t('Access denied to edit timeslot settings page.'));
+    $this->drupalGet('admin/settings/booking_timeslots/form_settings');
+    $this->assertResponse(403, t('Access denied to form form settings page.'));
+
+    $web_user = $this->drupalCreateUser(array('edit timeslot settings'));
+    $this->drupalLogin($web_user);
+    $this->drupalGet('admin/settings/booking_timeslots');
+    $this->assertResponse(200, t('Access granted to edit timeslot settings page.'));
+    $this->assertRaw('Booking Timeslots', t('Make sure that we are on the valid settings page.'));
+    $this->drupalGet('admin/settings/booking_timeslots/form_settings');
+    $this->assertResponse(403, t('Access denied to form settings page.'));
+
+    $web_user = $this->drupalCreateUser(array('administer booking timeslots'));
+    $this->drupalGet('admin/settings/booking_timeslots');
+    $this->assertResponse(200, t('Access granted to edit timeslot settings page.'));
+    $this->assertRaw('Booking Timeslots', t('Make sure that we are on the valid settings page.'));
+    $this->drupalGet('admin/settings/booking_timeslots/form_settings');
+    $this->assertResponse(200, t('Access granted to form settings page.'));
+  }
+
+  /**
+   * Verify Booking functionality
+   */
+  function testBookingFunctionality() {
+    $web_user = $this->drupalCreateUser(array('administer content types'));
+    $this->drupalLogin($web_user);
+
+    /* create some content type */
+    /*
+    $content_profile_name = $this->randomName();
+    $content_profile_type = strtolower($this->randomName());
+
+    $edit = array(
+      'name' => $content_profile_name,
+      'type' => $content_profile_type,
+      'content_profile' => 'Array',
+    );
+    $this->drupalPost('admin/content/types/add', $edit, t('Save content type'));
+    $this->assertText('The content type '. $content_profile_name .' has been added.');
+    */
+
+    /* set test options */
+    variable_set('booking_timeslot_length_hours', 1);
+    variable_set('booking_timeslot_length_minutes', 0);
+    variable_set('booking_timeslot_available_slots', 1);
+    variable_set('booking_timeslot_hour_from', 8);
+    variable_set('booking_timeslot_hour_to', 18);
+
+    /* get existing needed configuration */
+    $fields = variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot'));
+    $ex_dates = variable_get('booking_timeslot_excluded_dates', array());
+    $q = db_query("SELECT * FROM {variable} WHERE name LIKE 'booking_timeslot_view_%%'");
+    while ($row = db_fetch_array($q)) {
+      if (unserialize($row['value']) == $page_name) {
+        $view_name = substr($row['name'], strlen('booking_timeslot_view_'));
+        break;
+      }
+    }
+    if (empty($view_name)) $view_name = 'party_diary';
+    /* detect content type name */
+    /* TODO: fix content type detection */
+    $content_types = content_types();
+    if ($my_form_id = $_SESSION['booking_timeslot_ct_' . arg(0)] !== FALSE) {
+      foreach ($my_forms as $my_form_key => $my_form_id) {  // find associated content type with field
+          if (isset($content_types[$my_form_key]['fields'][$my_fields]) && !empty($my_form_key)) { // if field exist in this content type...
+            $_SESSION['booking_timeslot_ct_' . arg(0)] = $my_form_id; /// associate this content type with base path for futher use
+            break 2;
+          }
+      }
+    }
+    $node_add_link = "node/add/" . $my_form_id;
+    /* get translated text */
+    $slot_booked = t('Already booked');
+    $slot_free = t('Book now');
+    $slot_unavailable = t('Not Available');
+
+    /* set test data */
+    date_default_timezone_set('UTC'); /* TODO: set proper timezone? */ // set the default timezone to use. Available since PHP 5.1
+    $yesterday = date("Y-m-d", mktime(0, 0, 0, date("m")  , date("d")-1, date("Y")));
+    $tomorrow = date("Y-m-d", mktime(0, 0, 0, date("m")  , date("d")+1, date("Y")));
+    $yesterday_9 = date("Y-m-d", mktime(9, 0, 0, date("m")  , date("d")-1, date("Y")));
+    $tomorrow_9 = date("Y-m-d", mktime(9, 0, 0, date("m")  , date("d")+1, date("Y")));
+
+    /* go to tomorrow day view */
+    $this->drupalGet("$view_name/$tomorrow");
+    $this->assertResponse(200, t('Access granted to day view page.'));
+    $this->assertNoText($slot_booked, t('All slots are available on next day.'));
+    $this->assertNoText($slot_unavailable, t('All slots are available on next day.'));
+
+    /* click on the first available slot: Book Now */
+    $this->clickLink($slot_free);
+    $url = $this->getUrl();
+    $field = array();
+    $field['title'] = $this->randomName();
+    $this->drupalPost(NULL, $field, t('Save'));
+    $this->assertNoText('An illegal choice has been detected', t('No form errors.'));
+    if (!$this->nid) {
+      $this->assertFalse('Adding node failed.');
+    }
+    /* check if slot has been booked for tomorrow */
+    $this->drupalGet("$view_name/$tomorrow");
+    $this->assertResponse(200, t('Access granted to day view page (!url).'), array('!url' => "$view_name/$tomorrow"));
+    $this->assertText($slot_booked, t('All slots are available on the next day.'));
+
+    /* go to yesterday day view */
+    $this->drupalGet("$view_name/$yesterday");
+    $this->assertResponse(200, t('Access granted to day view page (!url).'), array('!url' => "$view_name/$yesterday"));
+    $this->assertText($slot_unavailable, t('All slots are not available yesterday.')); // difference betweeen assertWantedText ?
+  }
+}
+

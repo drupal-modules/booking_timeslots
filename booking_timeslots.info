@@ -1,0 +1,16 @@
+name = Booking Timeslots
+description = Booking timeslots module
+package = Date/Time
+core = 7.x
+dependencies[] = calendar
+dependencies[] = content
+version = 7.x-1.0
+files [] = booking_timeslots.module
+
+
+; Information added by drupal.org packaging script on 2012-02-06
+version = "6.x-1.2+39-dev"
+core = "6.x"
+project = "booking_timeslots"
+datestamp = "1328529868"
+
