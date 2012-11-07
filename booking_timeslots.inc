@@ -497,7 +497,6 @@ function booking_timeslots_generate_field_dates($field_names = array(), $perm_re
 function booking_timeslots_unixtime2timeslots($unixstart, $unixend) {
   $DateTime_start = date("Y-m-d H:i:s", $unixstart); 
   $DateTime_end = date("Y-m-d H:i:s", $unixend); 
-  var_dump($DateTime_start, $DateTime_end); 
 }
 
 /**
