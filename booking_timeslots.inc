@@ -146,7 +146,7 @@ function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
   static $content_type_cache = array();
   $my_fields = array_flip(variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot')));
   $arg0 = arg(0);
-  if (!isset($content_type_cache[$arg0])) {
+  if (!array_key_exists($arg0, $content_type_cache)) {
     $view_name = booking_timeslot_detect_view(); // get view from URL
     if ($field_name = booking_timeslot_detect_field_from_view($view_name)) { // detect field name via View
       $content_type = booking_timeslot_content_type_via_field($field_name); // detect content type via field name
@@ -210,7 +210,14 @@ function booking_timeslot_detect_field_from_view($view) {
  */
 function booking_timeslot_content_type_via_field($field_name) {
   $field = field_info_fields($field_name);
-  return $field['type_name'];
+  $field = $field [$field_name];
+  
+  $content_types = call_user_func_array('array_merge', $field['bundles']);
+  
+  if(count($content_types) > 1)
+    return $content_types;
+  
+  return $content_types [0];
 }
 
 /**
