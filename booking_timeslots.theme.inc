@@ -98,7 +98,7 @@ function template_preprocess_booking_timeslots_general(&$vars, $view_mode, $star
   
   $vars['granularity'] = booking_timeslots_filters_get_duration($vars['view']);
   
-  drupal_add_css(drupal_get_path('module', 'booking_timeslots') .'/templates/booking_timeslots.css');
+  drupal_add_css(drupal_get_path('module', 'booking_timeslots') .'/css/booking_timeslots.css');
   
   $data_matrix = NULL;
   if(is_array($fid))

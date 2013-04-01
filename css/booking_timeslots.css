@@ -1,0 +1,273 @@
+/*
+  _|_|                                  _|                          _|    _|                                          
+_|    _|  _|_|_|      _|_|    _|_|_|        _|_|_|      _|_|_|      _|    _|    _|_|    _|    _|  _|  _|_|    _|_|_|  
+_|    _|  _|    _|  _|_|_|_|  _|    _|  _|  _|    _|  _|    _|      _|_|_|_|  _|    _|  _|    _|  _|_|      _|_|      
+_|    _|  _|    _|  _|        _|    _|  _|  _|    _|  _|    _|      _|    _|  _|    _|  _|    _|  _|            _|_|  
+  _|_|    _|_|_|      _|_|_|  _|    _|  _|  _|    _|    _|_|_|      _|    _|    _|_|      _|_|_|  _|        _|_|_|    
+          _|                                                _|                                                        
+          _|                                            _|_|                                                          
+*/
+
+#opening-hours-admin                                    { border: 2px solid #ddd; padding: 10px; margin-bottom: 10px; background: #eee; }
+div.date-nav                                            { padding-bottom: 0px; margin-bottom: 0px; }
+div.date-nav-wrapper ul.pager                           { margin-bottom: 0; padding-bottom: 0; }
+div.view-filters fieldset                               { margin: 0; position: static; top: 0; }
+div.views-exposed-form div.fieldset-wrapper             { margin: 0; }
+div.date-heading                                        { margin-top: 40px; }
+div.admin-main-view h2                                  { display: none; }
+#opening-hours-admin div.admin-main-view .dateheader    { float: none; }
+#opening-hours-admin div.admin-main-view ul.navigation  { float: none !important; margin: 6px auto 6px auto; !important; width: 200px !important; }
+#opening-hours-admin div.admin-main-view h3             { text-align: center; padding: 0px !important; margin: 5px 0px 5px 0px; }
+
+div.ui-dialog                                           { padding: 2px !important;  }
+div.ui-dialog-content                                   { background: #eee !important; }
+div.ui-widget-header                                    { background: #ccc !important; border: none !imporant; }
+div.ui-dialog-titlebar                                  { border-radius: 0px !important; border: 0px !important; }
+button.ui-button                                        { padding: 0px 0px !important; }
+button.ui-button span                                   { padding: 3px 10px !important; font-size: 12px; }
+
+
+#opening-hours-admin .admin-main-view .instance-display-view
+                                                        { background: none repeat scroll 0 0 #EEEEEE; border: 1px solid #CCCCCC; border-radius: 3px 3px 3px 3px; box-shadow: 0 1px 2px #BBBBBB; color: #000000; padding: 4px 2px; }
+#opening-hours-admin td.day-view                        { padding: 6px 5px; }
+                                                        
+#opening-hours-admin .day-view                          { padding: 0px; }                                                        
+
+#oho-instance-edit-form table,
+#oho-instance-edit-form table tr,
+#opening-hours-admin table,
+#opening-hours-admin table tr                            { background-color: #fff !important; }
+
+#oho-instance-edit-form fieldset table                   { width: auto !important; }
+
+
+#oho-instance-edit-form table.simple tbody,
+#oho-instance-edit-form table.simple td                  { border: 0px !important; }
+
+#oho-instance-edit-form table th,
+#opening-hours-admin table th                            { background: #53aADD; color: #fff; font-weight: bold; }
+
+#oho-instance-edit-form table th,
+#opening-hours-admin table th                            { border: 1px solid #666 !important; font-size: 11px; }
+
+#oho-instance-edit-form table td,
+#opening-hours-admin table td                            { border: 1px solid #aaa !important; }
+
+#opening-hours-admin table .day-view:hover               { background-color: #ffa; border: 1px solid #888; cursor: pointer; }
+
+
+#oho-instance-edit-form fieldset                    { padding: 10px 16px !important; margin: 14px 0px !important; background: #fff; box-shadow: 0px 1px 1px #bbb; border: 1px solid #ccc !important; width: auto !important; }
+#oho-instance-edit-form fieldset label              { font-size: 12px; font-weight: bold !important; padding: 4px 6px 6px 0px !important;  }
+#oho-instance-edit-form select,
+#oho-instance-edit-form input                       { font-size: 12px; padding: 2px 4px !important; }
+
+
+
+
+/*
+  _|_|_|    _|                      _|                        _|                    _|_|_|                        _|        _|                      
+_|        _|_|_|_|  _|    _|    _|_|_|    _|_|_|    _|_|_|  _|_|_|_|    _|_|        _|    _|    _|_|      _|_|    _|  _|        _|_|_|      _|_|_|  
+  _|_|      _|      _|    _|  _|    _|  _|    _|  _|    _|    _|      _|_|_|_|      _|_|_|    _|    _|  _|    _|  _|_|      _|  _|    _|  _|    _|  
+      _|    _|      _|    _|  _|    _|  _|    _|  _|    _|    _|      _|            _|    _|  _|    _|  _|    _|  _|  _|    _|  _|    _|  _|    _|  
+_|_|_|        _|_|    _|_|_|    _|_|_|    _|_|_|    _|_|_|      _|_|    _|_|_|      _|_|_|      _|_|      _|_|    _|    _|  _|  _|    _|    _|_|_|  
+                                              _|                                                                                                _|  
+                                          _|_|                                                                                              _|_|    
+*/
+
+
+
+fieldset#edit-booking,
+fieldset#edit-booking div.fieldset-wrapper               { border: 0px; padding: 0px; }
+
+fieldset#edit-booking div.form-item                      { margin: 0px 5px; }
+fieldset#edit-booking div.form-item label                { padding-right: 3px; font-size: 12px; }
+
+fieldset#edit-booking select                             { max-width: 150px; padding: 2px 1px; font-size: 12px; }
+
+
+
+/* Removing white background */
+.calendar-calendar div.calendar                           { background-color: inherit; }
+
+/* Shrinking too wide th's */
+.calendar-calendar .week-view .full .days                 { width: 10%; background: #888; color: #fff; }
+.calendar-calendar td                                     { width: 10%; }
+
+.calendar-calendar th.days                 { width: 10%; background: #888; color: #fff; }
+
+
+div.green-box-info-box                                    { z-index: 1000; position: fixed; background: #70C9F1; font-size: 15px; padding: 3px 5px; text-align: left; }
+div.green-box-info-pay-box                                { z-index: 1000; position: fixed; background: #00986D; color: #fff; font-size: 15px; padding: 9px 7px 7px 7px; border-radius: 30px; text-align: center; }
+div.green-box-arrow-box                                   { z-index: 1000; position: fixed;  }
+div.green-box-arrow-box div.top                           { z-index: 1000; border-color: transparent #70C9F1 transparent transparent; border-style:solid; border-width:14px; width:0; height:0; }
+div.green-box-arrow-box div.bottom                        { z-index: 1000; }
+
+td.calendar-item                                          {  }
+
+.calendar-item,
+.calendar-item-unavailable span,
+.calendar-item-available span                             { font-size: 12px; }
+
+
+span.unavailable-text                                     { font-weight: bold; opacity: 0.6; }
+span.too-far-text                                         { font-weight: bold; opacity: 1; color: #555; }
+
+.calendar-item-unavailable.calendar-item-availability-unavailable                 {
+background: #9c81a3; /* Old browsers */
+background: -moz-linear-gradient(top, #9c81a3 0%, #836e89 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#9c81a3), color-stop(100%,#836e89)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #9c81a3 0%,#836e89 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #9c81a3 0%,#836e89 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #9c81a3 0%,#836e89 100%); /* IE10+ */
+background: linear-gradient(to bottom, #9c81a3 0%,#836e89 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9c81a3', endColorstr='#836e89',GradientType=0 ); /* IE6-9 */
+color: #fff;
+}
+
+
+.calendar-item-unavailable.calendar-item-availability-depleted                    {
+background: #c4384b; /* Old browsers */
+background: -moz-linear-gradient(top, #c4384b 0%, #aa3139 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#c4384b), color-stop(100%,#aa3139)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #c4384b 0%,#aa3139 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #c4384b 0%,#aa3139 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #c4384b 0%,#aa3139 100%); /* IE10+ */
+background: linear-gradient(to bottom, #c4384b 0%,#aa3139 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c4384b', endColorstr='#aa3139',GradientType=0 ); /* IE6-9 */
+color: #fff;
+}
+
+.calendar-item-available.calendar-item-availability-near-zero                   {
+background: #fdd153; /* Old browsers */
+background: -moz-linear-gradient(top, #fdd153 0%, #e5cc4e 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fdd153), color-stop(100%,#e5cc4e)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #fdd153 0%,#e5cc4e 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #fdd153 0%,#e5cc4e 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #fdd153 0%,#e5cc4e 100%); /* IE10+ */
+background: linear-gradient(to bottom, #fdd153 0%,#e5cc4e 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fdd153', endColorstr='#e5cc4e',GradientType=0 ); /* IE6-9 */
+}
+
+.calendar-agenda-items.single-day.closed                                        {
+  background: #ddd !important;
+}
+
+.calendar-agenda-items.single-day.too-far                                       {
+  background: #aaa !important;
+}
+
+.calendar-item-available.calendar-item-availability-not-all                      {
+background: #F9C933; color: #000;
+}
+
+.calendar-item-available.calendar-item-availability-all                        {
+  background: #6E9B25; color: #fff;
+}
+
+.calendar-calendar td.calendar-agenda-items.calendar-item-green-box              {
+vertical-align: top !important;
+background: #a0d690; /* Old browsers */
+background: -moz-linear-gradient(top, #a0d690 0%, #99c183 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a0d690), color-stop(100%,#99c183)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #a0d690 0%,#99c183 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #a0d690 0%,#99c183 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #a0d690 0%,#99c183 100%); /* IE10+ */
+background: linear-gradient(to bottom, #a0d690 0%,#99c183 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a0d690', endColorstr='#99c183',GradientType=0 ); /* IE6-9 */
+padding: 0px !important;
+border: 1px solid #fff;
+}
+
+.calendar-day-green-box {
+	vertical-align: top !important;
+	background: #A0D690;
+	padding: 0px !important;
+	border: 1px solid #fff;
+	cursor: pointer;
+}
+
+
+td.calendar-item-day-closed                               { background-color: #eee; color: #ccc;  }
+
+
+div.calendar-calendar table                               { border-collapse: collapse; border: 1px solid #ccc; }
+
+.calendar-agenda-items.single-day                       { height: 25px; vertical-align: middle !important;  }
+.calendar-agenda-items.calendar-item-available.single-day.calendar-item-available:hover                 {
+}
+
+.calendar-item-greenbox-virtualslot {
+  border: 0px !important;
+}
+.calendar-item-greenbox-virtualslot tr,
+.calendar-item-greenbox-virtualslot td
+{
+  margin: 0 !important; padding: 0 !important; border: 0 !important;
+}
+
+.calendar-item-greenbox-virtualslot td
+{
+  color: #000 !important;
+}
+
+.calendar-item-greenbox-virtualslot                       {
+  color: #000 !important;
+  text-transform: uppercase;
+  vertical-align: middle !important;
+  font-size: 11px;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+background: #fdd153; /* Old browsers */
+background: -moz-linear-gradient(top, #fdd153 0%, #e5cc4e 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fdd153), color-stop(100%,#e5cc4e)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #fdd153 0%,#e5cc4e 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #fdd153 0%,#e5cc4e 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #fdd153 0%,#e5cc4e 100%); /* IE10+ */
+background: linear-gradient(to bottom, #fdd153 0%,#e5cc4e 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fdd153', endColorstr='#e5cc4e',GradientType=0 ); /* IE6-9 */
+position: relative !important;
+margin-top: 0px !important;
+/*
+margin-left: -2px !important;
+margin-right: -4px !important;
+*/
+}
+
+.calendar-calendar .month-view .full td, .calendar-calendar .week-view .full td, .calendar-calendar .day-view td { padding: 3px 1px; }
+
+.calendar-calendar td.calendar-agenda-items               { border: 1px solid #ccc; }
+
+/* Centering hour title vertically */
+td.calendar-agenda-hour                                   { vertical-align: middle !important;  }
+td.calendar-agenda-hour                                   { font-size: 10px; font-weight: normal; color: #777; padding-right: 10px !important; }
+td.calendar-item-day-other-times-exists                   { background: #e0e0e0; color: #555; }
+
+.booking-item                                             { max-width: 140px; padding: 0px !important; text-align: center; background: rgba(0, 0, 0, 0.19) !important; margin: 2px auto !important; border-radius: 1px; font-size: 11px; border-top: 1px solid rgba(0, 0, 0, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.6); color: #fff; }
+.booking-item .field-content                              { text-shadow: 0px 1px 1px #444; }
+.booking-item .title                                      { text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.6); font-size: 11px; padding-top: 0px; font-size: 12px !important; font-weight: bold; }
+td.calendar-item-available a                              { padding: 2px 2px; color: #000; border-radius: 3px; }
+.booking-item .link a                                     { padding: 2px 2px; background: rgba(255, 255, 255, 0.3); color: #000; border-radius: 3px; border: 1px outset rgba(255, 255, 255, 0.5); line-height: 2.3em; }
+td.calendar-item-available a:hover,
+.booking-item .link a:hover                               { padding: 2px 2px; background: rgba(0, 0, 0, 0.5); color: #fff; text-decoration: none; }
+
+.book-now                                                { font-size: 10px; color: #000; font-weight: 900 !important; }
+
+div.link a                                                { white-space: nowrap; }
+
+.tipsy-title                                              { display: none; }
+
+th.calendar-agenda-hour                                   {  }
+
+.tipsy                                                    { font-size: 12px; padding: 6px 12px; }
+
+div.calendar-calendar span.day-num                        { color: #333; padding-left: 6px; /* width: 20px; display: inline-block; */ text-align: left; }
+div.calendar-calendar span.month-num                      { color: #adf; padding-left: 3px;  width: 20px; display: inline-block; text-align: left; }
+
+
+.calendar-calendar td .inner div, .calendar-calendar td .inner div a { background: none; }
+
+.calendar-calendar tr                                     { background: inherit; }
+.calendar-calendar tr td.calendar-agenda-items.zero-minutes,
+.calendar-calendar tr.zero-minutes td.calendar-agenda-hour,
+.calendar-calendar .zero-minutes                          { border-bottom: 1px solid #aaa !important; }
