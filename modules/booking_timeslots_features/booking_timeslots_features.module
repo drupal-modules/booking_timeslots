@@ -1,3 +1,7 @@
 <?php
+/**
+ * @file
+ * Code for the Booking Time Slots Features feature.
+ */
 
-include_once('booking_timeslots_features.features.inc');
+include_once 'booking_timeslots_features.features.inc';
