@@ -90,7 +90,6 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
     if (!Drupal.settings.booking_timeslots_user_may_book)
       return;
     
-    
     var GetGreenBoxInfo = function (td) {
       
       return JSON.parse (decodeURIComponent($(td)[0].id));

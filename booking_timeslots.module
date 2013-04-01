@@ -121,7 +121,7 @@ function booking_timeslots_menu() {
     'access callback' => 'booking_timeslots_access_callback',
     'page arguments' => array('booking_timeslots_settings_form'),
     'file' => 'includes/booking_timeslots.admin.inc',
-    'weight' => -20,
+    'weight' => -50,
   );
   
   $items['admin/config/booking_timeslots']['title'] = 'Booking Timeslots';
@@ -1293,7 +1293,7 @@ function booking_timeslots_check_configuration_validity ()
   $quaternary_name             = variable_get('booking_timeslots_4th_content_type');
   
   if (!$primary_name || !$secondary_name || !$secondary_to_primary_name || !$tertiary_name || !$tertiary_to_secondary_name || !$tertiary_to_quaternary_name || !$quaternary_name) {
-    drupal_set_message(t('Booking Timeslots are not properly configured. Please visit !url and configure the module.', array('!url' => l('settings page', 'admin/config/booking_timeslots/settings'))), $type = 'error');
+    drupal_set_message(t('Booking Timeslots module is not properly configured. Please visit !url and configure the module', array('!url' => l('settings page', 'admin/config/booking_timeslots/settings'))), $type = 'error');
     return $already_checked_value = FALSE;
   }
   
