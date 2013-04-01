@@ -159,7 +159,9 @@ function template_preprocess_booking_timeslots_month(&$vars) {
   $vars['bt_text']['slot_unavailable'] = t('Not Available'); // Text for slot, which is unavailable
 
   // '@TODO: Here we have rows as html code but we would like to operate on cells so we need to get the cell structure from somewhere'; 
-
+  // Nothing to do here
+  return;
+  
   $cid = arg(0);
   foreach ($vars['rows'] as $weekno => $row) {
     foreach ($row as $day => $data) {
