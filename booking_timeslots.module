@@ -1,7 +1,13 @@
 <?php
 /**
  * @file
- * Drupal needs this blank file.
+ *   Main module file.
+ *
+ * @version
+ *   $Id:$
+ *
+ * @developers
+ *   Rafal Wieczorek <kenorb+nospam@gmail.com>
  */
 
 require_once 'booking_timeslots.booking.inc';

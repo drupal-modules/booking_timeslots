@@ -7,8 +7,8 @@
  * @version
  *   $Id:$
  *
- * @author
- *   Rafal Wieczorek <kenorb@gmail.com>
+ * @developers
+ *   Rafal Wieczorek <kenorb+nospam@gmail.com>
  */
 
 /**

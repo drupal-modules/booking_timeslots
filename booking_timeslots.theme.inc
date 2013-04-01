@@ -6,7 +6,7 @@
  * @version
  *
  * @developers
- *   Rafal Wieczorek <kenorb@gmail.com>
+ *   Rafal Wieczorek <kenorb+nospam@gmail.com>
  */
 
 /**
