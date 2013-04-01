@@ -145,6 +145,8 @@ function template_preprocess_booking_timeslots_month(&$vars) {
    * $max_date_formatted: The maximum date for this calendar in the format YYYY-MM-DD HH:MM:SS.
    */
 
+  global $rows;
+  
   // name of current day of the week
   $vars['bt_day_of_week'] = $today = date("l", strtotime($rows['date'])); 
 
