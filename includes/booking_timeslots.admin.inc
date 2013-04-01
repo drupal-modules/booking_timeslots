@@ -15,6 +15,7 @@
  *  Menu callback for the settings form.
  */
 function booking_timeslots_settings_timeslots_form($form_state) {
+  /*
   $form['timeslot_length'] = array(
     '#type' => 'fieldset',
     '#title' => t('Timeslot settings'),
@@ -27,10 +28,10 @@ function booking_timeslots_settings_timeslots_form($form_state) {
     $hour_options[] = $i;
   }
 
-  $form['timeslot_length']['booking_timeslot_length_hours'] = array(
+  $form['timeslot_length']['booking_timeslots_length_hours'] = array(
     '#type' => 'select',
     '#title' => t('Hours'),
-    '#default_value' => variable_get('booking_timeslot_length_hours', 1),
+    '#default_value' => variable_get('booking_timeslots_length_hours', 1),
     '#options' => $hour_options,
   );
 
@@ -38,10 +39,10 @@ function booking_timeslots_settings_timeslots_form($form_state) {
     $minute_options[] = $i;
   }
 
-  $form['timeslot_length']['booking_timeslot_length_minutes'] = array(
+  $form['timeslot_length']['booking_timeslots_length_minutes'] = array(
     '#type' => 'select',
     '#title' => t('Minutes'),
-    '#default_value' => variable_get('booking_timeslot_length_minutes', 0),
+    '#default_value' => variable_get('booking_timeslots_length_minutes', 0),
     '#options' => $minute_options,
   );
 
@@ -49,34 +50,34 @@ function booking_timeslots_settings_timeslots_form($form_state) {
     $avaliable_slots[] = $i;
   }
 
-  $form['timeslot_length']['booking_timeslot_available_slots'] = array(
+  $form['timeslot_length']['booking_timeslots_available_slots'] = array(
     '#type' => 'select',
     '#title' => t('Maximum avaliable slots per timeframe'),
-    '#default_value' => variable_get('booking_timeslot_available_slots', 1),
+    '#default_value' => variable_get('booking_timeslots_available_slots', 1),
     '#options' => $avaliable_slots,
     '#description' => t('How many slots are available to book at the same time. Choose 0 to disable checking for slot availability.'),
   );
 
-   $form['timeslot_length']['booking_timeslot_hour_from'] = array(
+   $form['timeslot_length']['booking_timeslots_hour_from'] = array(
     '#type' => 'select',
     '#title' => t('Hour from'),
-    '#default_value' => variable_get('booking_timeslot_hour_from', 8),
+    '#default_value' => variable_get('booking_timeslots_hour_from', 8),
     '#options' => $hour_options,
     '#description' => t('Default starting hour.'),
   );
 
-  $form['timeslot_length']['booking_timeslot_hour_to'] = array(
+  $form['timeslot_length']['booking_timeslots_hour_to'] = array(
     '#type' => 'select',
     '#title' => t('Hour to'),
-    '#default_value' => variable_get('booking_timeslot_hour_to', 18),
+    '#default_value' => variable_get('booking_timeslots_hour_to', 18),
     '#options' => $hour_options,
     '#description' => t('Default ending hour.'),
   );
   
-  $form['timeslot_length']['booking_timeslot_not_avaliable'] = array(
+  $form['timeslot_length']['booking_timeslots_not_avaliable'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Weekdays which are not available for booking'),    
-    '#default_value' => variable_get('booking_timeslot_not_avaliable', array()),
+    '#default_value' => variable_get('booking_timeslots_not_avaliable', array()),
     '#options' => array(
         'monday' => t('Monday'),
         'tuesday' => t('Tuesday'),
@@ -87,6 +88,7 @@ function booking_timeslots_settings_timeslots_form($form_state) {
         'sunday' => t('Sunday')
     )
   );
+    */
    
   $form['#validate'][] = 'booking_timeslots_form_validate';
   return system_settings_form($form);
@@ -97,64 +99,111 @@ function booking_timeslots_settings_timeslots_form($form_state) {
  */
 function booking_timeslots_settings_form($form_state) {
 
-   $form['cck'] = array(
+   $form['entity'] = array(
     '#type' => 'fieldset',
-    '#title' => t('CCK integration'),
-    '#description' => t('Here you can select which fields you want to use for time slots.'),
+    '#title' => t('Entity integration'),
+    '#description' => t('Here you can choose which entities you want to integrate with booking time slots.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
 
-  if (module_exists('date')) {
-    $field_list = array();
-    $content_types = array();
-    foreach (field_info_fields() as $field_name => $data) {
-      if ($data['type'] == 'datetime' || $data['type'] == 'date') { // TODO: 'date' field types are not tested yet
-        
-        $field_content_types = call_user_func_array('array_merge', $data['bundles']);
-        $field_list[$field_name] = $field_name . ' (' . t('Content types:') . ' ' . implode(', ', $field_content_types) . ')';
-        
-        foreach ($field_content_types as $name)
-          $content_types[$name] = $name;
-      }
-    }
-    $form['cck']['booking_timeslot_fields'] = array(
-      '#type' => 'checkboxes',
-      '#title' => t('Field Names'),
-      '#description' => t('Select field names which are handled automatically by the module.'),
-      '#default_value' => $fields = variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot')),
-      '#options' => $field_list,
-      '#required' => TRUE,
-    );
-
-    if (empty($field_list)) {
-      drupal_set_message(t('Please add at least one CCK %type field into your content type.', array('%type' => 'datetime')), 'error');
-    }
-    elseif (empty($fields)) {
-      drupal_set_message(t('Please select at least one date or datetime field where you want to store booking times.'), 'warning');
-    }
-
-    $form['cck']['booking_timeslot_excluded_dates'] = array(
-      '#type' => 'checkboxes',
-      '#title' => t('Fields with non-available dates (optional)'),
-      '#description' => t('Select fields which contains non-available dates. Note: Use this option only when you want to limit availability of your time slots.'),
-      '#default_value' => variable_get('booking_timeslot_excluded_dates', array()),
-      '#options' => $field_list,
-    );
+  $content_types = array(0 => '(None)');
+  $content_types += drupal_map_assoc(array_keys(node_type_get_types()));
   
-    $form['cck']['booking_timeslot_limited_dates'] = array(
-      '#type' => 'checkboxes',
-      '#title' => t('Fields with limited dates (optional)'),
-      '#description' => t('If selected, limit booking availability only to configured dates within selected fields. Use this option only when you want to limit availability within specified periods.'),
-      '#default_value' => variable_get('booking_timeslot_limited_dates', array()),
-      '#options' => $field_list,
-    );
+  $fields = array(0 => '(None)');
+  foreach(field_info_fields() as $name => $info) {
+    
+    $bundles = array();
+    
+    if ($info['bundles']) {
+      $bundles = call_user_func_array('array_merge', $info['bundles']);
+    }
+      
+    $bundles = implode(', ', $bundles);
+    
+    $title = $name;
+    
+    if ($bundles) {
+      $title .= ' (' . $bundles . ')';
+    }
+    
+    $fields[$name] = $title;
+  }
   
-  }
-  else {
-    $content_types = node_type_get_types('names');
-    drupal_set_message(t('Please install %module module for fields settings.', array('%module' => 'Date')), 'error');
-  }
+  
+  
+  //$fields += drupal_map_assoc(array_keys(field_get_items('node')));
+  
+  $form['entity']['booking_timeslots_1st_content_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Primary content type'),
+    '#default_value' => variable_get('booking_timeslots_1st_content_type', ''),
+    '#options' => $content_types,
+    '#description' => t('Content type which is used for booking per calendar. Select None to disable the feature. E.g. Venue'),
+  );
+
+  $form['entity']['booking_timeslots_2nd_content_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Secondary content type'),
+    '#default_value' => variable_get('booking_timeslots_2nd_content_type', ''),
+    '#options' => $content_types,
+    '#description' => t('Content type which is associated with the primary content type. Select None to disable the feature. E.g. Facility'),
+  );
+
+  // Reference from the 2nd to 1st content type
+  $form['entity']['booking_timeslots_2nd_to_1st_ref_field'] = array(
+    '#type' => 'select',
+    '#title' => t('Secondary to primary content type reference field'),
+    '#default_value' => variable_get('booking_timeslots_2nd_to_1st_ref_field', ''),
+    '#options' => $fields,
+    '#description' => t('Field acting as a reference from the 2nd to 1st content type'),
+  );
+  
+  $form['entity']['booking_timeslots_3rd_content_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Tertiary content type'),
+    '#default_value' => variable_get('booking_timeslots_3rd_content_type', ''),
+    '#options' => $content_types,
+    '#description' => t('Content type which is associated with the secondary content type. Select None to disable the feature. E.g. Class'),
+  );
+  
+  // 3rd content type capacity field
+  $form['entity']['booking_timeslots_3rd_capacity_field'] = array(
+    '#type' => 'select',
+    '#title' => t('Tertiary content type capacity field'),
+    '#default_value' => variable_get('booking_timeslots_3rd_capacity_field', ''),
+    '#options' => $fields,
+    '#description' => t('Field acting as a capacity indicator for a 3rd content type'),
+  );
+  
+
+  // Reference from the 3rd to 2nd content type
+  $form['entity']['booking_timeslots_3rd_to_2nd_ref_field'] = array(
+    '#type' => 'select',
+    '#title' => t('Tertiary to secondary content type reference field'),
+    '#default_value' => variable_get('booking_timeslots_3rd_to_2nd_ref_field', ''),
+    '#options' => $fields,
+    '#description' => t('Field acting as a reference from the 3rd to 2nd content type'),
+  );
+  
+  // Reference from the 3rd to 4th content type
+  $form['entity']['booking_timeslots_3rd_to_4th_ref_field'] = array(
+    '#type' => 'select',
+    '#title' => t('Tertiary to quaternary content type reference field'),
+    '#default_value' => variable_get('booking_timeslots_3rd_to_4th_ref_field', ''),
+    '#options' => $fields,
+    '#description' => t('Field acting as a reference from the 3rd to 4th content type'),
+  );
+  
+  $form['entity']['booking_timeslots_4th_content_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Quaternary content type'),
+    '#default_value' => variable_get('booking_timeslots_4th_content_type', ''),
+    '#options' => $content_types,
+    '#description' => t('Content type which is associated with the tertiary content type. Select None to disable the feature. E.g. Instructor'),
+  );
+  
+  
 
   $form['views'] = array(
     '#type' => 'fieldset',
@@ -182,52 +231,103 @@ function booking_timeslots_settings_form($form_state) {
   else {
     foreach ($list_views as $key => $value) {
       $view_path = booking_timeslots_calendar_view_path($key);
-      $form['views']['booking_timeslot_view_' . $key] = array(
+      $form['views']['booking_timeslots_view_' . $key] = array(
           '#type' => 'select',
           '#title' => t('View: %view', array('%view' => $key)),
           '#description' => t('Choose which content type should be associated with your <a target=_blank href="@url">calendar view</a>.', array('@url' => url($view_path))),
-          '#default_value' => variable_get('booking_timeslot_view_' . $key, ''),
+          '#default_value' => variable_get('booking_timeslots_view_' . $key, ''),
           '#options' => array_merge(array('' => t('- None -')), $content_types),
         );
     }
   }
-  if (isset($form['views']['booking_timeslot_view_booking_calendar']) && empty($form['views']['booking_timeslot_view_booking_calendar']['#default_value'])) {
-    $form['views']['booking_timeslot_view_booking_calendar']['#default_value'] = array('booking_slot');
+  if (isset($form['views']['booking_timeslots_view_booking_calendar']) && empty($form['views']['booking_timeslots_view_booking_calendar']['#default_value'])) {
+    $form['views']['booking_timeslots_view_booking_calendar']['#default_value'] = array('booking_slot');
   }
 
   $form['config'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Settings'),
+    '#title' => t('Calendar presentation and default timezone'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
-  $form['config']['booking_timeslot_past_booking'] = array(
+  
+  $form['config']['date_first_day'] = array(
+    '#type' => 'select',
+    '#title' => t('First day of week'),
+    '#default_value' => variable_get('date_first_day', 0),
+    '#options' => array(0 => t('Sunday'), 1 => t('Monday'), 2 => t('Tuesday'), 3 => t('Wednesday'), 4 => t('Thursday'), 5 => t('Friday'), 6 => t('Saturday')),
+    '#weight' => -2
+  );
+  
+  $form['config']['date_default_timezone'] = array(
+    '#type' => 'select',
+    '#title' => st('Default time zone'),
+    '#default_value' => variable_get('date_default_timezone', date_default_timezone_get()),
+    '#options' => system_time_zones(),
+    '#description' => st('By default, dates in this site will be displayed in the chosen time zone.'),
+    '#weight' => -1,
+    '#attributes' => array('class' => array('timezone-detect')),
+  );
+  
+  $form['config']['booking_timeslots_calendar_granularity'] = array(
+    '#type' => 'select',
+    '#title' => t('Calendar granularity'),
+    '#default_value' => variable_get('booking_timeslots_calendar_granularity', '15'),
+    '#options' => array('15' => '15 min', '30' => '30 min', '60' => '60 min'),
+    '#description' => t('Time step between each time row'),
+  );
+
+  $form['config']['booking_timeslots_enable_booking_for_past_dates'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable booking of slots from past (apply to normal users)'),
+    '#default_value' => variable_get('booking_timeslots_enable_booking_for_past_dates', '1'),
+    '#description' => t('By enabling this options you will allow normal users to book slots in past. Venue managers will we able to book such slots anyway.'),
+  );
+  
+  
+  $form['config']['booking_timeslots_durations'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Enabled durations'),
+    '#default_value' => variable_get('booking_timeslots_durations', "15|15 min\n30|30 min\n45|45 min\n60|60 min\n120|120 min"),
+    '#description' => t("List of enabled durations. Each line should contain number of minutes and title separated by '|' character. Note that those durations must be a multiple of the calendar granularity and be greater or equal to that granularity."),
+  );
+  
+  /*
+  $form['config']['booking_timeslots_past_booking'] = array(
     '#type' => 'checkbox',
     '#title' => t("Allow to book in the past."),
     '#description' => t('If enabled, slots in the past are available to book.'),
-    '#default_value' => variable_get('booking_timeslot_past_booking', FALSE),
+    '#default_value' => variable_get('booking_timeslots_past_booking', FALSE),
   );
+  */
 
+  /*
   $form['other'] = array(
     '#type' => 'fieldset',
     '#title' => t('Other Settings'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
-  $form['other']['booking_timeslot_show_warnings'] = array(
+  */
+  
+  /*
+  $form['other']['booking_timeslots_show_warnings'] = array(
     '#type' => 'checkbox',
     '#title' => t("Don't show configuration warnings, etc. on admin pages."),
     '#description' => t('If you configured module correctly or you customized already some settings, some warnings are no longer necessary. Check to disable them.'),
-    '#default_value' => variable_get('booking_timeslot_show_warnings', FALSE),
+    '#default_value' => variable_get('booking_timeslots_show_warnings', FALSE),
   );
-  $form['other']['booking_timeslot_show_debug_messages'] = array(
+  $form['other']['booking_timeslots_show_debug_messages'] = array(
     '#type' => 'checkbox',
     '#title' => t("Show debug messages."),
     '#description' => t('Show additional debug messages (administration permission required).'),
-    '#default_value' => variable_get('booking_timeslot_show_debug_messages', FALSE),
+    '#default_value' => variable_get('booking_timeslots_show_debug_messages', FALSE),
   );
+  */
 
-  !variable_get('booking_timeslot_show_warnings', FALSE) ?  booking_timeslots_check_admin_options() : NULL; // Check for configuration issues
+  /*
+  !variable_get('booking_timeslots_show_warnings', FALSE) ?  booking_timeslots_check_admin_options() : NULL; // Check for configuration issues
+  */
   $form['#validate'][] = 'booking_timeslots_settings_form_validate';
   return system_settings_form($form);
 }
@@ -236,7 +336,6 @@ function booking_timeslots_settings_form($form_state) {
  * Get calendar view path based on view name
  */
 function booking_timeslots_calendar_view_path($view_name) {
-  
   $view = views_get_view($view_name);
   return isset($view->display[$view_name]) ? $view->display[$view_name]->display_options['path'] : '';
 }
@@ -245,13 +344,15 @@ function booking_timeslots_calendar_view_path($view_name) {
  * Form API callback to validate the settings form.
  */
 function booking_timeslots_form_validate($form, &$form_state) {
-  $hour_from = $form['timeslot_length']['booking_timeslot_hour_from']['#value'];
-  $hour_to = $form['timeslot_length']['booking_timeslot_hour_to']['#value'];
+  /*
+  $hour_from = $form['timeslot_length']['booking_timeslots_hour_from']['#value'];
+  $hour_to = $form['timeslot_length']['booking_timeslots_hour_to']['#value'];
 
   if ($hour_from >= $hour_to) {
-    form_set_error('booking_timeslot_hour_from', t("Hour To should be greater than Hour From."));
-    form_set_error('booking_timeslot_hour_to', ' ');
+    form_set_error('booking_timeslots_hour_from', t("Hour To should be greater than Hour From."));
+    form_set_error('booking_timeslots_hour_to', ' ');
   }
+  */
 }
 
 /**
@@ -260,16 +361,17 @@ function booking_timeslots_form_validate($form, &$form_state) {
 function booking_timeslots_settings_form_validate($form, &$form_state) {
   $values = $form_state['values'];
 
-  /* MAKE THE LIST OF ACTIVATED VIEWS */
+  /*
+  // MAKE THE LIST OF ACTIVATED VIEWS
   $enabled_views = array();
-  preg_match_all("/booking_timeslot_view_\w+/", join(",", array_keys($values)), $names); // find all interval array keys from the submitted form
+  preg_match_all("/booking_timeslots_view_\w+/", join(",", array_keys($values)), $names); // find all interval array keys from the submitted form
   foreach ((array)$names[0] as $key => $vkey) { // for each key, find the items
-    $view_name = substr($vkey, strlen('booking_timeslot_view_'));
+    $view_name = substr($vkey, strlen('booking_timeslots_view_'));
     $content_name = $values[$vkey]; // find interval for found key from form
     $enabled_views[$view_name] = $content_name;
     if (!empty($content_name)) { // if view is associated with content type...
       module_load_include('inc', 'booking_timeslots');
-      if (!($field_name = booking_timeslot_detect_field_from_view($view_name))) { // check if that view has proper configuration
+      if (!($field_name = booking_timeslots_detect_field_from_view($view_name))) { // check if that view has proper configuration
         form_set_error($vkey,
           t("Please configure <a target='_blank' href='@view_url'>%name view</a> by <a target='_blank' href='@view_arg_url'>selecting proper field</a> which you chosen for time slots and <a target='_blank' href='@view_fields_url'>adding it</a> to the list of fields, before activating the view!",
             array(
@@ -284,22 +386,23 @@ function booking_timeslots_settings_form_validate($form, &$form_state) {
     }
   }
   $enabled_views = array_filter($enabled_views); // filter empty settings
-  empty($enabled_views) && !variable_get('booking_timeslot_show_warnings', FALSE) ?  drupal_set_message(t("Proper configuration require at least one view associated with a content type!"), 'warning') : NULL; // Check for configuration issues
+  empty($enabled_views) && !variable_get('booking_timeslots_show_warnings', FALSE) ?  drupal_set_message(t("Proper configuration require at least one view associated with a content type!"), 'warning') : NULL; // Check for configuration issues
 
-  /* CHECK PROPER CONFIGURATION OF FIELDS */
-  $field_names = array_flip($values['booking_timeslot_fields']);
-  $field_names_off = array_flip($values['booking_timeslot_excluded_dates']);
-  $field_names_limited = array_flip($values['booking_timeslot_limited_dates']);
+  // CHECK PROPER CONFIGURATION OF FIELDS
+  $field_names = array_flip($values['booking_timeslots_fields']);
+  $field_names_off = array_flip($values['booking_timeslots_excluded_dates']);
+  $field_names_limited = array_flip($values['booking_timeslots_limited_dates']);
   unset($field_names[0], $field_names_off[0], $field_names_limited[0]); // remove disabled checkboxes
   if (($wrong_fields = array_intersect($field_names, $field_names_off)) && !empty($wrong_fields)) { // search for fields, which are enabled in two places at the same time
-    form_set_error('booking_timeslot_excluded_dates', t("You can't use the same field %field for non-available dates, which is already used for time slots!", array('%field' => current($wrong_fields))));
+    form_set_error('booking_timeslots_excluded_dates', t("You can't use the same field %field for non-available dates, which is already used for time slots!", array('%field' => current($wrong_fields))));
   }
   if (($wrong_fields = array_intersect($field_names, $field_names_limited)) && !empty($wrong_fields)) { // search for fields, which are enabled in two places at the same time
-    form_set_error('booking_timeslot_limited_dates', t("You can't use the same field %field for limiting dates, which is already used for time slots!", array('%field' => current($wrong_fields))));
+    form_set_error('booking_timeslots_limited_dates', t("You can't use the same field %field for limiting dates, which is already used for time slots!", array('%field' => current($wrong_fields))));
   }
   if (($wrong_fields = array_intersect($field_names_off, $field_names_limited)) && !empty($wrong_fields)) { // search for fields, which are enabled in two places at the same time
-    form_set_error('booking_timeslot_limited_dates', t("You can't use the same field %field for limiting dates, which is already used for non-available dates!", array('%field' => current($wrong_fields))));
+    form_set_error('booking_timeslots_limited_dates', t("You can't use the same field %field for limiting dates, which is already used for non-available dates!", array('%field' => current($wrong_fields))));
   }
+  */
 }
 
 /**
@@ -309,6 +412,7 @@ function booking_timeslots_settings_form_validate($form, &$form_state) {
  */
 function booking_timeslots_check_admin_options() {
   /* CHECK IF TPL TEMPLATE HAS BEEN COPIED INTO THEME FOLDER */
+  /*
   $theme_path = drupal_get_path('theme', variable_get('theme_default', NULL));
   if (($registry = theme_get_registry()) && (array_search('template_preprocess_booking_timeslots_day', (array)$registry['calendar_day']['preprocess functions']) === FALSE)) { // check or preprocess function
     drupal_set_message(t('Please <a href="@url">clear the cache</a> to reload preprocess hooks!', array('@url' => url('admin/settings/performance'))), 'warning');
@@ -321,5 +425,6 @@ function booking_timeslots_check_admin_options() {
       '@url' => url('admin/build/modules'),
       '@issue' => 'http://drupal.org/node/1005336')), 'error');
   }
+  */
 }
 
