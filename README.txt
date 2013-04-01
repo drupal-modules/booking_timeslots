@@ -3,8 +3,9 @@ GitHub project page: https://github.com/kenorb/booking_timeslots
 
 QUICK INSTALLATION:
 
+// @FIXME: Out-dated
 1. Enable the module.
-2. Copy theme files from booking_timeslots/theme/ to your theme directory.
+2. Copy theme files from booking_timeslots/templates/ to your theme directory.
 3. Create new Content Type with at least one date or datetime field (or make sure that you have already).
 4. Go to Settings Page and select your Content Type where do you have your date field and type the name of your field as well (i.e. field_datetime).
 5. Go to calendar, you should see booking timeslots.
