@@ -1,67 +1,193 @@
 <?php
-
 /**
  * @file
- *   Allows users to select an available calendar time slot to book.
- *
- * @version
- *
- * @developers
- *   Rafal Wieczorek <kenorb@gmail.com>
+ * Drupal needs this blank file.
  */
+
+require_once 'booking_timeslots.booking.inc';
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu_local_tasks_alter().
  *
+ * Schedule tab should only be added on venue nodes.
+ */
+function booking_timeslots_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  $primary_name = variable_get('booking_timeslots_1st_content_type');
+  
+  if(isset($data['tabs'][0])) {
+    $current_node_type = @$router_item['page_arguments'][0]->type;
+    foreach($data['tabs'][0]['output'] as $key => $link) {
+      if($link['#link']['title'] == ('Schedule') && $current_node_type != $primary_name && $router_item['page_arguments'][0] !== 'public_calendar') {
+        $data['tabs'][0]['output'][$key]['#active'] = FALSE;
+        unset($data['tabs'][0]['output'][$key]);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function booking_timeslots_entity_info() {
+  $info = array();
+  booking_timeslots_booking_entity_info($info);
+  return $info;
+}
+
+/**
+ * Implements hook_url_inbound_alter().
+ *
+ * Tells drupal that urls called via /venue-name should be rendered as /node/nid
+ */
+function booking_timeslots_url_inbound_alter(&$path, $original_path, $path_language) {
+    $arg = explode("/", $path);
+    
+    $primary_name = variable_get('booking_timeslots_1st_content_type');
+    
+    if (!$primary_name) {
+      return;
+    }
+    
+    //if($arg[0] == "venue") {
+        $title = str_replace("-", " ", $arg[0]);
+        $query = new EntityFieldQuery();
+        $entities = $query->entityCondition('entity_type', 'node')
+        ->propertyCondition('type', $primary_name)
+        ->propertyCondition('title', $title)
+        ->propertyCondition('status', 1)
+        ->range(0,1)
+        ->execute();
+        
+        if (!empty($entities['node'])) {
+            $node = node_load(array_shift(array_keys($entities['node'])));
+            $path = 'node/' . $node->nid;
+            
+            if(isset($arg[1])) {
+                for($i = 0; $i < (count($arg) - 1); $i++) {
+                    $path .= '/' . $arg[1 + $i];
+                }
+            }
+        }
+    //}
+}
+
+/**
+ * Implements hook_url_outbound_alter().
+ *
+ * Replaces node urls with venue ones
+ */
+function booking_timeslots_url_outbound_alter(&$path, &$options, $original_path) {
+    $arg = explode("/", $path);
+    
+    $primary_name = variable_get('booking_timeslots_1st_content_type');
+    
+    if($arg[0] == "node") {
+        if(is_numeric($arg[1]))    {
+            $query = new EntityFieldQuery();
+            $entities = $query->entityCondition('entity_type', 'node')
+            ->propertyCondition('type', $primary_name)
+            ->propertyCondition('nid', $arg[1])
+            ->propertyCondition('status', 1)
+            ->range(0,1)
+            ->execute();
+            
+            if (!empty($entities['node'])) {
+                $node = node_load(array_shift(array_keys($entities['node'])));
+                $path = str_replace(" ", "-", $node->title);
+                //$path = 'venue/' . str_replace(" ", "-", $node->title);
+                
+                if(isset($arg[2])) {
+                    for($i = 0; $i < (count($arg) - 2); $i++) {
+                        $path .= '/' . $arg[2 + $i];
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Implements hook_menu().
  */
 function booking_timeslots_menu() {
-
+  $items = array();
+  booking_timeslots_booking_menu($items);
+  
   $items['admin/config/booking_timeslots'] =
   $items['admin/config/booking_timeslots/settings'] = array(
     'title' => 'Booking Timeslots Settings',
-    'description' => 'Manage booking timeslots.',
+    'description' => 'Manage booking settings.',
     'page callback' => 'drupal_get_form',
     'access callback' => 'booking_timeslots_access_callback',
-    'page arguments' => array('booking_timeslots_settings_timeslots_form'),
-    'file' => 'booking_timeslots.admin.inc',
+    'page arguments' => array('booking_timeslots_settings_form'),
+    'file' => 'includes/booking_timeslots.admin.inc',
     'weight' => -20,
   );
   
+  $items['admin/config/booking_timeslots']['title'] = 'Booking Timeslots';
+  
+  /*
   $items['admin/config/booking_timeslots/settings/timeslots_settings'] = array(
     'title' => 'Timeslot settings',
     'description' => 'Manage booking timeslots.',
     'page callback' => 'drupal_get_form',
     'access callback' => 'booking_timeslots_access_callback',
     'page arguments' => array('booking_timeslots_settings_timeslots_form'),
-    'file' => 'booking_timeslots.admin.inc',
+    'file' => 'includes/booking_timeslots.admin.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
-  ); 
+  );
+  */ 
   
+
+  /*
   $items['admin/config/booking_timeslots/settings/form_settings'] = array(
-    'title' => 'Form Settings',
+    'title' => 'Timeslot settings',
     'description' => 'Manage form settings.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('booking_timeslots_settings_form'),
     'access arguments' => array('administer booking timeslots'),
     'type' => MENU_LOCAL_TASK,
-    'file' => 'booking_timeslots.admin.inc',
+    'file' => 'includes/booking_timeslots.admin.inc',
   );
-
+  */
+  
+  
   return $items;
 }
 
 /**
- * Implementation of hook_perm().
+ * Page view handler
+ */
+function booking_timeslots_page_view($obj, $view_mode = 'full') {
+  $obj -> content = array();
+  booking_timeslots_booking_page_view($obj, $view_mode);
+  return $obj -> content;
+}
+
+/**
+ * Module permissions handler
  */
 function booking_timeslots_permission() {
-  $permissions = array(
-    'administer booking timeslots' => array('title' => t('Administer booking timeslots')),
-    'edit booking dates' => array('title' => t('Edit booking dates')),
-    'show booking dates' => array('title' => t('Show booking dates')),
-    'edit timeslot settings' => array('title' => t('Edit timeslot settings')),
-  );
+  $permissions = array();
+  booking_timeslots_booking_permission($permissions);
   return $permissions;
+}
+
+/**
+ * Field Api extra fields handler
+ */
+function booking_timeslots_field_extra_fields() {
+  $return = array();
+  booking_timeslots_booking_field_extra_fields($return);
+  return $return;
+}
+
+/**
+* Implements hook_entity_property_info_alter().
+*/
+function booking_timeslots_entity_property_info_alter(&$info) {
+  booking_timeslots_booking_entity_property_info_alter($info);
 }
 
 /**
@@ -71,73 +197,422 @@ function booking_timeslots_access_callback() {
   return user_access('administer booking timeslots') || user_access('edit timeslot settings');
 }
 
+function booking_timeslots_views_pre_render(&$view) {
+  // Create an AJAX dom ID based on the view name and display to prevent
+  // errors that occur when caching views.
+  // SOURCE: http://drupal.org/node/655002
+  $view -> dom_id = $view -> name . '-' . $view -> current_display;
+}
+
+function booking_timeslots_form_views_exposed_form_alter(&$form, $form_state, $form_id) {
+
+  if ($form_state['view'] -> name == 'public_calendar') {
+    
+    $form['#info'] = array ();
+        
+    unset ($form['nid']);
+
+    if (!booking_timeslots_check_configuration_validity())
+      return;
+    
+    list($time_start, $time_end) = booking_timeslots_get_calendar_time_range ($form_state['view'], $form);
+    
+
+    $primary_id    = &$form_state['view'] -> args[0];
+    $sport_id      = &$form_state['view'] -> exposed_input['sport'];
+    $type_id       = &$form_state['view'] -> exposed_input['type'];
+    $secondary_id  = &$form_state['view'] -> exposed_input['court'];
+    $tertiary_id   = &$form_state['view'] -> exposed_input['class'];
+    $quaternary_id = &$form_state['view'] -> exposed_input['instructor'];
+    $duration      = &$form_state['view'] -> exposed_input['duration'];
+    
+    if ($secondary_id == 'All')
+      $secondary_id = null;
+    
+    if ($tertiary_id == 'All')
+      $tertiary_id = null;
+        
+    $sports      = booking_timeslots_filter_get_sports($sport_id, $primary_id, $secondary_id);
+    $types       = booking_timeslots_filter_get_types($type_id, $primary_id, $secondary_id, $sport_id);
+    
+    if ($type_id == 'courts') {
+      $courts       = booking_timeslots_filter_get_courts($primary_id, $secondary_id, $sport_id);
+      $durations    = booking_timeslots_filter_get_durations($duration, $primary_id, $secondary_id, null, $time_start, $time_end);
+      $classes      = array();
+      $instructors  = array();
+      $tertiary_id  = null;
+    }
+    else {
+      $courts       = array();
+      
+      $classes      = booking_timeslots_filter_get_classes($primary_id, $tertiary_id, $sport_id);
+      $instructors  = booking_timeslots_filter_get_instructors($quaternary_id, $primary_id, $tertiary_id, $tertiary_id);
+      $durations    = booking_timeslots_filter_get_durations($duration, $primary_id, $secondary_id, $tertiary_id, $time_start, $time_end);
+      $secondary_id = null;
+    }
+    
+    $form['booking'] = array (
+      '#type' => 'fieldset',
+      '#title' => t(''),
+      '#attributes' => array('class' => array('container-inline')), 
+      '#weight' => 1
+    );
+    
+    $form['booking']['sport'] = array(
+      '#title' => t('Sport'),
+      '#type' => 'select',
+      '#options' => $sports,
+      '#value' => $sport_id,
+      '#validated' => TRUE
+    );
+    
+    $form['booking']['type'] = array(
+      '#title' => t('Type'),
+      '#type' => 'select',
+      '#options' => $types,
+      '#value' => $type_id,
+      '#validated' => TRUE
+    );
+    
+    $form['booking']['court'] = array(
+      '#title' => t('Court'),
+      '#type' => 'select',
+      '#options' => $courts,
+      '#value' => is_array($secondary_id) ? 'All' : $secondary_id,
+      '#validated' => TRUE
+    );
+    
+    $form['booking']['class'] = array(
+      '#title' => t('Class'),
+      '#type' => 'select',
+      '#options' => $classes,
+      '#value' => $tertiary_id,
+      '#validated' => TRUE        
+    );
+    
+    $form['booking']['instructor'] = array(
+      '#title' => t('Instructor'),
+      '#type' => 'select',
+      '#options' => $instructors,
+      '#value' => $quaternary_id,
+      '#validated' => TRUE
+    );
+    
+    $form['booking']['duration'] = array(
+      '#title' => t(''),
+      '#type' => 'select',
+      '#options' => $durations,
+      '#value' => $duration,
+      '#validated' => TRUE
+    );
+  }
+
+
+}
+
+function booking_timeslots_get_calendar_time_range($view, $form) {
+
+  $calendar_type = $view -> display [$view -> current_display] -> display_options['style_options']['calendar_type'];
+  
+  switch ($calendar_type) {
+    
+    case 'week':
+      
+      $week = $view -> args [$view -> argument['date_argument'] -> position];
+      
+      if (!$week)
+        $week = date ('Y-\WW');
+      
+      return booking_timeslots_week_to_start_end_date ($week);
+      
+    case 'day':
+      
+      $day = $view -> exposed_input['day'];
+      
+      if (!$day)
+        $day = $view -> args [$view -> argument['date_argument'] -> position];
+      
+      if (!$day)
+        $day = date('Y-m-d 00:00:00', time ());
+      
+      return array(date ('Y-m-d H:i:s', strtotime($day)), date ('Y-m-d H:i:s', strtotime($day) + 86399));
+      
+    case 'month':
+      return booking_timeslots_helper_calculate_month_view_range($view -> args [$view -> argument['date_argument'] -> position]);
+      
+    default:
+      
+      //dsm ('Bad type: ' . $calendar_type);
+  }
+}
 
 /**
  * Implementation of hook_form_alter().
  */
 function booking_timeslots_form_alter(&$form, &$form_state, $form_id) {
-  if (strpos($form_id, '_node_form') !== FALSE) {
-    $booking_active = FALSE;
-    $content_type = str_replace('_node_form', '', $form_id); // convert name to plain content type name
-    $fieldnames = array_flip(variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot')));
-    module_load_include('inc', 'booking_timeslots');
-    foreach ($fieldnames as $fieldname => $value) {
-      if (isset($form[$fieldname])) {
-        $last_arg = end(arg());
-        $start_date = arg(3);
-        $end_date = arg(4);
-        $datetime = $form[$fieldname][LANGUAGE_NONE][0]['#default_value']['value'];
-        if (!empty($start_date)) {
-        if (booking_timeslots_valid_datetime($start_date)) {
-            $form[$fieldname][LANGUAGE_NONE][0]['#default_value']['value'] = $datetime = $start_date;
-          }
+  drupal_add_js(array('booking_timeslots_user_is_member'       => booking_timeslots_get_user_is_member()), 'setting');
+  drupal_add_js(array('booking_timeslots_user_may_book'        => user_access('administer bookings') || user_access('create booking entities')), 'setting');
+  
+  drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
+}
+
+function booking_timeslots_filters_callback($form, $form_state) {
+  return $form;
+}
+
+function booking_timeslots_filter_get_sports(&$sport_id, &$primary_id = null, &$secondary_id = null) {
+  
+  $taxonomy_vid = taxonomy_vocabulary_machine_name_load('sports_categories') -> vid;
+  
+  $primary_name                = variable_get('booking_timeslots_1st_content_type');
+  $secondary_name              = variable_get('booking_timeslots_2nd_content_type');
+  $secondary_to_primary_name   = variable_get('booking_timeslots_2nd_to_1st_ref_field');
+  $tertiary_name               = variable_get('booking_timeslots_3rd_content_type');
+  $tertiary_to_secondary_name  = variable_get('booking_timeslots_3rd_to_2nd_ref_field');
+  $tertiary_to_quaternary_name = variable_get('booking_timeslots_3rd_to_4th_ref_field');
+  $quaternary_name             = variable_get('booking_timeslots_4th_content_type');
+  
+  $sports = db_query("
+    SELECT DISTINCT T.tid, T.name
+      FROM {field_data_field_{$primary_name}_id} C2_C1
+      LEFT JOIN {node} C2 ON C2.status = 1 AND C2.type = :secondary_name AND C2.nid = C2_C1.entity_id
+      LEFT JOIN {field_data_field_{$tertiary_name}_{$secondary_name}} C2_C3 ON C2_C3.field_{$tertiary_name}_{$secondary_name}_nid = C2.nid
+      LEFT JOIN {node} C3 ON C3.nid = C2_C3.entity_id 
+      LEFT JOIN {field_data_field_sport_category_term_ref} S ON S.entity_id = C2.nid OR S.entity_id = C3.nid
+      LEFT JOIN {taxonomy_term_data} T ON T.tid = S.field_sport_category_term_ref_tid
+      WHERE C2_C1.field_{$primary_name}_id_nid = :primary_id AND (C2_C1.bundle = '{$secondary_name}' OR C2_C1.bundle = '{$tertiary_name}')
+      GROUP BY T.tid 
+      ORDER BY T.name
+    ", array(
+      ':primary_id'     => $primary_id,
+      ':secondary_name' => $secondary_name,
+    )) -> fetchAllKeyed();
+    
+  if (!$sports)
+    return array('All' => t('- No sports found -'));
+
+  if (!is_numeric($sport_id) || !isset($sports[$sport_id])) {
+    $sport_id = reset(array_keys($sports));
+  }  
+    
+  return $sports;
+}
+
+function booking_timeslots_filter_get_types(&$type_id, &$primary_id = null, &$secondary_id = null, &$sport_id = null) {
+  $primary_name                = variable_get('booking_timeslots_1st_content_type');
+  $secondary_name              = variable_get('booking_timeslots_2nd_content_type');
+  $secondary_to_primary_name   = variable_get('booking_timeslots_2nd_to_1st_ref_field');
+  $tertiary_name               = variable_get('booking_timeslots_3rd_content_type');
+  $tertiary_to_secondary_name  = variable_get('booking_timeslots_3rd_to_2nd_ref_field');
+  $tertiary_to_quaternary_name = variable_get('booking_timeslots_3rd_to_4th_ref_field');
+  $quaternary_name             = variable_get('booking_timeslots_4th_content_type');
+  
+     
+  $result = array();
+  
+  // Checking for Courts
+  
+  $has = db_query("
+    SELECT COUNT(1) AS has
+    FROM field_data_{$secondary_to_primary_name} C2_C1
+      LEFT JOIN node C2 ON C2.status = 1 AND C2.type = :secondary_name AND C2.nid = C2_C1.entity_id
+      LEFT JOIN field_data_field_sport_category_term_ref S ON S.entity_id = C2.nid
+      LEFT JOIN taxonomy_term_data T ON T.tid = S.field_sport_category_term_ref_tid
+      WHERE C2_C1.{$secondary_to_primary_name}_nid = :primary_id AND T.tid = :sport_id AND (C2_C1.bundle = '{$secondary_name}')
+    ", array(
+      ':primary_id'     => $primary_id,
+      ':secondary_name' => $secondary_name,
+      ':sport_id'       => $sport_id
+    )) -> fetchField();
+  
+  if ($has)
+    $result['courts'] = t('Courts');
+    
+
+  // Checking for Classes
+  
+  $has = db_query("
+    SELECT COUNT(1)
+    FROM field_data_{$secondary_to_primary_name} C2_C1
+      LEFT JOIN node C2 ON C2.status = 1 AND C2.type = :secondary_name AND C2.nid = C2_C1.entity_id
+      LEFT JOIN field_data_{$tertiary_to_secondary_name} C2_C3 ON C2_C3.{$tertiary_to_secondary_name}_nid = C2.nid
+      LEFT JOIN node C3 ON C3.status = 1 AND C3.type = :tertiary_name AND C3.nid = C2_C3.entity_id
+      LEFT JOIN field_data_field_sport_category_term_ref S ON S.entity_id = C3.nid
+      LEFT JOIN taxonomy_term_data T ON T.tid = S.field_sport_category_term_ref_tid
+      WHERE C2_C1.{$secondary_to_primary_name}_nid = :primary_id AND T.tid = :sport_id AND (C2_C1.bundle = '{$secondary_name}' OR C2_C1.bundle = '{$tertiary_name}')
+    ", array(
+      ':primary_id'     => $primary_id,
+      ':secondary_name' => $secondary_name,
+      ':tertiary_name'  => $tertiary_name,
+      ':sport_id'       => $sport_id
+    )) -> fetchField();
+  
+  if ($has)
+    $result['classes'] = t('Classes');
+    
+  if ($type_id !== 'classes' && $type_id !== 'courts' || !isset($result[$type_id])) {
+    $type_id = reset(array_keys($result));
+  }
+    
+  if (!$result)
+    return array('All' => t('- No items -'));  
+  
+  return $result;
+}
+
+function booking_timeslots_filter_get_courts(&$primary_id, &$secondary_id, &$sport_id) {
+  
+  $primary_name                = variable_get('booking_timeslots_1st_content_type');
+  $secondary_name              = variable_get('booking_timeslots_2nd_content_type');
+  $secondary_to_primary_name   = variable_get('booking_timeslots_2nd_to_1st_ref_field');
+  $tertiary_name               = variable_get('booking_timeslots_3rd_content_type');
+  $tertiary_to_secondary_name  = variable_get('booking_timeslots_3rd_to_2nd_ref_field');
+  $tertiary_to_quaternary_name = variable_get('booking_timeslots_3rd_to_4th_ref_field');
+  $quaternary_name             = variable_get('booking_timeslots_4th_content_type');
+
+  $courts = db_query("
+    SELECT C2.nid, C2.title
+    FROM {field_data_field_{$primary_name}_id} C2_C1
+      LEFT JOIN {node} C2 ON C2.status = 1 AND (C2.type = :secondary_name) AND C2.nid = C2_C1.entity_id
+      LEFT JOIN {field_data_field_sport_category_term_ref} S ON S.entity_id = C2.nid
+      LEFT JOIN {taxonomy_term_data} T ON T.tid = S.field_sport_category_term_ref_tid AND T.tid = :sport_id
+      WHERE C2_C1.field_{$primary_name}_id_nid = :primary_id AND T.tid IS NOT NULL AND (C2_C1.bundle = '{$secondary_name}')
+      ORDER BY C2.title
+    ", array(
+      ':primary_id'               => $primary_id,
+      ':secondary_name'           => $secondary_name,
+      ':sport_id'                 => $sport_id
+    )) -> fetchAllKeyed();
+    
+  if (!$courts)
+    return array('All' => t('- No courts found -'));
+  
+  if (!is_numeric($secondary_id) || !isset($courts[$secondary_id])) {
+    $secondary_id = array_keys($courts);
+  }
+  
+  return array('All' => t('- All -')) + $courts;
+}
+
+function booking_timeslots_filter_get_classes(&$primary_id, &$secondary_id, &$sport_id) {
+  $primary_name                = variable_get('booking_timeslots_1st_content_type');
+  $secondary_name              = variable_get('booking_timeslots_2nd_content_type');
+  $secondary_to_primary_name   = variable_get('booking_timeslots_2nd_to_1st_ref_field');
+  $tertiary_name               = variable_get('booking_timeslots_3rd_content_type');
+  $tertiary_to_secondary_name  = variable_get('booking_timeslots_3rd_to_2nd_ref_field');
+  $tertiary_to_quaternary_name = variable_get('booking_timeslots_3rd_to_4th_ref_field');
+  $quaternary_name             = variable_get('booking_timeslots_4th_content_type');
+  
+  $courts = db_query("
+    SELECT C3.nid, C3.title
+    FROM field_data_$secondary_to_primary_name C2_C1
+      LEFT JOIN node C2 ON C2.status = 1 AND C2.type = :secondary_name AND C2.nid = C2_C1.entity_id
+      LEFT JOIN field_data_{$tertiary_to_secondary_name} C2_C3 ON C2_C3.{$tertiary_to_secondary_name}_nid = C2.nid
+      LEFT JOIN node C3 ON C3.status = 1 AND C3.type = :tertiary_name AND C3.nid = C2_C3.entity_id
+      LEFT JOIN field_data_field_sport_category_term_ref S ON S.entity_id = C3.nid
+      LEFT JOIN taxonomy_term_data T ON T.tid = S.field_sport_category_term_ref_tid
+      WHERE C2_C1.{$secondary_to_primary_name}_nid = :primary_id AND T.tid = :sport_id AND (C2_C1.bundle = '{$secondary_name}' OR C2_C1.bundle = '{$tertiary_name}')
+      GROUP BY C3.nid
+      ORDER BY C3.title
+    ", array(
+      ':primary_id'     => $primary_id,
+      ':secondary_name' => $secondary_name,
+      ':tertiary_name'  => $tertiary_name,
+      ':sport_id'       => $sport_id
+    )) -> fetchAllKeyed();
+    
+  if (!$courts)
+    return array('All' => t('- No classes found -'));
+  
+  if (!is_numeric($secondary_id) || !isset($courts[$secondary_id])) {
+    $secondary_id = reset(array_keys($courts));
+  }
+  
+  return $courts;
+}
+
+function booking_timeslots_filter_get_instructors(&$instructor_id, &$primary_id, &$secondary_id, &$tertiary_id) {
+  $primary_name                = variable_get('booking_timeslots_1st_content_type');
+  $secondary_name              = variable_get('booking_timeslots_2nd_content_type');
+  $secondary_to_primary_name   = variable_get('booking_timeslots_2nd_to_1st_ref_field');
+  $tertiary_name               = variable_get('booking_timeslots_3rd_content_type');
+  $tertiary_to_secondary_name  = variable_get('booking_timeslots_3rd_to_2nd_ref_field');
+  $tertiary_to_quaternary_name = variable_get('booking_timeslots_3rd_to_4th_ref_field');
+  $quaternary_name             = variable_get('booking_timeslots_4th_content_type');
+  
+  $instructors = db_query("
+    SELECT I.nid, I.title
+    FROM {field_data_{$tertiary_to_quaternary_name}} IR
+      LEFT JOIN {node} I ON I.status = 1 AND I.type = :quaternary_name AND I.nid = IR.{$tertiary_to_quaternary_name}_nid
+      WHERE IR.bundle = :tertiary_name AND IR.entity_id = :class_id AND I.nid IS NOT NULL
+      GROUP BY I.nid
+      ORDER BY I.title
+    ", array(
+      ':tertiary_name'   => $tertiary_name,
+      ':quaternary_name' => $quaternary_name,
+      ':class_id'        => $tertiary_id
+    )) -> fetchAllKeyed();
+    
+  if (!$instructors)
+    return array('All' => t('- All -'));
+  
+  if (!is_numeric($instructor_id) || !isset($instructors[$instructor_id])) {
+    $instructor_id = reset(array_keys($instructors));
+  }
+  
+  return $instructors;
+}
+
+function booking_timeslots_filter_get_durations(&$duration, $primary_id, $secondary_id, $tertiary_id, $time_start, $time_end) {
+  
+  // We collect opening_hour slots primarily and then checks for available durations
+  
+  $daily_settings = booking_timeslots_get_daily_settings($primary_id, $secondary_id, $tertiary_id, $time_start, $time_end);
+  
+  $durations = array();
+  
+  $price_key = booking_timeslots_get_user_is_member() ? 'members' : 'non_members';
+  
+  $enabled_durations = booking_timeslots_get_durations();
+  $durations         = array();
+  
+  foreach ($daily_settings['days'] as $day_settings) {
+    foreach ($day_settings['slots'] as $slot_settings) {
+      $data = json_decode($slot_settings -> notice);
+      
+      if ($data -> price -> type == 'regular' && !empty($data -> price -> regular -> $price_key)) {
+        break;
+      } elseif ($data -> price -> type == 'non_regular') {
+        
+        foreach ($data -> price -> non_regular as $id => $prices) {
+          if (!empty ($prices -> $price_key))
+            $durations[$id] = $enabled_durations[$id];
         }
-        if (!empty($datetime)) {
-          $date_after = booking_timeslots_add_time($datetime, array('hour' => variable_get('booking_timeslot_length_hours', 1), 'minute' => variable_get('booking_timeslot_length_minutes', 0)));
-          $form[$fieldname][LANGUAGE_NONE][0]['#default_value']['value2'] = $date_after;
-        }
-        if (booking_timeslots_valid_datetime($end_date) && !empty($end_date)) {
-          $form[$fieldname][LANGUAGE_NONE][0]['#default_value']['value2'] = $end_date;
-        }
-        $form['#validate'][] = 'booking_timeslots_validate';
-        $form['buttons']['submit']['#value'] = t('Book Now');
-        $booking_active = TRUE;
-      }
-    }
-    if ($booking_active) {
-      drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
-      if (!user_access('edit booking dates')) {
-        drupal_add_js("$(document).ready(function() { $('.container-inline-date').parent().hide(); })", 'inline'); // hide input date form
       }
     }
   }
+
+  ksort($durations);
+  
+  if (!is_numeric($duration) || !isset($durations[$duration])) {
+    $duration = reset(array_keys($durations));
+  }
+  
+  
+  if (!$durations)
+    $durations['None'] = t('Closed');
+    
+  return $durations;
+}
+
+function booking_timeslots_get_user_is_member() {
+  return true;
 }
 
 /**
  * Form validate callback.
  */
 function booking_timeslots_validate($form, &$form_state) {
-  module_load_include('inc', 'booking_timeslots');
-  drupal_add_js(drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.js');
-  if (!user_access('edit booking dates')) {
-    drupal_add_js("$(document).ready(function() { $('.container-inline-date').parent().hide(); })", 'inline'); // hide input date form
-  }
-  $fieldnames = array_flip(variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot')));
-  foreach ($fieldnames as $fieldname => $value) {
-    if (isset($form_state['values'][$fieldname])) {
-      $date1 = $form_state['values'][$fieldname][LANGUAGE_NONE][0]['value'];
-      $date2 = $form_state['values'][$fieldname][LANGUAGE_NONE][0]['value2'];
-      break;
-    }
-    // Form Data: field_timeslot%5B0%5D%5Bvalue%5D%5Bdate%5D:Dec 15 2010 - 11am
-  }
-
-  // TODO: validate if the slot length is equal to settings (booking_timeslot_length_hours & booking_timeslot_length_minutes)
-  $nid = $form['nid']['#value'];
-  
-  if (empty($nid) && is_array($date1) && !booking_timeslots_check_slot_availability($date1, $form['type']['#value'], array($form, $form_state))) {
-    form_set_error('code', t('Sorry, this slot is unavailable.'));
-  }
 }
 
 /**
@@ -145,6 +620,19 @@ function booking_timeslots_validate($form, &$form_state) {
  * Adds our own preprocess functions to some templates.
  */
 function booking_timeslots_theme_registry_alter(&$items) {
+  
+  $mod_path = drupal_get_path('module', 'booking_timeslots');
+  $theme_registry_copy = $items;
+  _theme_process_registry($theme_registry_copy, 'phptemplate', 'theme_engine', 'pow', $mod_path);
+  $items += array_diff_key($theme_registry_copy, $items);
+  
+  $hooks = array('opening_hours_admin', 'calendar_week', 'calendar_day', 'calendar_month');
+  
+  foreach ($hooks as $h) {
+    $items[$h]['path']       = $mod_path . '/templates';
+    $items[$h]['theme path'] = $mod_path;
+  }
+  
   $items['calendar_month']['preprocess functions'][] = 'template_preprocess_booking_timeslots_month';
   $items['calendar_month']['includes'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
 
@@ -153,20 +641,713 @@ function booking_timeslots_theme_registry_alter(&$items) {
 
   $items['calendar_day']['preprocess functions'][] = 'template_preprocess_booking_timeslots_day';
   $items['calendar_day']['includes'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+  
+  $items['calendar_week_overlap']['preprocess functions'][] = 'template_preprocess_booking_timeslots_week_overlap';
+  $items['calendar_week_overlap']['includes'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+  
+  $items['calendar_day_overlap']['preprocess functions'][] = 'template_preprocess_booking_timeslots_day_overlap';
+  $items['calendar_day_overlap']['includes'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+  
+  $items['calendar_month_overlap']['preprocess functions'][] = 'template_preprocess_booking_timeslots_month_overlap';
+  $items['calendar_month_overlap']['includes'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+  
+  $items['opening_hours_admin']['preprocess functions'][] = 'template_preprocess_booking_timeslots_opening_hours_admin';
+  $items['opening_hours_admin']['includes'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+}
 
-  /* TODO: Find the right template
-        $plugin = $this->get_plugin();
-        if ($plugin) {
-          $funcs[] = $this->option_link(t('Style output'), 'analyze-theme-style') . ': ' . $this->format_themes($plugin->theme_functions(), $plugin->additional_theme_functions());
-          $themes = $plugin->additional_theme_functions();
-          if ($themes) {
-            foreach ($themes as $theme) {
-              $funcs[] = $this->option_link(t('Alternative style'), 'analyze-theme-style') . ': '  . $this->format_themes($theme);
+/**
+ * Implements hook_views_ajax_data_alter().
+ * @param type $object
+ * @param type $view
+ */
+function booking_timeslots_views_ajax_data_alter(&$object, $view) {
+  // apply only to public_calendar nodes
+  if($view->name == 'public_calendar')
+  {
+    $object[1]['selector'] = '#block-system-main';
+    $object[1]['data'] = '<div id="block-system-main" class="block block-system">' . $object[1]['data'] . '</div>';
+  }
+}
+
+/**
+ * Returns the total number of available capacity to book based on the granularity specified
+ * For the 'week' view it returns the data matrix for all the week days
+ * For the 'month view, it returns the data matrix composed of total availabilites in a given day
+ * @param int $nid Nid of the node we use to determine opening hours information
+ * @param string $granularity 'week', 'month'
+ * @param int|string $value Number of week or month
+ * @param array $start_times
+ */
+function booking_timeslots_get_availability_data_matrix($primary_id, $secondary_id, $tertiary_id, $view_mode, $time_start, $time_end, $start_times = array(), $granularity, $grid_granularity) {
+  
+  $data_matrix    = array('data' => array());
+  
+  $daily_settings = booking_timeslots_get_daily_settings($primary_id, $secondary_id, $tertiary_id, $time_start, $time_end);
+  
+  $data_matrix ['daily_settings'] = $daily_settings;
+  
+  if($view_mode == 'month') {
+    $data_matrix['month_data'] = array();
+  }
+  
+  if (!is_numeric($primary_id))
+    return $data_matrix;
+  
+  if ((!is_numeric($secondary_id) && !is_array($secondary_id)) && !is_numeric($tertiary_id))
+    return $data_matrix;
+  
+
+  // Filling data matrix with untouched availabilites retrieved from the selected facility's opening hours settings
+  
+  if (isset($data_matrix['daily_settings']['days'])) {
+    
+    $cids = array();
+    
+    foreach ($data_matrix['daily_settings']['days'] as $day_settings) {
+      foreach ($day_settings['slots'] as $slot_settings) {
+        $cids[] = $slot_settings -> instance_id;
+      }
+    }
+
+    if ($cids) {
+      
+      $bookings = db_query('
+        SELECT pid, slot_time, duration, players, DATEDIFF(B.slot_time, :time_start) AS day
+        FROM {booking} B
+        WHERE B.slot_time BETWEEN :time_start
+          AND :time_end
+          AND B.primary_id = :primary_id
+          AND B.secondary_id IN ( :secondary_id )
+          AND (
+            (:tertiary_id IS NULL     AND B.tertiary_id = 0) OR
+            (:tertiary_id IS NOT NULL AND B.tertiary_id = :tertiary_id)
+          )
+          
+      ', array (
+        'time_start'    => $time_start,
+        'time_end'      => $time_end,
+        ':primary_id'   => $primary_id,
+        ':secondary_id' => $secondary_id,
+        ':tertiary_id'  => $tertiary_id
+      )) -> fetchAllAssoc('pid');
+      
+//      dsm("BOOKINGS ( ". $secondary_id ." )");
+//      dsm($bookings);
+    }
+    else
+      $bookings = array();
+  }
+  else
+    $bookings = array();
+
+  foreach ($bookings as $booking) {
+
+    $booking -> start_time_hm = date('H:i', strtotime($booking -> slot_time));
+    $booking -> end_time_hm   = date('H:i', strtotime($booking -> slot_time) + $booking -> duration * 60);
+    
+    $hour        = date('H:i', strtotime($booking -> slot_time));
+    
+    $data_matrix['data'][$booking -> day][$hour]['bookings'][] = $booking;
+  }
+  
+  if (TRUE) {
+    
+    // Generating list of green boxes
+    
+    for ($d = 0; $d < (strtotime($time_end) - strtotime($time_start) + 1) / 86400; $d++) {
+      
+      if (!isset($daily_settings['days'][$d]))
+      // There is no information for this day
+        continue;
+      
+      $green_boxes = array ();
+      
+      foreach ($daily_settings['days'][$d]['slots'] as $slot) {
+        
+        $date = date('Y-m-d', strtotime ($time_start) + $d * 86400);
+        
+        $node = node_load ($slot -> nid);
+        
+        if (!user_access('administer bookings') && ($time_ahead_minutes = booking_timeslots_get_reservation_minimum_time_ahead($slot)))
+        {
+          $slot_date_time_start = $date . ' ' . $slot -> start_time_hm;
+          $slot_date_time_end   = $date . ' ' . $slot -> end_time_hm;
+          
+          if ($slot -> date < date('Y-m-d', strtotime(booking_timeslots_get_server_time ()) + $time_ahead_minutes * 60)) {
+            $slot -> too_late = TRUE;
+            continue;
+          } elseif ($slot -> date == date('Y-m-d', strtotime(booking_timeslots_get_server_time ()) + $time_ahead_minutes * 60)) {
+
+            if (strtotime(booking_timeslots_get_server_time()) + $time_ahead_minutes * 60 > strtotime($slot_date_time_start)) {
+            
+              if ($slot -> type == 2) {
+                
+                $slot_start_m = booking_timeslots_helper_hour_min_to_minutes($slot -> start_time_hm);
+                $current_m    = booking_timeslots_helper_hour_min_to_minutes(substr(booking_timeslots_get_server_time(), 11, 5)) + $time_ahead_minutes;
+                $real_m       = $current_m - ($current_m - $slot_start_m) % $grid_granularity + $grid_granularity;
+                
+                $slot -> start_time_hm  = booking_timeslots_helper_add_minutes_to_hour_min('00:00', $real_m);
+                
+              } else {
+                
+                $slot -> too_late = TRUE;
+                continue;
+                // We can't book lesson partially
+                
+              }
             }
           }
-*/
+        }
 
-  // Other theme callbacks:
-  //   calendar_month_multiple_node, calendar_week_multiple_node, calendar_datebox, calendar_date_combo, calendar_empty_day, calendar_stripe_legend, calendar_stripe_stripe, calendar_colorpicker, calendar_colorfield, calendar_time_row_heading
+        if (!user_access('administer bookings') && ($time_ahead_minutes = booking_timeslots_get_reservation_maximum_time_ahead($slot)))
+        {
+          $slot_date_time_start = $date . ' ' . $slot -> start_time_hm;
+          $slot_date_time_end   = $date . ' ' . $slot -> end_time_hm;
+          
+          if ($slot -> date > date('Y-m-d', strtotime(booking_timeslots_get_server_time ()) + $time_ahead_minutes * 60)) {
+            $slot -> too_late = TRUE;
+            continue;
+          } elseif ($slot -> date == date('Y-m-d', strtotime (booking_timeslots_get_server_time()) + $time_ahead_minutes * 60)) {
+
+            if (strtotime(booking_timeslots_get_server_time()) + $time_ahead_minutes * 60 < strtotime($slot_date_time_end)) {
+            
+              if ($slot -> type == 2) {
+                $slot_start_m = booking_timeslots_helper_hour_min_to_minutes($slot -> start_time_hm);
+                $current_m    = booking_timeslots_helper_hour_min_to_minutes(substr(booking_timeslots_get_server_time(), 11, 5)) + $time_ahead_minutes;
+                $real_m       = $current_m - ($current_m - $slot_start_m) % $grid_granularity + $grid_granularity;
+                
+                $slot -> end_time_hm  = booking_timeslots_helper_add_minutes_to_hour_min('00:00', $real_m);
+              }
+              else
+              {
+                // We can't book lesson partially
+                
+                $slot -> too_late = TRUE;
+                continue;
+                
+              }
+              
+            }
+          }
+        }
+        
+        
+        if (!booking_timeslots_can_book_past_dates() && is_numeric ($granularity)) {
+          
+          if ($slot -> date < substr(booking_timeslots_get_server_time(), 0, 10)) {
+            $slot -> too_late = TRUE;
+            continue;
+          }
+          elseif ($slot -> date == substr(booking_timeslots_get_server_time(), 0, 10))
+          {
+            if ($slot -> end_time_hm <= substr(booking_timeslots_get_server_time(), 11, 5)) {
+              $slot -> too_late = TRUE;
+              continue;
+            }
+            else
+            if ($slot -> start_time_hm >= substr(booking_timeslots_get_server_time(), 11, 5) && $slot -> end_time_hm <= substr(booking_timeslots_get_server_time(), 11, 5))
+            {
+              
+              // Calculating valid start time
+  
+              if ($slot -> type == 2)
+                $duration = $grid_granularity;
+              else {
+                
+                $slot -> too_late = TRUE;
+                
+                // We can't book lesson partially
+                continue;
+              }
+            
+              $slot_start_m = booking_timeslots_helper_hour_min_to_minutes($slot -> start_time_hm);
+              $current_m    = booking_timeslots_helper_hour_min_to_minutes(date('H:i'));
+              $real_m       = $current_m - ($current_m - $slot_start_m) % $duration + $duration;
+              
+              $slot -> start_time_hm = booking_timeslots_helper_add_minutes_to_hour_min('00:00', $real_m);
+              
+              $green_boxes[] = array (
+                'start' => $slot_start_m,
+                'end'   => $real_m * 60,
+              );
+            }
+              
+            
+//            $slot -> start_time_hm = $s;
+            
+          }
+        }
+         
+        
+        $green_boxes[] = array (
+          'start' => booking_timeslots_helper_hour_min_to_minutes($slot -> start_time_hm),
+          'end'   => booking_timeslots_helper_hour_min_to_minutes($slot -> end_time_hm),
+        );
+      }
+      
+      $cutters = array();
+      
+      if (isset($data_matrix['data'][$d])) {
+        foreach ($data_matrix['data'][$d] as $hour) {
+            if (isset($hour['bookings'])) {
+              foreach ($hour['bookings'] as &$booking) {
+                $cutters[] = array (
+                  'start' => booking_timeslots_helper_hour_min_to_minutes($booking -> start_time_hm),
+                  'end'   => booking_timeslots_helper_hour_min_to_minutes($booking -> end_time_hm)
+                );
+              }
+            }
+        }
+      }
+                
+      foreach ($cutters as $booking_box) {
+        
+        foreach ($green_boxes as $i => &$box) {
+          if ($booking_box['start'] <= $box['start'] && $booking_box['end'] >= $box['end']) {
+            // Removing the whole green box
+            unset($green_boxes[$i--]);
+          }
+          elseif ($booking_box['start'] <= $box['start'] && $booking_box['end'] > $box['start'] && $booking_box['end'] < $box['end']) {
+            $box['start'] = $booking_box['end'];
+          } elseif ($booking_box['start'] > $box['start'] && $booking_box['start'] < $box['end'] && $booking_box['end'] >= $box['end']) {
+            $box['end'] = $booking_box['start'];
+          } elseif ($booking_box['start'] > $box['start'] && $booking_box['end'] < $box['end']) {
+            $green_boxes[] = array(
+              'start' => $booking_box['end'],
+              'end'   => $box['end']
+            );
+            $box['end'] = $booking_box['start'];
+            break;
+          }
+        }
+      }
+      
+      // Copying green boxes into the hour based structure
+      $green_boxes_hours = array();
+      
+      foreach ($green_boxes as &$box) {
+        $box['height'] = ($box['end'] - $box['start']) / $grid_granularity;
+        
+        $green_boxes_hours[booking_timeslots_helper_add_minutes_to_hour_min('00:00', $box['start'])] = $box;
+      }
+      
+      ksort($green_boxes_hours);
+      
+      // Iterating over all opening_hours records of a $d day
+      foreach ($daily_settings['days'][$d]['slots'] as $slot_settings)
+      {
+        for ($m = booking_timeslots_helper_hour_min_to_minutes($daily_settings['start_time_hm']); $m < booking_timeslots_helper_hour_min_to_minutes($daily_settings['end_time_hm']); $m += $grid_granularity) {
+          
+          $hour  = substr ('0' . ((int)($m / 60)), -2);
+          $min   = substr ('0' . ($m % 60), -2);
+          $date  = $hour . ':' . $min;
+          
+          if ($date < $slot_settings -> start_time_hm || $date >= $slot_settings -> end_time_hm)
+            continue;
+          
+          if (!$slot_settings || $date < $slot_settings -> start_time_hm || $date >= $slot_settings -> end_time_hm)
+          // Day not open at all or not yet open or Day just closed
+            continue;
+          
+          $data_matrix['data'][$d][$date]['affected_settings'] = $slot_settings;
+          
+          $data_matrix['data']['cids'][$d] = $slot_settings -> instance_id;
+          
+          $data = json_decode($slot_settings -> notice);
+          
+          if (isset($green_boxes_hours[$date])) {
+            $data_matrix['data'][$d][$date]['type']    = 'green_box';
+            $data_matrix['data'][$d][$date]['rowspan'] = $green_boxes_hours[$date]['height'];
+            $data_matrix['data'][$d][$date]['box']     = $green_boxes_hours[$date];
+            $data_matrix['data'][$d][$date]['length']  = $green_boxes_hours[$date]['end'] - $green_boxes_hours[$date]['start'];
+          }
+        }
+      }
+    }
+  } else {
+    
+    // Generating list of normal slots
+    
+    for ($d = 0; $d < (strtotime($time_end) - strtotime($time_start) + 1) / 86400; $d++) {
+      
+      if (!isset($daily_settings['days'][$d]))
+      // There is no information for this day
+        continue;
+      
+      // Iterating over all opening_hours records of a $d day
+      foreach ($daily_settings['days'][$d]['slots'] as $slot_settings)
+      {
+        $data = json_decode ($slot_settings -> notice);
+        
+        if ($slot_settings -> original_instance_id)
+          $info = (object)db_query('SELECT slot_length, capacity FROM {opening_hours} WHERE instance_id = :id',  array ('id' => $slot_settings -> original_instance_id)) -> fetchAssoc();
+        else
+          $info = (object)array('slot_length' => $slot_settings -> slot_length, 'capacity' => $slot_settings -> capacity);
+        
+        for ($m = booking_timeslots_helper_hour_min_to_minutes($daily_settings['start_time_hm']); $m < booking_timeslots_helper_hour_min_to_minutes($daily_settings['end_time_hm']); $m += $info -> slot_length) {
+          
+          $hour  = substr ('0' . ((int)($m / 60)), -2);
+          $min   = substr ('0' . ($m % 60), -2);
+          $date  = $hour . ':' . $min;
+          
+          if ($date < $slot_settings -> start_time_hm || $date >= $slot_settings -> end_time_hm)
+            continue;
+          
+          if (!$slot_settings || $date < $slot_settings -> start_time_hm || $date >= $slot_settings -> end_time_hm)
+          // Day not open at all or not yet open or Day just closed
+            continue;
+          
+          
+          $data_matrix['data']['cids'][$d] = $slot_settings -> instance_id;
+          
+          $data = json_decode($slot_settings -> notice);
+          
+          $data_matrix['data'][$d][$date]['affected_settings'] = $slot_settings;
+          $data_matrix['data'][$d][$date]['price']    = booking_timeslots_get_data_price($data, $info -> slot_length);
+          $data_matrix['data'][$d][$date]['duration'] = $info -> slot_length;
+          $data_matrix['data'][$d][$date]['type']     = 'normal';
+          $data_matrix['data'][$d][$date]['rowspan']  = $info -> slot_length / $grid_granularity;
+          $data_matrix['data'][$d][$date]['length']   = $info -> slot_length;
+        }
+      }
+      
+    }
   }
+
+  // Sending bookings on to the data matrix array
+  
+  $settingsArr = array();
+  
+  // Calculating real availability based on the slot bookings
+  for ($d = 0; $d < (strtotime($time_end) - strtotime($time_start) + 1 ) / 86400; $d++) {
+    $start_time_hm = booking_timeslots_helper_hour_min_to_minutes($data_matrix['daily_settings']['start_time_hm']);
+    $end_time_hm = booking_timeslots_helper_hour_min_to_minutes($data_matrix['daily_settings']['end_time_hm']);
+    
+    $day_time = strtotime($time_start) + $d * 86400;
+    $day = date("Y-m-d", $day_time);
+    
+    if($view_mode == 'month') {
+      $data_matrix['month_data'][$day]['total_free_minutes'] = 0;
+      $data_matrix['month_data'][$day]['day_name'] = date("l", $day_time);
+      $data_matrix['month_data'][$day]['day_number'] = date("j", $day_time);
+    }
+    
+    for ($m = $start_time_hm; $m < $end_time_hm; $m += $grid_granularity) {
+      
+      $hour  = substr ('0' . ((int)($m / 60)), -2);
+      $min   = substr ('0' . ((int)$m % 60), -2);
+      $date  = $hour . ':' . $min;
+      
+      $settings = $data_matrix['data'][$d][$date]['affected_settings'];
+      $data = json_decode ($settings -> notice);
+      
+      if($settings != NULL && $settings -> capacity == 0)
+      {
+        $orginal_id = $settings->original_instance_id ;
+
+        if(!isset($settingsArr[$orginal_id]))
+        {
+          $result = db_query('
+              SELECT slot_length, capacity FROM {opening_hours} WHERE instance_id = :id', 
+              array (
+                'id'    => $orginal_id
+              ))->fetchAll();
+          $settingsArr[$orginal_id] = $result[0];
+        }
+
+        $settings -> capacity = $settingsArr[$orginal_id]->capacity;
+        $settings -> slot_length = $settingsArr[$orginal_id]->slot_length;
+      }
+      
+      if($view_mode == 'month') {
+        $data_matrix['month_data'][$day]['total_free_minutes'] += $settings -> capacity * $grid_granularity;
+      }
+      else {
+        $data_matrix['data'][$d][$date]['capacity_max'] = $settings -> capacity;
+        $data_matrix['data'][$d][$date]['capacity']     = $settings -> capacity;
+      }
+	  
+      if (isset ($data_matrix['data'][$d][$date]['bookings']))
+        foreach ($data_matrix['data'][$d][$date]['bookings'] as &$booking)
+        {
+          $booking -> players_original = $booking -> players;
+          
+          if ($settings -> type == 2)
+          // "For the capacity, can we just make it that when someone book a court, it is no longer available for booking,
+          // capacity will be only for user information (it make sense for classes to keep track of capacity but courts is not)"
+          // THE IDEA is to mark court bookings as booked for the whole capacity available
+            $booking -> players = $settings -> capacity;
+          
+          if($view_mode == 'month') {
+            $data_matrix['month_data'][$day]['total_free_minutes'] -=  $booking -> players * $booking -> duration;
+          }
+          else {
+            $data_matrix['data'][$d][$date]['capacity'] -= $booking -> players;
+
+            $price_key = booking_timeslots_get_user_is_member() ? 'members' : 'non_members';
+          
+            $data_matrix['data'][$d][$date]['duration'] = $booking -> duration;
+            $data_matrix['data'][$d][$date]['price'] =
+              $data -> price -> type == 'regular' ?
+                $data -> price -> regular -> $price_key :
+                $data -> price -> non_regular -> {$booking -> duration} -> $price_key;
+          }
+          
+        }
+    }
+  }
+  
+  $data_matrix['day_week_start'] = date('w', strtotime($time_start));
+  
+  return $data_matrix;
+  
+}
+
+function booking_timeslots_get_data_price($data, $duration) {
+  $price_key = booking_timeslots_get_user_is_member() ? 'members' : 'non_members';
+
+  return
+    $data -> price -> type == 'regular' ?
+      $data -> price -> regular -> $price_key :
+      $data -> price -> non_regular -> $duration -> $price_key;
+}
+
+function booking_timeslots_get_daily_settings($primary_id, $secondary_id, $tertiary_id, $time_start, $time_end) {
+  
+  $tertiary_capacity_name      = variable_get('booking_timeslots_3rd_capacity_field');
+  
+  $daily_settings = array();
+  
+  $daily_settings['days'] = array();
+  
+  $settings_query = db_query("
+    SELECT
+      H.instance_id,
+      H.nid,
+      H.date,
+      H.start_time,
+      H.end_time,
+      H.notice,
+      H.repeat_rule,
+      H.repeat_end_date,
+      H.original_instance_id,
+      H.customised,
+      H.slot_length,
+      CASE WHEN H.nid = :tertiary_id THEN C.{$tertiary_capacity_name}_value ELSE H.capacity END AS capacity,
+      DATEDIFF(H.date, DATE(:time_start)) AS day, CASE WHEN H.nid = :primary_id THEN '1' WHEN H.nid IN ( :secondary_id ) THEN '2' WHEN H.nid = :tertiary_id THEN '3' ELSE '0' END AS type
+      FROM {opening_hours} H
+      LEFT JOIN field_data_{$tertiary_capacity_name} C ON C.entity_id = H.nid
+      WHERE
+        (nid = :primary_id OR nid IN (:secondary_id) OR nid = :tertiary_id) AND (
+            (H.repeat_end_date IS NULL AND H.date BETWEEN :time_start AND :time_end) OR
+            (H.repeat_end_date IS NOT NULL
+                AND (
+                    CONCAT(H.date, ' ', H.start_time) BETWEEN :time_start AND :time_end
+                )
+            )
+       )
+      ORDER BY nid = :primary_id DESC, nid IN ( :secondary_id ) DESC, nid = :tertiary_id DESC, H.repeat_end_date DESC, H.date ASC
+  ", array(
+    ':primary_id'   => $primary_id,
+    ':secondary_id' => $secondary_id,
+    ':tertiary_id'  => $tertiary_id,
+    ':time_start'   => $time_start,
+    ':time_end'     => $time_end
+  ));
+  
+  while ($row = $settings_query -> fetch(PDO::FETCH_OBJ)) {
+    $daily_settings['days'][$row -> day]['slots'][] = $row;
+  }
+
+  $daily_settings['primary_id']   = $primary_id;
+  $daily_settings['secondary_id'] = $secondary_id;
+  $daily_settings['tertiary_id']  = $tertiary_id;
+  
+//  dsm("DAILY SETTINGS");
+//  dsm($daily_settings);
+  
+  booking_timeslots_populate_daily_settings_min_max_time($daily_settings);
+  
+  return $daily_settings;
+}
+
+function booking_timeslots_get_durations() {
+  $content   = variable_get('booking_timeslots_durations');
+  $lines     = array_map('trim', explode("\n", $content));
+  $durations = array();
+  
+  foreach($lines as $line) {
+    list($value, $title) = array_map('trim', explode('|', $line));
+    $durations[$value] = $title;
+  }
+  
+  ksort($durations);
+  
+  return $durations;
+}
+
+function booking_timeslots_get_calendar_granularity() {
+  return (int)variable_get('booking_timeslots_calendar_granularity', 15);
+}
+
+function booking_timeslots_populate_daily_settings_min_max_time(&$daily_settings) {
+
+    $start_all = '24:00:00';
+    $end_all   = '00:00:00';
+    $min_dur   = 120;
+    
+    foreach ($daily_settings['days'] as $i => &$day_settings) {
+      
+      $start_day = '24:00:00';
+      $end_day   = '00:00:00';
+      
+      foreach ($day_settings['slots'] as $k => &$slot) {
+          
+        $data      = json_decode($slot -> notice);
+        
+        if ($slot -> type == 1) {
+          $start_day = min($start_day, $slot -> start_time);
+          $end_day   = max($end_day,   $slot -> end_time);
+        }
+        
+        $start_all = min($start_all, $start_day);
+        $end_all   = max($end_all,   $end_day);
+        $min_dur   = min ($min_dur,  $slot -> slot_length);
+        
+        if ($slot -> type == 1 || (is_numeric($daily_settings['tertiary_id']) && $slot -> type == 2) || (!is_numeric($daily_settings['tertiary_id']) && $slot -> type == 3)) {
+          unset ($day_settings['slots'][$k]);
+          continue;
+        }
+       
+        $slot -> duration      = $slot -> slot_length;
+        $slot -> start_time_hm = substr($slot -> start_time, 0, 5);
+        $slot -> end_time_hm   = substr($slot -> end_time,   0, 5);  
+      }
+      
+      $day_settings['start_time_hm'] = substr($start_day, 0, 5);
+      $day_settings['end_time_hm']   = substr($end_day,   0, 5);
+    }
+    
+    if ($start_all >= $end_all) {
+      $start_all = '08:00:00';
+      $end_all   = '16:00:00';
+    }
+    
+    $daily_settings['start_time_hm'] = substr($start_all, 0, 5);
+    $daily_settings['end_time_hm']   = substr($end_all,   0, 5);
+}
+
+
+function booking_timeslots_filters_get_duration($view) {
+  
+  $granularity = $view -> exposed_raw_input['duration'];
+  
+  if (!$granularity)
+    $granularity = null;
+  
+  return $granularity;
+}
+
+function booking_timeslots_week_to_start_end_date($week) {
+  
+  preg_match_all('/(\d+)\-W(\d+)/', $week, $matches);
+  
+  $year = $matches[1][0];
+  $week = $matches[2][0];
+  
+  $week_start = new DateTime();
+  
+  $first_day_of_week = variable_get('date_first_day');
+  
+  $week_start -> setTimezone(new DateTimeZone (variable_get ('date_default_timezone')));
+  $week_start -> setISODate($year, $week);
+  $week_start -> sub(new DateInterval('P1D'));
+  $week_start -> add(new DateInterval('P' . $first_day_of_week . 'D'));
+  
+  $time = strtotime($week_start -> format('Y-m-d 00:00:00'));
+
+  $time_start     = $week_start -> format('Y-m-d 00:00:00');
+  $time_end       = $week_start -> add (new DateInterval('P6D')) -> format('Y-m-d 23:59:59');
+  
+  return array ($time_start, $time_end);
+}
+
+function booking_timeslots_can_book_past_dates()
+{
+  return user_access('book past dates') || variable_get('booking_timeslots_enable_booking_for_past_dates', 1);
+}
+
+function booking_timeslots_check_configuration_validity ()
+{
+  static $already_checked_value;
+  
+  if (isset($already_checked_value))
+    return $already_checked_value;
+  
+  $primary_name                = variable_get('booking_timeslots_1st_content_type');
+  $secondary_name              = variable_get('booking_timeslots_2nd_content_type');
+  $secondary_to_primary_name   = variable_get('booking_timeslots_2nd_to_1st_ref_field');
+  $tertiary_name               = variable_get('booking_timeslots_3rd_content_type');
+  $tertiary_to_secondary_name  = variable_get('booking_timeslots_3rd_to_2nd_ref_field');
+  $tertiary_to_quaternary_name = variable_get('booking_timeslots_3rd_to_4th_ref_field');
+  $quaternary_name             = variable_get('booking_timeslots_4th_content_type');
+  
+  if (!$primary_name || !$secondary_name || !$secondary_to_primary_name || !$tertiary_name || !$tertiary_to_secondary_name || !$tertiary_to_quaternary_name || !$quaternary_name) {
+    drupal_set_message(t('Booking Timeslots are not properly configured. Please visit !url and configure the module.', array('!url' => l('settings page', 'admin/config/booking_timeslots/settings'))), $type = 'error');
+    return $already_checked_value = FALSE;
+  }
+  
+  return $already_checked_value = TRUE;
+}
+
+function booking_timeslots_get_reservation_maximum_time_ahead($obj)
+{
+  if ($obj -> original_instance_id) {
+    $obj = (object)db_query('SELECT notice FROM {opening_hours} WHERE instance_id = :id',  array ('id' => $obj -> original_instance_id)) -> fetchAssoc();
+  }
+  
+  $data = json_decode($obj -> notice);
+    
+  if (!isset($data -> max_time_ahead_rsrv_weeks))
+    return 262800; // Half a year
+  
+  $hours =
+    $data -> max_time_ahead_rsrv_weeks * 168 +
+    $data -> max_time_ahead_rsrv_days  * 24 +
+    $data -> max_time_ahead_rsrv_hours;
+  
+  if ($hours == 0)
+    return 262800; // Half a year
+  
+  return booking_timeslots_get_reservation_minimum_time_ahead($obj) +
+    $hours * 60; 
+}
+
+function booking_timeslots_get_reservation_minimum_time_ahead($obj)
+{
+  if ($obj -> original_instance_id) {
+    $obj = (object)db_query('SELECT notice FROM {opening_hours} WHERE instance_id = :id',  array ('id' => $obj -> original_instance_id)) -> fetchAssoc();
+  }
+  
+  $data = json_decode($obj -> notice);
+  
+  if (!isset($data -> min_time_ahead_rsrv_weeks)) {
+    return 1; // 1 hour
+  }
+  
+  $hours =
+    $data -> min_time_ahead_rsrv_weeks * 168 +
+    $data -> min_time_ahead_rsrv_days  * 24 +
+    $data -> min_time_ahead_rsrv_hours;
+  
+  if ($hours <= 1)
+    $hours = 1;
+  
+  return
+    $hours * 60; 
+}
+
+function booking_timeslots_get_server_time() {
+  return date_now(variable_get('date_default_timezone')) -> format ('Y-m-d H:i:s');
+}
 
