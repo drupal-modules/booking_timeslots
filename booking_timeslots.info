@@ -2,8 +2,9 @@ name = Booking Timeslots
 description = Booking timeslots module
 package = Date/Time
 core = 7.x
+dependencies[] = date
 dependencies[] = calendar
-dependencies[] = content
+dependencies[] = entity
 version = 7.x-1.0
 files [] = booking_timeslots.module
 
