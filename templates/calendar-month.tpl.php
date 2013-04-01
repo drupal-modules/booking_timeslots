@@ -17,7 +17,8 @@
  *   it is in the form: calendar-nid-field_name-delta
  * 
  */
-//dsm('Display: '. $display_type .': '. $min_date_formatted .' to '. $max_date_formatted);
+//dsm($rows);
+//dsm($day_items);
 ?>
 <div class="calendar-calendar"><div class="month-view">
 <table class="full">
@@ -32,9 +33,29 @@
   </thead>
   <tbody>
     <?php 
-      foreach ((array) $rows as $row) {
+      foreach($day_items as $week_number => $week) {
+        echo '<tr class="date-box">';
+        foreach($week as $date => $day) {
+          echo '<td id="public_calendar-'. $date .'-date-box" class="date-box '. $day['class'] .'" link="'. $day['url'] .'" colspan="1" rowspan="1" data-date="'. $date .'" headers="'. $day['day_name'] .'" data-day-of-month="'. $day['day_number'] .'" >
+                  <div class="inner"><div class="month day"> '. $day['day_number'] .' </div></div>
+                </td>';
+        }
+        echo '</tr>';
+        
+        echo '<tr class="single-day">';
+        foreach($week as $date => $day) {
+          echo '<td id="public_calendar-'. $date .'-0" class="single-day no-entry '. $day['class'] .'" link="'. $day['url'] .'" colspan="1" rowspan="1" data-date="'. $date .'" headers="'. $day['day_name'] .'"  data-day-of-month="'. $day['day_number'] .'" >
+                  <div class="inner">
+                    '. ( $day['total_free_minutes'] > 0 ? $day['free_hours'] .'. '. t('Available') : '&nbsp;' ) .'
+                  </div>
+                </td>';
+        }
+        echo '</tr>';
+      }
+      
+      /*foreach ((array) $rows as $row) {
         print $row['data'];
-      } ?>
+      }*/ ?>
   </tbody>
 </table>
 </div></div>
