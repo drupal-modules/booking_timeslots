@@ -1,60 +1,326 @@
 <?php
 
-/**
- * @file
- *   Installation file
- *
- * @version
- *
- * @developers
- *   Rafal Wieczorek <kenorb@gmail.com>
- */
+function booking_timeslots_schema() {
+  $schema['booking'] = array (
+    'description' => 'The main store for our entity',
+    'fields' => array(
+      'pid' => array(
+        'description' => 'Primary key for our table',
+        'type'        => 'serial',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+      ),
+      'cid' => array(
+        'description' => 'ID of the {booking_slot_config} table record',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'uid' => array(
+        'description' => 'ID of the user booking the slot',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'primary_id' => array(
+        'description' => 'ID of the 1st content type id related with the booking',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'secondary_id' => array(
+        'description' => 'ID of the 2nd content type id related with the booking',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'tertiary_id' => array(
+        'description' => 'ID of the 3rd content type id related with the booking',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'quaternary_id' => array(
+        'description' => 'ID of the 4th content type id related with the booking',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the booking was created.',
+        'type'        => 'int',
+        'not null'    => TRUE,
+      ),
+      'slot_time' => array(
+        'description' => 'Slot date and time',
+        'type'        => 'datetime:normal',
+        'mysql_type'  => 'DATETIME',
+        'not null'    => TRUE,
+      ),
+      'hour_start' => array(
+        'description' => 'Starting hour',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),            
+      'min_start' => array(
+        'description' => 'Starting minute',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),            
+      'duration' => array(
+        'description' => 'Duration',
+        'type' => 'int',
+        'size' => 'small',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),            
+      'players' => array(
+        'description' => 'Number of players',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),            
+      'total' => array(
+        'description' => 'Total',
+        'type' => 'float',
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'deposit' => array(
+        'description' => 'Deposit',
+        'type' => 'float',
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'tax' => array(
+        'description' => 'Tax',
+        'type' => 'float',
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'notes' => array(
+        'description' => 'Customer notes',
+        'type' => 'varchar',
+        'length' => 255,
+        'default' => ''
+      ),
+    ),
+    'primary key' => array('pid'),
+    'indexes' => array(
+      'index_cid' => array('cid'),
+      'index_created' => array('created'),
+    )
+  );
+  
+  $schema['booking_slot_config'] = array (
+    'description' => 'Configuration of booking slots per venue/facility',
+    'fields' => array( // id, nid, day_of_week, hour_start, min_start, hour_end, min_end, price, slot_length, capacity, closed
+      'cid' => array(
+        'description' => 'Primary key',
+        'type'        => 'serial',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+      ),
+      'vid' => array(
+        'description' => 'Venue ID',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'fid' => array(
+        'description' => 'Facility ID',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'day_of_week' => array(
+        'description' => 'Day of the week',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),            
+      'hour_start' => array(
+        'description' => 'Starting hour',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),            
+      'min_start' => array(
+        'description' => 'Starting minute',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),            
+      'hour_end' => array(
+        'description' => 'Ending hour',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),            
+      'min_end' => array(
+        'description' => 'Ending minute',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),            
+      'price' => array(
+        'description' => 'Price in JSON structure',
+        'type' => 'varchar',
+        'length' => 1024,
+        'default' => '{}',
+        'not null' => TRUE,
+      ),            
+      'duration' => array(
+        'description' => 'Duration',
+        'type' => 'int',
+        'size' => 'small',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),            
+      'capacity' => array(
+        'description' => 'Capacity',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),            
+      'closed' => array(
+        'description' => "If set, bookings won't be allowed",
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+    ),
+    'primary key' => array('cid'),
+    'unique keys' => array(
+        'unique_vid_fid' => array('vid', 'fid')
+    ),
+    'indexes' => array(
+      'index_closed'  => array('closed'),
+    ),
+  );
+  
+  return $schema;
+}
 
-
 /**
- * Implementation of hook_install().
- */
+  * Implementation of hook_install().
+  */
 function booking_timeslots_install() {
-   // Set the weight of booking_timeslots module to be one higher than calendars.
-   $weight = (int) db_query("SELECT weight FROM {system} WHERE name = 'calendar'") -> fetchField();
-   db_query("UPDATE {system} SET weight = %d WHERE name = 'booking_timeslots'", $weight + 1);
-   drupal_set_message(st("Booking Timeslots module has been activated. Now you should configure it on <a href='@url'>Settings Page</a>.", array(
-     '@url' => url('admin/settings/booking_timeslots/form_settings')
-   )));
+  $schema = drupal_get_schema('opening_hours');
+  booking_timeslots_schema_alter($schema);
+
+  db_add_field('opening_hours', 'capacity', $schema['opening_hours']['fields']['capacity']);
+  db_add_field('opening_hours', 'slot_length', $schema['opening_hours']['fields']['slot_length']);
+  
+  // Installing taxonomies
+  
+  echo "Loading payloads...\n";
+  
+  foreach (new DirectoryIterator(dirname(__FILE__) . '/payloads') as $file) {
+    
+    if ($file -> isDot())
+      continue;
+    
+    echo " - Got file '" . $file -> getFilename() . "'...\n";
+  
+    if (substr($file ->  getFilename(), 0, 11) == 'Taxonomies.') {
+      
+      $segments        = explode('.', $file -> getFilename());
+      $vocabulary_name = $segments[1];
+      
+      echo " ^-- Importing taxonomies to vocabulary '$vocabulary_name'...\n";
+      
+      $vocabularies = taxonomy_vocabulary_get_names();
+      $vid          = null;
+      
+      foreach ($vocabularies as $vid => $vocabulary) {
+        print_r ($vocabulary);
+        if ($vocabulary -> name == $vocabulary_name)
+          break;
+      }
+      
+      if (!$vid) {
+        // No vocabulary yet created
+        $vid = taxonomy_vocabulary_save((object)array(
+          'name'         => 'Sports Categoriess',
+          'machine_name' => 'sports_categories',
+          'description'  => 'Sports Categories'
+        ));
+      }
+    
+      foreach (file($file -> getPathname ()) as $line) {
+        
+        $csv = str_getcsv($line);
+        
+        taxonomy_term_save((object)array (
+          'vid' => $vid,
+          'name' => $csv[0]
+        ));
+      }
+    }
+  }
 }
 
-
 /**
- * Implementation of hook_uninstall().
- */
+  * Implementation of hook_uninstall().
+  */
 function booking_timeslots_uninstall() {
-  db_query("DELETE FROM {variable} WHERE name LIKE 'booking_timeslot_%%'");
+  $ret = array();
+  $schema = drupal_get_schema('opening_hours');
+  booking_timeslots_schema_alter($schema);
+  db_drop_field('opening_hours', 'capacity');
+  db_drop_field('opening_hours', 'slot_length');
 }
 
 /**
- * Implementation of hook_update().
- */
-function booking_timeslots_update_2() {
-    /* conversion from old to new format */
-    $old_form = variable_get('booking_timeslot_form_id', '');
-    if (!empty($old_form)) {
-        variable_set('booking_timeslot_forms', array($old_form));
-        variable_del('booking_timeslot_form_id');
-    }
-
-    $old_field = variable_get('booking_timeslot_field_name', '');
-    if (!empty($old_form)) {
-        variable_set('booking_timeslot_fields', array($old_field));
-        variable_del('booking_timeslot_field_name');
-    }
+  * Implementation of hook_schema_alter().
+  */
+function booking_timeslots_schema_alter(&$schema) {
+  $schema['opening_hours']['fields']['notice']['length'] = 4095;
+  $schema['opening_hours']['fields']['capacity'] = array(
+    'type' => 'int',
+    'size' => 'small',
+    'length' => 5,
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  );
+  $schema['opening_hours']['fields']['slot_length'] = array(
+    'type' => 'int',
+    'size' => 'small',
+    'length' => 5,
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  );
 }
-
-/**
- * Implementation of hook_update().
- */
-function booking_timeslots_update_3() {
-    /* conversion from old to new format */
-    variable_set('booking_timeslot_available_slots', variable_get('booking_timeslot_avaliable_slots', 1));
-    variable_del('booking_timeslot_avaliable_slots');
-}
-
