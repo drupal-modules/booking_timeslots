@@ -105,6 +105,7 @@ function template_preprocess_booking_timeslots_day(&$vars) {
  *  See: template_preprocess_calendar($vars);
  */
 function template_preprocess_booking_timeslots_week(&$vars) {
+  
   extract($vars);
   /*
    * Variables available:
@@ -155,15 +156,18 @@ function template_preprocess_booking_timeslots_month(&$vars) {
   $vars['bt_text']['slot_booked'] = t('Already booked'); // Text for slot, which is already booked
   $vars['bt_text']['slot_unavailable'] = t('Not Available'); // Text for slot, which is unavailable
 
+  // '@TODO: Here we have rows as html code but we would like to operate on cells so we need to get the cell structure from somewhere'; 
+
   $cid = arg(0);
   foreach ($vars['rows'] as $weekno => $row) {
     foreach ($row as $day => $data) {
       $cell = $data['data'];
-      $date = str_replace($cid.'-', $cid.'/',$data['id']);
+      $date = str_replace($cid . '-', $cid . '/', $data['id']);
       if (!is_array($cell) && $data['class'] != 'week' && strpos($data['class'], 'empty') === FALSE) {
         // FIXME: && booking_timeslots_day_not_available($date)) { // If this cell is already rendered...
         $link = l($vars['bt_text']['book_now'], $date);
-        $vars['rows'][$weekno][$day]['data'] .= "<div class='slot_free'>$link</div>"; // ...and which is free
+        
+        $vars['rows'][$weekno][$day] .= "<div class='slot_free'>$link</div>"; // ...and which is free
       }
     }
   }

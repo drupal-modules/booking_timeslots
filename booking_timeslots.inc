@@ -80,18 +80,18 @@ function booking_timeslots_valid_datetime($datetime) {
  * @return
  *      TRUE if date is available
  */
-function booking_timeslots_check_slot_availability($date, $nodeType, $forms = NULL) {
+function booking_timeslots_check_slot_availability($date, $node_type, $forms = NULL) {
     try {
-      $date = new DateTime($date['year']."-".$date['month']."-".$date['day']." ".$date['hour'].":".$date['minute']);
+      $date = new DateTime($date['year'] . "-" . $date['month'] . "-" . $date['day'] . " " . $date['hour'] . ":" . $date['minute']);
     } catch (Exception $e) {
         $err = $e->getMessage();
-        drupal_set_message('php', $e->getMessage(), 'error');
+        drupal_set_message($e->getMessage(), 'error');
         watchdog('php', $e->getMessage() . "<br>\n" . print_r($forms, TRUE), 'error');
     }
     $date = date_format_date($date, 'custom', 'Y-m-d H:i');
     $timeslot_fields = variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot'));
 
-    $slots = db_query('SELECT nid FROM {node} WHERE type = "%s"', $nodeType);
+    $slots = db_query('SELECT nid FROM {node} WHERE type = "%s"', $node_type);
     while ($row = db_fetch_array($slots)) {
         $slot = node_load($row['nid']);
         foreach ($timeslot_fields as $func_name) {
@@ -99,28 +99,28 @@ function booking_timeslots_check_slot_availability($date, $nodeType, $forms = NU
               continue;
             }
 
-            $slotDate = $slot->{$func_name}[0]['value'];
-            $curTimezone = $slot->{$func_name}[0]['timezone_db'];
-            $tarTimezone = $slot->{$func_name}[0]['timezone'];
+            $slot_date = $slot->{$func_name}[0]['value'];
+            $cur_timezone = $slot->{$func_name}[0]['timezone_db'];
+            $tar_timezone = $slot->{$func_name}[0]['timezone'];
 
             // converting time
-            $utc_date = date_make_date(date_format_date(new DateTime($slotDate), 'custom', 'Y-m-d H:i'), $curTimezone, DATE_DATETIME);
-            date_timezone_set($utc_date, timezone_open($tarTimezone));
+            $utc_date = date_make_date(date_format_date(new DateTime($slot_date), 'custom', 'Y-m-d H:i'), $cur_timezone, DATE_DATETIME);
+            date_timezone_set($utc_date, timezone_open($tar_timezone));
             $utc_date_string = date_format_date($utc_date, 'custom', 'Y-m-d H:i');
-            $slotDate = $utc_date_string;
+            $slot_date = $utc_date_string;
 
-            if(!isset($slotMap[$slotDate]))
-                $slotMap[$slotDate] = 1;
+            if (!isset($slot_map[$slot_date]))
+                $slot_map[$slot_date] = 1;
             else
-                $slotMap[$slotDate]++;
+                $slot_map[$slot_date]++;
         }
     }
 
     $slots = variable_get('booking_timeslot_available_slots', 1);
-    if(isset($slotMap[$date]) || $slotMap[$date] > $slots)
-        return false;
+    if (isset($slot_map[$date]) || $slot_map[$date] > $slots)
+        return FALSE;
     
-    return true;
+    return TRUE;
 }
 
 /**
@@ -152,14 +152,15 @@ function booking_timeslots_get_ctype_name($content_type = NULL, $link = FALSE) {
       $content_type = booking_timeslot_content_type_via_field($field_name); // detect content type via field name
       $content_type_cache[$view_name] = $content_type;
     }
-  } else {
+  }
+  else {
     $content_type = $arg0;
   }
 
   if (empty($content_type)) {
     drupal_set_message(t("Booking time slots are not properly configured for this page, please contact your site administrator!"), 'warning');
     if (user_access('administer booking timeslots')) {
-      drupal_set_message(t("Please <a href='!url'>configure Booking Timeslots</a>.", array('!url' => url('admin/settings/booking_timeslots/form_settings'))), 'error');
+      drupal_set_message(t("Please <a href='@url'>configure Booking Timeslots</a>.", array('@url' => url('admin/settings/booking_timeslots/form_settings'))), 'error');
     }
   }
 
@@ -175,28 +176,32 @@ function booking_timeslot_detect_field_from_view($view) {
   if (!is_object($view)) {
     $view_name = $view;
     $view = views_get_view($view);
-  } else {
+  }
+  else {
     $view_name = $view->name;
   }
   $my_fields = array_flip(variable_get('booking_timeslot_fields', $view_name == 'booking_calendar' ? array('field_booking_slot' => 'field_booking_slot') : array()));
   $handler = $view->display['default'];
-  $field_args = $handler->display_options['arguments']['date_argument']['date_fields'];
+  
+
+  
+  // Avoiding notices by '@' as there may be no arguments at all
+  $field_args = @$handler->display_options['fields'];
+
+//  echo '<pre>';print_r ($field_args);exit;  
+  
   if (!empty($field_args)) {
-    foreach ($field_args as $field) {
-      if (strpos($field, 'field_') !== FALSE) {
-        $view_field_name = next(explode('.', $field));
-        foreach ($my_fields as $key => $field_conf) {
-          if (strpos($view_field_name, $field_conf) !== FALSE) { // check if our field is in this view
-            $field_name = $field_conf;
-            break 2;
-          }
-        }
+    foreach ($field_args as $name => $field) {
+      if (strpos($name, 'field_') !== FALSE) {
+        $view_field_name = $name;
+        break;
       }
     }
-  } else if (user_access('administer booking timeslots')) {
+  }
+  elseif (user_access('administer booking timeslots')) {
     drupal_set_message(t('Booking Timeslots: Your calendar view has missing date arguments!'), 'warning');
   }
-  return $field_name;
+  return $view_field_name;
 }
 
 /**
@@ -204,7 +209,7 @@ function booking_timeslot_detect_field_from_view($view) {
  *
  */
 function booking_timeslot_content_type_via_field($field_name) {
-  $field = content_fields($field_name);
+  $field = field_info_fields($field_name);
   return $field['type_name'];
 }
 
@@ -271,7 +276,10 @@ function booking_timeslots_get_day_availability($times, $rows = array(), $bt_no_
       $avail_slots = booking_timeslots_unixtime_within_ranges($unixtime, $available_times['all']); // check if current slot is within available dates
       $times[$time] = min($bt_no_of_slots_available, $avail_slots == 0 ? -1 : $avail_slots); // set the number of slots (otherwise set to -1 as unavailable)
       if ($times[$time] == -1 && user_access('administer booking timeslots') && variable_get('booking_timeslot_show_debug_messages', FALSE)) {
-        drupal_set_message(__FUNCTION__ . t("(): Slot %date %time is not available, because is not added to available list.", array('%date' => $date, '%time' => $time)), 'status');
+        drupal_set_message(__FUNCTION__ . t("(): Slot %date %time is not available, because is not added to available list.", array(
+          '%date' => check_plain($date),
+          '%time' => check_plain($time))),
+          'status');
       }
     }
   }
@@ -330,13 +338,19 @@ function booking_timeslots_day_not_available($date) {
   $dayofweek = date("l", strtotime($date));
   if (!variable_get('booking_timeslot_past_booking', FALSE) && strtotime($date) < strtotime("now")) {
     if (user_access('administer booking timeslots') && variable_get('booking_timeslot_show_debug_messages', FALSE)) {
-      drupal_set_message(__FUNCTION__ . t("(): Date %date is not available, because it's in the past.", array('%date' => $date)), 'status');
+      drupal_set_message(__FUNCTION__ . t("(): Date %date is not available, because it's in the past.", array(
+        '%date' => check_plain($date)
+      )), 'status');
     }
     $avail = FALSE; // not available if it's in the past
     // TODO: http://drupal.org/node/869418 - close bookings xxx hours in advance
-  } else if (in_array(strtolower($dayofweek), variable_get('booking_timeslot_not_avaliable', array()), TRUE)) {
+  }
+  elseif (in_array(strtolower($dayofweek), variable_get('booking_timeslot_not_avaliable', array()), TRUE)) {
     if (user_access('administer booking timeslots') && variable_get('booking_timeslot_show_debug_messages', FALSE)) {
-      drupal_set_message(__FUNCTION__ . t("(): Date %date is not available, because %dayofweek is on non-available list.", array('%date' => $date, '%dayofweek' => $dayofweek)), 'status');
+      drupal_set_message(__FUNCTION__ . t("(): Date %date is not available, because %dayofweek is on non-available list.", array(
+        '%date' => $date,
+        '%dayofweek' => $dayofweek
+      )), 'status');
     }
     $avail = FALSE; // current weekday is not available for booking (configurable)
   }
@@ -391,13 +405,13 @@ function booking_timeslots_get_holidays() {
 
   $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $form_name);
   while ($row = db_fetch_array($q)) {
-    $temp_node = node_load(array('type' => $form_name, 'nid' => $row['nid']));
+    $temp_node = node_load($row['nid']);
     if (node_access('view', $temp_node)) $matches[] = $temp_node;
   }
 
   $q = db_query('SELECT * FROM {node} WHERE type = "%s"', $bt_ctype_non_avail);
   while ($row = db_fetch_array($q)) {
-    $matches[] = node_load(array('type' => $bt_ctype_non_avail, 'nid' => $row['nid']));
+    $matches[] = node_load($row['nid']);
   }
 
   $holidays = array();
@@ -414,7 +428,7 @@ function booking_timeslots_get_holidays() {
       $date_to_unix = strtotime($date_to_value . ' ' . $date_to[0]['timezone_db']);
 
       if ($date_to_unix < $date_from_unix) {
-        list($date_from_unix,$date_to_unix) = array($date_to_unix,$date_from_unix);
+        list($date_from_unix, $date_to_unix) = array($date_to_unix, $date_from_unix);
       }
 
       if ((($date_from_unix == $date_to_unix) && ($date_from == $date_to)) || ($node->type == $bt_ctype_non_avail)) {
@@ -495,8 +509,9 @@ function booking_timeslots_generate_field_dates($field_names = array(), $perm_re
  *      array of time slots
  */
 function booking_timeslots_unixtime2timeslots($unixstart, $unixend) {
-  $DateTime_start = date("Y-m-d H:i:s", $unixstart); 
-  $DateTime_end = date("Y-m-d H:i:s", $unixend); 
+  $datetime_start = date("Y-m-d H:i:s", $unixstart); 
+  $datetime_end = date("Y-m-d H:i:s", $unixend); 
+  var_dump($datetime_start, $datetime_end); 
 }
 
 /**

@@ -14,7 +14,7 @@
 /**
  *  Menu callback for the settings form.
  */
-function booking_timeslots_settings_timeslots_form(&$form_state) {
+function booking_timeslots_settings_timeslots_form($form_state) {
   $form['timeslot_length'] = array(
     '#type' => 'fieldset',
     '#title' => t('Timeslot settings'),
@@ -79,7 +79,7 @@ function booking_timeslots_settings_timeslots_form(&$form_state) {
     '#default_value' => variable_get('booking_timeslot_not_avaliable', array()),
     '#options' => array(
         'monday' => t('Monday'),
-        'tuesday'=> t('Tuesday'),
+        'tuesday' => t('Tuesday'),
         'wednesday' => t('Wednesday'),
         'thursday' => t('Thursday'),
         'friday' => t('Friday'),
@@ -95,7 +95,7 @@ function booking_timeslots_settings_timeslots_form(&$form_state) {
 /**
  *  Menu callback for the settings form.
  */
-function booking_timeslots_settings_form(&$form_state) {
+function booking_timeslots_settings_form($form_state) {
 
    $form['cck'] = array(
     '#type' => 'fieldset',
@@ -108,10 +108,14 @@ function booking_timeslots_settings_form(&$form_state) {
   if (module_exists('date')) {
     $field_list = array();
     $content_types = array();
-    foreach( content_fields() as $field_name => $data ) {
-      if( $data['type'] == 'datetime' || $data['type'] == 'date') { // TODO: 'date' field types are not tested yet
-        $field_list[$field_name] = $field_name . ' (' . t('Content type: ') . $data['type_name'] . ')';
-        $content_types[$data['type_name']] = $data['type_name'];
+    foreach (field_info_fields() as $field_name => $data) {
+      if ($data['type'] == 'datetime' || $data['type'] == 'date') { // TODO: 'date' field types are not tested yet
+        
+        $field_content_types = call_user_func_array('array_merge', $data['bundles']);
+        $field_list[$field_name] = $field_name . ' (' . t('Content types:') . ' ' . implode(', ', $field_content_types) . ')';
+        
+        foreach ($field_content_types as $name)
+          $content_types[$name] = $name;
       }
     }
     $form['cck']['booking_timeslot_fields'] = array(
@@ -125,7 +129,8 @@ function booking_timeslots_settings_form(&$form_state) {
 
     if (empty($field_list)) {
       drupal_set_message(t('Please add at least one CCK %type field into your content type.', array('%type' => 'datetime')), 'error');
-    } else if (empty($fields)) {
+    }
+    elseif (empty($fields)) {
       drupal_set_message(t('Please select at least one date or datetime field where you want to store booking times.'), 'warning');
     }
 
@@ -145,8 +150,9 @@ function booking_timeslots_settings_form(&$form_state) {
       '#options' => $field_list,
     );
   
-  } else {
-    $content_types = node_get_types('names');
+  }
+  else {
+    $content_types = node_type_get_types('names');
     drupal_set_message(t('Please install %module module for fields settings.', array('%module' => 'Date')), 'error');
   }
 
@@ -172,13 +178,14 @@ function booking_timeslots_settings_form(&$form_state) {
   /* CHECK IF DEFAULT CALENDAR VIEW IS ENABLED */
   if (empty($list_views)) {
     drupal_set_message(t('Please enable at least one calendar based view i.e. <a href="@url">Calendar View.</a>', array('@url' => url('admin/build/views/list'))), 'warning');
-  } else {
+  }
+  else {
     foreach ($list_views as $key => $value) {
       $view_path = booking_timeslots_calendar_view_path($key);
       $form['views']['booking_timeslot_view_' . $key] = array(
           '#type' => 'select',
           '#title' => t('View: %view', array('%view' => $key)),
-          '#description' => t('Choose which content type should be associated with your <a target=_blank href="!url">calendar view</a>.', array('!url' => url($view_path))),
+          '#description' => t('Choose which content type should be associated with your <a target=_blank href="@url">calendar view</a>.', array('@url' => url($view_path))),
           '#default_value' => variable_get('booking_timeslot_view_' . $key, ''),
           '#options' => array_merge(array('' => t('- None -')), $content_types),
         );
@@ -228,28 +235,29 @@ function booking_timeslots_settings_form(&$form_state) {
 /**
  * Get calendar view path based on view name
  */
-function booking_timeslots_calendar_view_path($view_name){
+function booking_timeslots_calendar_view_path($view_name) {
+  
   $view = views_get_view($view_name);
-  return $view->display['calendar_1']->display_options['path'];
+  return isset($view->display[$view_name]) ? $view->display[$view_name]->display_options['path'] : '';
 }
 
 /**
  * Form API callback to validate the settings form.
  */
-function booking_timeslots_form_validate($form, &$form_state){
+function booking_timeslots_form_validate($form, &$form_state) {
   $hour_from = $form['timeslot_length']['booking_timeslot_hour_from']['#value'];
   $hour_to = $form['timeslot_length']['booking_timeslot_hour_to']['#value'];
 
-  if ($hour_from >= $hour_to){
+  if ($hour_from >= $hour_to) {
     form_set_error('booking_timeslot_hour_from', t("Hour To should be greater than Hour From."));
-    form_set_error('booking_timeslot_hour_to',t(' '));
+    form_set_error('booking_timeslot_hour_to', ' ');
   }
 }
 
 /**
  * Form API callback to validate the admin settings form.
  */
-function booking_timeslots_settings_form_validate($form, &$form_state){
+function booking_timeslots_settings_form_validate($form, &$form_state) {
   $values = $form_state['values'];
 
   /* MAKE THE LIST OF ACTIVATED VIEWS */
@@ -262,12 +270,21 @@ function booking_timeslots_settings_form_validate($form, &$form_state){
     if (!empty($content_name)) { // if view is associated with content type...
       module_load_include('inc', 'booking_timeslots');
       if (!($field_name = booking_timeslot_detect_field_from_view($view_name))) { // check if that view has proper configuration
-        form_set_error($vkey, t("Please configure <a target='_blank' href='@view_url'>%name view</a> by <a target='_blank' href='@view_arg_url'>selecting proper field</a> which you chosen for time slots and <a target='_blank' href='@view_fields_url'>adding it</a> to the list of fields, before activating the view!", array('@view_url' => url("admin/build/views/edit/$view_name"), '@view_arg_url' => url("admin/build/views/nojs/config-item/$view_name/default/argument/date_argument"), '@view_fields_url' => url("admin/build/views/nojs/add-item/$view_name/default/field"), '%name' => $view_name)));
+        form_set_error($vkey,
+          t("Please configure <a target='_blank' href='@view_url'>%name view</a> by <a target='_blank' href='@view_arg_url'>selecting proper field</a> which you chosen for time slots and <a target='_blank' href='@view_fields_url'>adding it</a> to the list of fields, before activating the view!",
+            array(
+              '@view_url' => url("admin/build/views/edit/$view_name"),
+              '@view_arg_url' => url("admin/build/views/nojs/config-item/$view_name/default/argument/date_argument"),
+              '@view_fields_url' => url("admin/build/views/nojs/add-item/$view_name/default/field"),
+              '%name' => $view_name
+             )
+          )
+        );
       }
     }
   }
   $enabled_views = array_filter($enabled_views); // filter empty settings
-  empty($enabled_views) && !variable_get('booking_timeslot_show_warnings', FALSE) ?  drupal_set_message("Proper configuration require at least one view associated with a content type!", 'warning') : NULL; // Check for configuration issues
+  empty($enabled_views) && !variable_get('booking_timeslot_show_warnings', FALSE) ?  drupal_set_message(t("Proper configuration require at least one view associated with a content type!"), 'warning') : NULL; // Check for configuration issues
 
   /* CHECK PROPER CONFIGURATION OF FIELDS */
   $field_names = array_flip($values['booking_timeslot_fields']);
@@ -290,7 +307,7 @@ function booking_timeslots_settings_form_validate($form, &$form_state){
  * Check if tpl files are in the right place
  * Note: works only with default calendar view
  */
-function booking_timeslots_check_admin_options(){
+function booking_timeslots_check_admin_options() {
   /* CHECK IF TPL TEMPLATE HAS BEEN COPIED INTO THEME FOLDER */
   $theme_path = drupal_get_path('theme', variable_get('theme_default', NULL));
   if (($registry = theme_get_registry()) && (array_search('template_preprocess_booking_timeslots_day', (array)$registry['calendar_day']['preprocess functions']) === FALSE)) { // check or preprocess function
@@ -300,7 +317,9 @@ function booking_timeslots_check_admin_options(){
     drupal_set_message(t('Please copy theme files from module themes/ folder into your theme path: @theme_path to see changes in calendar view and clear the cache.', array('@theme_path' => $theme_path)), 'error');
   }
   if (module_exists('calendar_multiday')) {
-    drupal_set_message(t("Currently Calendar Multiday module is not supported! <a href='!url'>Please disable it!</a> See: <a href='!issue'>#1005336</a>", array('!url' => url('admin/build/modules'), '!issue' => 'http://drupal.org/node/1005336')), 'error');
+    drupal_set_message(t("Currently Calendar Multiday module is not supported! <a href='@url'>Please disable it!</a> See: <a href='!issue'>#1005336</a>", array(
+      '@url' => url('admin/build/modules'),
+      '!issue' => 'http://drupal.org/node/1005336')), 'error');
   }
 }
 

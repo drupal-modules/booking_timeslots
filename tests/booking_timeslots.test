@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Test plan for Booking Timeslots module
  */
 class BookingTimeslotsUnitTest extends DrupalWebTestCase {
@@ -78,7 +82,7 @@ class BookingTimeslotsUnitTest extends DrupalWebTestCase {
     $q = db_query("SELECT * FROM {variable} WHERE name LIKE 'booking_timeslot_view_%%'");
     while ($row = db_fetch_array($q)) {
       if (unserialize($row['value']) == $page_name) {
-        $view_name = substr($row['name'],strlen('booking_timeslot_view_'));
+        $view_name = substr($row['name'], strlen('booking_timeslot_view_'));
         break;
       }
     }
@@ -86,10 +90,10 @@ class BookingTimeslotsUnitTest extends DrupalWebTestCase {
     /* detect content type name */
     /* TODO: fix content type detection */
     $content_types = content_types();
-    if ($my_form_id = $_SESSION['booking_timeslot_ct_'.arg(0)] !== FALSE) {
+    if ($my_form_id = $_SESSION['booking_timeslot_ct_' . arg(0)] !== FALSE) {
       foreach ($my_forms as $my_form_key => $my_form_id) {  // find associated content type with field
           if (isset($content_types[$my_form_key]['fields'][$my_fields]) && !empty($my_form_key)) { // if field exist in this content type...
-            $_SESSION['booking_timeslot_ct_'.arg(0)] = $my_form_id; /// associate this content type with base path for futher use
+            $_SESSION['booking_timeslot_ct_' . arg(0)] = $my_form_id; /// associate this content type with base path for futher use
             break 2;
           }
       }

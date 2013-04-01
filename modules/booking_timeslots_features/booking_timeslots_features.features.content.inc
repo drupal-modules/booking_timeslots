@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Implementation of hook_content_default_fields().
  */
 function booking_timeslots_features_content_default_fields() {

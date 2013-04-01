@@ -1,4 +1,4 @@
-core = "6.x"
+core = 7.x
 dependencies[] = "booking_timeslots"
 dependencies[] = "calendar"
 dependencies[] = "date"
@@ -7,7 +7,9 @@ description = "Provides configured content type and calendar view for Booking Ti
 features[content][] = "booking_slot-field_booking_slot"
 features[views][] = "booking_calendar"
 features[views_api][] = "api:2"
+project = "booking_timeslots"
 name = "Booking Timeslots Features"
 package = Date/Time
-project = "booking_timeslots_features"
-version = "6.x-1.1-beta1"
+version = "7.x-1.0"
+files [] = booking_timeslots_features.module
+

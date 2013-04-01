@@ -16,21 +16,21 @@
  */
 function booking_timeslots_menu() {
   $items['admin/settings/booking_timeslots/timeslots_settings'] = array(
-    'title' => t('Timeslot settings'),
+    'title' => 'Timeslot settings',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   ); 
   $items['admin/settings/booking_timeslots'] = array(
-    'title' => t('Booking Timeslots Settings'),
-    'description' => t('Manage booking timeslots.'),
+    'title' => 'Booking Timeslots Settings',
+    'description' => 'Manage booking timeslots.',
     'page callback' => 'drupal_get_form',
-    'access callback' => 'booking_timeslots_access',
+    'access callback' => 'booking_timeslots_access_callback',
     'page arguments' => array('booking_timeslots_settings_timeslots_form'),
     'file' => 'booking_timeslots.admin.inc',
   );
   $items['admin/settings/booking_timeslots/form_settings'] = array(
-    'title' => t('Form Settings'),
-    'description' => t('Manage form settings.'),
+    'title' => 'Form Settings',
+    'description' => 'Manage form settings.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('booking_timeslots_settings_form'),
     'access arguments' => array('administer booking timeslots'),
@@ -44,12 +44,12 @@ function booking_timeslots_menu() {
 /**
  * Implementation of hook_perm().
  */
-function booking_timeslots_perm() {
+function booking_timeslots_permission() {
   $permissions = array(
-    'administer booking timeslots',
-    'edit booking dates',
-    'show booking dates',
-    'edit timeslot settings',
+    'administer booking timeslots' => array('title' => t('Administer booking timeslots')),
+    'edit booking dates' => array('title' => t('Edit booking dates')),
+    'show booking dates' => array('title' => t('Show booking dates')),
+    'edit timeslot settings' => array('title' => t('Edit timeslot settings')),
   );
   return $permissions;
 }
@@ -57,7 +57,7 @@ function booking_timeslots_perm() {
 /**
  * Menu item access callback - only admin or user with proper privileges can access it
  */
-function booking_timeslots_access() {
+function booking_timeslots_access_callback() {
   return user_access('administer booking timeslots') || user_access('edit timeslot settings');
 }
 
@@ -65,7 +65,7 @@ function booking_timeslots_access() {
 /**
  * Implementation of hook_form_alter().
  */
-function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
+function booking_timeslots_form_alter(&$form, &$form_state, $form_id) {
   if (strpos($form_id, '_node_form') !== FALSE) {
     $booking_active = FALSE;
     $content_type = str_replace('_node_form', '', $form_id); // convert name to plain content type name
@@ -76,18 +76,18 @@ function booking_timeslots_form_alter(&$form, $form_state, $form_id) {
         $last_arg = end(arg());
         $start_date = arg(3);
         $end_date = arg(4);
-        $datetime = $form[$fieldname][0]['#default_value']['value'];
+        $datetime = $form[$fieldname][LANGUAGE_NONE][0]['#default_value']['value'];
         if (!empty($start_date)) {
         if (booking_timeslots_valid_datetime($start_date)) {
-            $form[$fieldname][0]['#default_value']['value'] = $datetime = $start_date;
+            $form[$fieldname][LANGUAGE_NONE][0]['#default_value']['value'] = $datetime = $start_date;
           }
         }
         if (!empty($datetime)) {
           $date_after = booking_timeslots_add_time($datetime, array('hour' => variable_get('booking_timeslot_length_hours', 1), 'minute' => variable_get('booking_timeslot_length_minutes', 0)));
-          $form[$fieldname][0]['#default_value']['value2'] = $date_after;
+          $form[$fieldname][LANGUAGE_NONE][0]['#default_value']['value2'] = $date_after;
         }
         if (booking_timeslots_valid_datetime($end_date) && !empty($end_date)) {
-          $form[$fieldname][0]['#default_value']['value2'] = $end_date;
+          $form[$fieldname][LANGUAGE_NONE][0]['#default_value']['value2'] = $end_date;
         }
         $form['#validate'][] = 'booking_timeslots_validate';
         $form['buttons']['submit']['#value'] = t('Book Now');
@@ -114,10 +114,9 @@ function booking_timeslots_validate($form, &$form_state) {
   }
   $fieldnames = array_flip(variable_get('booking_timeslot_fields', array('field_booking_slot' => 'field_booking_slot')));
   foreach ($fieldnames as $fieldname => $value) {
-      
     if (isset($form_state['values'][$fieldname])) {
-      $date1 = $form_state['values'][$fieldname][0]['value'];
-      $date2 = $form_state['values'][$fieldname][0]['value2'];
+      $date1 = $form_state['values'][$fieldname][LANGUAGE_NONE][0]['value'];
+      $date2 = $form_state['values'][$fieldname][LANGUAGE_NONE][0]['value2'];
       break;
     }
     // Form Data: field_timeslot%5B0%5D%5Bvalue%5D%5Bdate%5D:Dec 15 2010 - 11am
@@ -137,14 +136,13 @@ function booking_timeslots_validate($form, &$form_state) {
  */
 function booking_timeslots_theme_registry_alter(&$items) {
   $items['calendar_month']['preprocess functions'][] = 'template_preprocess_booking_timeslots_month';
-  $items['calendar_month']['include files'][] = './' . drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+  $items['calendar_month']['includes'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
 
   $items['calendar_week']['preprocess functions'][] = 'template_preprocess_booking_timeslots_week';
-  $items['calendar_week']['include files'][] = './' . drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
+  $items['calendar_week']['includes'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
 
   $items['calendar_day']['preprocess functions'][] = 'template_preprocess_booking_timeslots_day';
-  $items['calendar_day']['include files'][] = './' . drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
-
+  $items['calendar_day']['includes'][] = drupal_get_path('module', 'booking_timeslots') . '/booking_timeslots.theme.inc';
 
   /* TODO: Find the right template
         $plugin = $this->get_plugin();
@@ -160,5 +158,5 @@ function booking_timeslots_theme_registry_alter(&$items) {
 
   // Other theme callbacks:
   //   calendar_month_multiple_node, calendar_week_multiple_node, calendar_datebox, calendar_date_combo, calendar_empty_day, calendar_stripe_legend, calendar_stripe_stripe, calendar_colorpicker, calendar_colorfield, calendar_time_row_heading
-}
+  }
 

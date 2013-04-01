@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Implementation of hook_views_default_views().
  */
 function booking_timeslots_features_views_default_views() {

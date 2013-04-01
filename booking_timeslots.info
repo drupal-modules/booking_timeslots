@@ -1,8 +1,9 @@
 name = Booking Timeslots
 description = Booking timeslots module
 package = Date/Time
-core = 6.x
+core = 7.x
 dependencies[] = calendar
 dependencies[] = content
-version = VERSION
+version = 7.x-1.0
+files [] = booking_timeslots.module
 
