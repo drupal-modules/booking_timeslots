@@ -7,103 +7,12 @@
 require_once 'booking_timeslots.booking.inc';
 
 /**
- * Implements hook_menu_local_tasks_alter().
- *
- * Schedule tab should only be added on venue nodes.
- */
-function booking_timeslots_menu_local_tasks_alter(&$data, $router_item, $root_path) {
-  $primary_name = variable_get('booking_timeslots_1st_content_type');
-  
-  if(isset($data['tabs'][0])) {
-    $current_node_type = @$router_item['page_arguments'][0]->type;
-    foreach($data['tabs'][0]['output'] as $key => $link) {
-      if($link['#link']['title'] == ('Schedule') && $current_node_type != $primary_name && $router_item['page_arguments'][0] !== 'public_calendar') {
-        $data['tabs'][0]['output'][$key]['#active'] = FALSE;
-        unset($data['tabs'][0]['output'][$key]);
-      }
-    }
-  }
-}
-
-/**
  * Implements hook_entity_info().
  */
 function booking_timeslots_entity_info() {
   $info = array();
   booking_timeslots_booking_entity_info($info);
   return $info;
-}
-
-/**
- * Implements hook_url_inbound_alter().
- *
- * Tells drupal that urls called via /venue-name should be rendered as /node/nid
- */
-function booking_timeslots_url_inbound_alter(&$path, $original_path, $path_language) {
-    $arg = explode("/", $path);
-    
-    $primary_name = variable_get('booking_timeslots_1st_content_type');
-    
-    if (!$primary_name) {
-      return;
-    }
-    
-    //if($arg[0] == "venue") {
-        $title = str_replace("-", " ", $arg[0]);
-        $query = new EntityFieldQuery();
-        $entities = $query->entityCondition('entity_type', 'node')
-        ->propertyCondition('type', $primary_name)
-        ->propertyCondition('title', $title)
-        ->propertyCondition('status', 1)
-        ->range(0,1)
-        ->execute();
-        
-        if (!empty($entities['node'])) {
-            $node = node_load(array_shift(array_keys($entities['node'])));
-            $path = 'node/' . $node->nid;
-            
-            if(isset($arg[1])) {
-                for($i = 0; $i < (count($arg) - 1); $i++) {
-                    $path .= '/' . $arg[1 + $i];
-                }
-            }
-        }
-    //}
-}
-
-/**
- * Implements hook_url_outbound_alter().
- *
- * Replaces node urls with venue ones
- */
-function booking_timeslots_url_outbound_alter(&$path, &$options, $original_path) {
-    $arg = explode("/", $path);
-    
-    $primary_name = variable_get('booking_timeslots_1st_content_type');
-    
-    if($arg[0] == "node") {
-        if(is_numeric($arg[1]))    {
-            $query = new EntityFieldQuery();
-            $entities = $query->entityCondition('entity_type', 'node')
-            ->propertyCondition('type', $primary_name)
-            ->propertyCondition('nid', $arg[1])
-            ->propertyCondition('status', 1)
-            ->range(0,1)
-            ->execute();
-            
-            if (!empty($entities['node'])) {
-                $node = node_load(array_shift(array_keys($entities['node'])));
-                $path = str_replace(" ", "-", $node->title);
-                //$path = 'venue/' . str_replace(" ", "-", $node->title);
-                
-                if(isset($arg[2])) {
-                    for($i = 0; $i < (count($arg) - 2); $i++) {
-                        $path .= '/' . $arg[2 + $i];
-                    }
-                }
-            }
-        }
-    }
 }
 
 /**
@@ -125,7 +34,7 @@ function booking_timeslots_menu() {
   );
   
   $items['admin/config/booking_timeslots']['title'] = 'Booking Timeslots';
-  
+
   /*
   $items['admin/config/booking_timeslots/settings/timeslots_settings'] = array(
     'title' => 'Timeslot settings',
@@ -151,8 +60,7 @@ function booking_timeslots_menu() {
     'file' => 'includes/booking_timeslots.admin.inc',
   );
   */
-  
-  
+
   return $items;
 }
 
@@ -218,6 +126,7 @@ function booking_timeslots_form_views_exposed_form_alter(&$form, $form_state, $f
     list($time_start, $time_end) = booking_timeslots_get_calendar_time_range ($form_state['view'], $form);
     
 
+    // @FIXME: remove hardcoded variables
     $primary_id    = &$form_state['view'] -> args[0];
     $sport_id      = &$form_state['view'] -> exposed_input['sport'];
     $type_id       = &$form_state['view'] -> exposed_input['type'];
@@ -232,6 +141,7 @@ function booking_timeslots_form_views_exposed_form_alter(&$form, $form_state, $f
     if ($tertiary_id == 'All')
       $tertiary_id = null;
         
+    // @FIXME: remove hardcoded variables
     $sports      = booking_timeslots_filter_get_sports($sport_id, $primary_id, $secondary_id);
     $types       = booking_timeslots_filter_get_types($type_id, $primary_id, $secondary_id, $sport_id);
     
@@ -360,6 +270,7 @@ function booking_timeslots_filters_callback($form, $form_state) {
   return $form;
 }
 
+// @FIXME: remove hardcoded variables
 function booking_timeslots_filter_get_sports(&$sport_id, &$primary_id = null, &$secondary_id = null) {
   
   $taxonomy_vid = taxonomy_vocabulary_machine_name_load('sports_categories') -> vid;
@@ -372,6 +283,7 @@ function booking_timeslots_filter_get_sports(&$sport_id, &$primary_id = null, &$
   $tertiary_to_quaternary_name = variable_get('booking_timeslots_3rd_to_4th_ref_field');
   $quaternary_name             = variable_get('booking_timeslots_4th_content_type');
   
+  // @FIXME: remove hardcoded variables
   $sports = db_query("
     SELECT DISTINCT T.tid, T.name
       FROM {field_data_field_{$primary_name}_id} C2_C1
@@ -412,6 +324,7 @@ function booking_timeslots_filter_get_types(&$type_id, &$primary_id = null, &$se
   
   // Checking for Courts
   
+  // @FIXME: remove hardcoded variables
   $has = db_query("
     SELECT COUNT(1) AS has
     FROM field_data_{$secondary_to_primary_name} C2_C1
@@ -447,13 +360,14 @@ function booking_timeslots_filter_get_types(&$type_id, &$primary_id = null, &$se
       ':sport_id'       => $sport_id
     )) -> fetchField();
   
+  // @FIXME: remove hardcoded variables
   if ($has)
     $result['classes'] = t('Classes');
     
+  // @FIXME: remove hardcoded variables
   if ($type_id !== 'classes' && $type_id !== 'courts' || !isset($result[$type_id])) {
     $type_id = reset(array_keys($result));
   }
-    
   if (!$result)
     return array('All' => t('- No items -'));  
   
@@ -470,6 +384,7 @@ function booking_timeslots_filter_get_courts(&$primary_id, &$secondary_id, &$spo
   $tertiary_to_quaternary_name = variable_get('booking_timeslots_3rd_to_4th_ref_field');
   $quaternary_name             = variable_get('booking_timeslots_4th_content_type');
 
+  // @FIXME: remove hardcoded variables
   $courts = db_query("
     SELECT C2.nid, C2.title
     FROM {field_data_field_{$primary_name}_id} C2_C1
@@ -503,6 +418,7 @@ function booking_timeslots_filter_get_classes(&$primary_id, &$secondary_id, &$sp
   $tertiary_to_quaternary_name = variable_get('booking_timeslots_3rd_to_4th_ref_field');
   $quaternary_name             = variable_get('booking_timeslots_4th_content_type');
   
+  // @FIXME: remove hardcoded variables
   $courts = db_query("
     SELECT C3.nid, C3.title
     FROM field_data_$secondary_to_primary_name C2_C1

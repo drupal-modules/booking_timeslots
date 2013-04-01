@@ -1,5 +1,12 @@
 <?php
+/**
+ * @file
+ * Drupal installation file.
+ */
 
+/**
+ * Implements hook_schema().
+ */
 function booking_timeslots_schema() {
   $schema['booking'] = array (
     'description' => 'The main store for our entity',
@@ -241,54 +248,6 @@ function booking_timeslots_install() {
 
   db_add_field('opening_hours', 'capacity', $schema['opening_hours']['fields']['capacity']);
   db_add_field('opening_hours', 'slot_length', $schema['opening_hours']['fields']['slot_length']);
-  
-  // Installing taxonomies
-  
-  echo "Loading payloads...\n";
-  
-  foreach (new DirectoryIterator(dirname(__FILE__) . '/payloads') as $file) {
-    
-    if ($file -> isDot())
-      continue;
-    
-    echo " - Got file '" . $file -> getFilename() . "'...\n";
-  
-    if (substr($file ->  getFilename(), 0, 11) == 'Taxonomies.') {
-      
-      $segments        = explode('.', $file -> getFilename());
-      $vocabulary_name = $segments[1];
-      
-      echo " ^-- Importing taxonomies to vocabulary '$vocabulary_name'...\n";
-      
-      $vocabularies = taxonomy_vocabulary_get_names();
-      $vid          = null;
-      
-      foreach ($vocabularies as $vid => $vocabulary) {
-        print_r ($vocabulary);
-        if ($vocabulary -> name == $vocabulary_name)
-          break;
-      }
-      
-      if (!$vid) {
-        // No vocabulary yet created
-        $vid = taxonomy_vocabulary_save((object)array(
-          'name'         => 'Sports Categoriess',
-          'machine_name' => 'sports_categories',
-          'description'  => 'Sports Categories'
-        ));
-      }
-    
-      foreach (file($file -> getPathname ()) as $line) {
-        
-        $csv = str_getcsv($line);
-        
-        taxonomy_term_save((object)array (
-          'vid' => $vid,
-          'name' => $csv[0]
-        ));
-      }
-    }
-  }
 }
 
 /**
@@ -324,3 +283,4 @@ function booking_timeslots_schema_alter(&$schema) {
     'default' => 0,
   );
 }
+
