@@ -3,7 +3,7 @@ description = Booking timeslots module
 core = 7.x
 package = Date/Time
 php = 5.3
-version = 7.x-0.1-alpha
+version = 7.x-1.x
 project = booking_timeslots
 dependencies[] = addressfield
 dependencies[] = calendar
@@ -11,16 +11,17 @@ dependencies[] = date
 dependencies[] = entity
 dependencies[] = entityreference
 dependencies[] = features
+; TODO: to remove?
 dependencies[] = hierarchical_select
+; TODO: it is needed?
 dependencies[] = hs_taxonomy
+; TODO: it is needed?
 dependencies[] = hs_taxonomy_views
-dependencies[] = office_hours
 dependencies[] = opening_hours
 dependencies[] = taxonomy
+; TODO: it is needed?
 dependencies[] = views
-dependencies[] = views_ui
 dependencies[] = workflow
-dependencies[] = workflow_admin_ui
 features[features_api][] = api:1
 files [] = booking_timeslots.module
 
