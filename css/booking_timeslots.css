@@ -99,8 +99,8 @@ fieldset#edit-booking select                             { max-width: 150px; pad
 div.green-box-info-box                                    { z-index: 1000; position: fixed; background: #70C9F1; font-size: 15px; padding: 3px 5px; text-align: left; }
 div.green-box-info-pay-box                                { z-index: 1000; position: fixed; background: #00986D; color: #fff; font-size: 15px; padding: 9px 7px 7px 7px; border-radius: 30px; text-align: center; }
 div.green-box-arrow-box                                   { z-index: 1000; position: fixed;  }
-div.green-box-arrow-box div.top                           { z-index: 1000; border-color: transparent #70C9F1 transparent transparent; border-style:solid; border-width:14px; width:0; height:0; }
-div.green-box-arrow-box div.bottom                        { z-index: 1000; }
+div.green-box-arrow-box div.top                           { z-index: 2000; border-color: transparent #70C9F1 transparent transparent; border-style:solid; border-width:14px; width:0; height:0; }
+div.green-box-arrow-box div.bottom                        { z-index: 2000; }
 
 td.calendar-item                                          {  }
 
