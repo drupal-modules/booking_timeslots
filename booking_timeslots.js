@@ -12,71 +12,57 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
     if (!form[0])
       return;
     
-    var sport       = form.find('select#edit-sport');
-    var type        = form.find('div.form-item-type');
-    var className   = form.find('div.form-item-class');
-    var court       = form.find('div.form-item-court');
-    var instructor  = form.find('div.form-item-instructor');
+    var category       = form.find('select#edit-category');
+    var tertiariesName   = form.find('div.form-item-tertiaries');
+    var secondaries       = form.find('div.form-item-secondaries');
+    var quaternaries  = form.find('div.form-item-quaternaries');
     var duration    = form.find('div.form-item-duration');
     
     form.find ("select option[value='None']").attr('disabled', true);
+    form.find ("select option[value='N/A']").parent().parent().hide();
 
-    if (sport[0] && !FilterTypeAlreadyProcessed) {
+    if (category[0] && !FilterTypeAlreadyProcessed) {
     
-      sport.change (OnFilterTypeChange);
-      type.find ('select').change (OnFilterTypeChange);
-      className.find ('select').change (OnFilterTypeChange);
-      court.find ('select').change (OnFilterTypeChange);
-      instructor.find ('select').change (OnFilterTypeChange);
+      category.change (OnFilterTypeChange);
+      tertiariesName.find ('select').change (OnFilterTypeChange);
+      secondaries.find ('select').change (OnFilterTypeChange);
+      quaternaries.find ('select').change (OnFilterTypeChange);
       duration.find ('select').change (OnFilterTypeChange);
     }
 
-    type.hide();
-    type.find ('select').attr ('disabled', true);
-    className.hide();
-    className.find ('select').attr ('disabled', true);
-    court.hide();
-    court.find ('select').attr ('disabled', true);
-    instructor.hide();
-    instructor.find ('select').attr ('disabled', true);
-    duration.hide();
-    duration.find ('select').attr ('disabled', true);
+    tertiariesName.hide();
+    tertiariesName.find ('select').attr ('disabled', true);
+    secondaries.hide();
+    secondaries.find ('select').attr ('disabled', true);
+    quaternaries.hide();
+    quaternaries.find ('select').attr ('disabled', true);
     
-    if (sport.val () != 'All')
+    if (category.val () != 'All')
     {
-      type.show();
-      type.find('select').removeAttr('disabled');
+      secondaries.show();
+      secondaries.find('select').removeAttr('disabled');
       
-      if (type.find('select').val () != 'All')
-      {
-        if (type.find('select option:selected').val () == 'classes')
+      if (secondaries.find('select').val () != 'All' && tertiariesName.find("select")[0] && tertiariesName.find("select")[0].options.length > 1) {
+        
+        tertiariesName.show();
+        tertiariesName.find('select').removeAttr('disabled');
+
+        if (tertiariesName.find('select').val () != 'All' && quaternaries.find("select")[0] && quaternaries.find("select")[0].options.length > 1)
         {
-          className.show();
-          className.find('select').removeAttr('disabled');
-          
-          if (className.find('select').val () != 'All')
+          if (tertiariesName.find('select option:selected').val () != 'All')
           {
-            if (className.find('select option:selected').val () != 'All')
-            {
-              instructor.show();
-              instructor.find('select').removeAttr('disabled');
-            }
+            quaternaries.show();
+            quaternaries.find('select').removeAttr('disabled');
           }
         }
         else
-        if (type.find('select option:selected').val () == 'courts')
         {
-          court.show();
-          court.find('select').removeAttr('disabled');
-          duration.show();
-          duration.find('select').removeAttr('disabled');
+          duration.hide();
+          duration.find ('select').attr ('disabled', true);
         }
-        
-        
-        
       }
     }
-  
+    
     
     FilterTypeAlreadyProcessed = true;
   }
@@ -124,47 +110,60 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
         if (y >= tds[k].y && y <= tds[k].yl)
         {
           var halfway = {
-            y:  tds[k].m - height / 2 + Drupal.settings.booking_timeslots_calendar_granularity,
-            yl: tds[k].m
+            m:  parseInt (tds[k].m - height / 2 + Drupal.settings.booking_timeslots_calendar_granularity),
+            my: tds[k].m,
+            y:  tds[k].y,
+            yl: tds[k].yl
           };
-          
-          if (halfway.yl >= (tds[tds.length - 1].m))
+
+          if (halfway.my + height / 2 >= (tds[tds.length - 1].m))
           {
-            halfway.yObj  = tds[tds.length - height / Drupal.settings.booking_timeslots_calendar_granularity];
-            halfway.y     = tds[tds.length - height / Drupal.settings.booking_timeslots_calendar_granularity].m;
+            var yIndex = parseInt(tds.length - height / Drupal.settings.booking_timeslots_calendar_granularity);
+            
+            console.log ('here ' + yIndex);
+            
+            halfway.yObj  = tds[Math.max(0, yIndex)];
+            halfway.y     = halfway.yObj.y;
             halfway.ylObj = tds[tds.length - 1];
-            halfway.yl    = tds[tds.length - 1].m;
+            halfway.yl    = halfway.ylObj.yl;
+          }
+          else
+          if (halfway.m <= tds[0].m)
+          {
+            halfway.yObj  = tds[0];
+            halfway.y     = tds[0].m;
+            halfway.ylObj = tds[Math.min(tds.length - 1, parseInt(height / Drupal.settings.booking_timeslots_calendar_granularity - 1))];
+            halfway.yl    = halfway.ylObj.m;
           }
           else
           {
-            if (halfway.y <= tds[0].m)
+            for (var i = k; i >= 0; i--)
             {
-              halfway.yObj  = tds[0];
-              halfway.y     = tds[0].m;
-              halfway.ylObj = tds[height / Drupal.settings.booking_timeslots_calendar_granularity - 1];
-              halfway.yl    = tds[height / Drupal.settings.booking_timeslots_calendar_granularity - 1].m;
+              if (halfway.m >= tds[i].m && (tds.length >= i || halfway.m < tds[i + 1].m))
+              {
+                halfway.yObj = tds[i];
+                halfway.y    = halfway.yObj.m;
+                halfway.ylObj = tds[Math.min (tds.length - 1, parseInt(i + height / Drupal.settings.booking_timeslots_calendar_granularity) - 1)];
+                
+                halfway.yl   = halfway.yObj.m + height;
+                break;
+              }
             }
+            
+            
           }
         
           // Searching half block up
 
-          for (var i = k; i >= 0; i--)
-          {
-            if (halfway.y >= tds[i].m && (tds.length >= i || halfway.y < tds[i + 1].m))
-            {
-              halfway.yObj = tds[i];
-              halfway.y    = halfway.yObj.m;
-              halfway.ylObj = tds[i + height / Drupal.settings.booking_timeslots_calendar_granularity - 1];
-              halfway.yl   = halfway.y + height;
-              break;
-            }
-          }
+          console.log (halfway);
+          
           
           result.startDate     = info.date.substr (0, 10) + " " + halfway.yObj.hm;
           result.startHour     = halfway.yObj.hm;
           result.startPosition = halfway.yObj.y;
           result.endHour       = halfway.yObj.m + height;
           result.endHour       = (("0" + parseInt(result.endHour / 60, 10)).substr (-2)) + ":" + (("0" + parseInt(result.endHour % 60, 10)).substr (-2));
+          
           result.height        = halfway.ylObj.yl - halfway.yObj.y;
                     
           break;
@@ -218,10 +217,13 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
       
       // Searching for the hour near the mouse cursor
       
+
       var x = e.pageX;
       var y = e.pageY;
       
       var result = GetNearHour (this, y);
+
+      console.log (result);
 
       if (!result.height)
         return;
@@ -254,7 +256,7 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
       td.style.verticalAlign = "middle";
       td.style.textAlign = "center";
       td.style.width = '100%';
-      td.setAttribute('class', 'book-now')
+      td.setAttribute('tertiaries', 'book-now')
       
       if (showPlaceholder != false)
       {

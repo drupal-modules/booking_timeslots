@@ -73,10 +73,10 @@ function booking_timeslots_settings_timeslots_form($form_state) {
     '#options' => $hour_options,
     '#description' => t('Default ending hour.'),
   );
-  
+
   $form['timeslot_length']['booking_timeslots_not_avaliable'] = array(
     '#type' => 'checkboxes',
-    '#title' => t('Weekdays which are not available for booking'),    
+    '#title' => t('Weekdays which are not available for booking'),
     '#default_value' => variable_get('booking_timeslots_not_avaliable', array()),
     '#options' => array(
         'monday' => t('Monday'),
@@ -89,7 +89,7 @@ function booking_timeslots_settings_timeslots_form($form_state) {
     )
   );
     */
-   
+
   $form['#validate'][] = 'booking_timeslots_form_validate';
   return system_settings_form($form);
 }
@@ -97,9 +97,17 @@ function booking_timeslots_settings_timeslots_form($form_state) {
 /**
  *  Menu callback for the settings form.
  */
-function booking_timeslots_settings_form($form_state) {
+function booking_timeslots_settings_form($form, $form_state) {
 
-   $form['entity'] = array(
+  if (variable_get('booking_timeslots_1st_content_type', 'UNKNOWN') !== 'UNKNOWN') {
+    if (!$form_state['input']) {
+      // It's normal form display callback.
+      // Form has been saved at least once, we may display status.
+      booking_timeslots_check_configuration_validity();
+    }
+  }
+
+  $form['entity'] = array(
     '#type' => 'fieldset',
     '#title' => t('Entity integration'),
     '#description' => t('Here you can choose which entities you want to integrate with booking time slots.'),
@@ -107,34 +115,119 @@ function booking_timeslots_settings_form($form_state) {
     '#collapsed' => FALSE,
   );
 
-  $content_types = array(0 => '(None)');
-  $content_types += drupal_map_assoc(array_keys(node_type_get_types()));
-  
-  $fields = array(0 => '(None)');
+  $content_types = drupal_map_assoc(array_keys(node_type_get_types()));
+  ksort($content_types);
+  $content_types = array(0 => '(None)') + $content_types;
+
   foreach(field_info_fields() as $name => $info) {
-    
+
     $bundles = array();
-    
+
     if ($info['bundles']) {
       $bundles = call_user_func_array('array_merge', $info['bundles']);
     }
-      
+
     $bundles = implode(', ', $bundles);
-    
-    $title = $name;
-    
+    $title   = $name;
+
     if ($bundles) {
       $title .= ' (' . $bundles . ')';
     }
-    
+
     $fields[$name] = $title;
   }
-  
-  
-  
+
+  ksort($fields);
+  $fields = array(0 => '(None)') + $fields;
+
+  $term_reference_fields = array(0 => '(None)');
+
+  foreach(field_info_fields() as $name => $info) {
+
+    if ($info['type'] != 'taxonomy_term_reference') {
+      continue;
+    }
+
+    $bundles = array();
+
+    if ($info['bundles']) {
+      $bundles = call_user_func_array('array_merge', $info['bundles']);
+    }
+
+    $bundles = implode(', ', $bundles);
+
+    $title = $name;
+
+    if ($bundles) {
+      $title .= ' (' . $bundles . ')';
+    }
+
+    $term_reference_fields[$name] = $title;
+  }
+
+
   //$fields += drupal_map_assoc(array_keys(field_get_items('node')));
-  
-  $form['entity']['booking_timeslots_1st_content_type'] = array(
+
+  $form['entity']['booking_timeslots_category_term_ref_field'] = array(
+    '#type' => 'select',
+    '#title' => t('Category field'),
+    '#default_value' => variable_get('booking_timeslots_category_term_ref_field', ''),
+    '#options' => $term_reference_fields,
+    '#description' => t('Taxonomy vocabulary term reference field used to categorize selected content type. Select None to disable the feature. <u>Must be of type <b>Term reference</b>.</u>.'),
+  );
+
+  $form['entity']['booking_timeslots_category_ct'] = array(
+    '#type' => 'select',
+    '#title' => t('Content type associated with this category field'),
+    '#default_value' => variable_get('booking_timeslots_category_ct', '1'),
+    '#options' => array(
+      '2' => 'Secondary',
+     ),
+    '#description' => t('Select content type which contain above category field.'),
+  );
+
+  $form['entity']['booking_timeslots_filter_title_category'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Category filter title'),
+    '#default_value' => variable_get('booking_timeslots_filter_title_category', 'Category'),
+  );
+
+  $form['entity']['ct1'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Primary content type'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['entity']['ct2'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Secondary content type'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['entity']['ct3'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Tertiary content type'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['entity']['ct4'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Quaternary content type'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['entity']['ct1']['booking_timeslots_1st_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#default_value' => variable_get('booking_timeslots_1st_title', 'Primary'),
+    '#description' => t('Title of the content type displayed in various forms'),
+  );
+
+  $form['entity']['ct1']['booking_timeslots_1st_content_type'] = array(
     '#type' => 'select',
     '#title' => t('Primary content type'),
     '#default_value' => variable_get('booking_timeslots_1st_content_type', ''),
@@ -142,7 +235,14 @@ function booking_timeslots_settings_form($form_state) {
     '#description' => t('Content type which is used for booking per calendar. Select None to disable the feature. E.g. Venue'),
   );
 
-  $form['entity']['booking_timeslots_2nd_content_type'] = array(
+  $form['entity']['ct2']['booking_timeslots_2nd_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#default_value' => variable_get('booking_timeslots_2nd_title', 'Secondary'),
+    '#description' => t('Title of the content type displayed in various forms'),
+  );
+
+  $form['entity']['ct2']['booking_timeslots_2nd_content_type'] = array(
     '#type' => 'select',
     '#title' => t('Secondary content type'),
     '#default_value' => variable_get('booking_timeslots_2nd_content_type', ''),
@@ -151,59 +251,73 @@ function booking_timeslots_settings_form($form_state) {
   );
 
   // Reference from the 2nd to 1st content type
-  $form['entity']['booking_timeslots_2nd_to_1st_ref_field'] = array(
+  $form['entity']['ct2']['booking_timeslots_2nd_to_1st_ref_field'] = array(
     '#type' => 'select',
     '#title' => t('Secondary to primary content type reference field'),
     '#default_value' => variable_get('booking_timeslots_2nd_to_1st_ref_field', ''),
     '#options' => $fields,
-    '#description' => t('Field acting as a reference from the 2nd to 1st content type'),
+    '#description' => t('Field acting as a reference from the 2nd to 1st content type. <u>Must be of type <b>Entity Reference</b>. Should use <b>Select list</b> widget and be related to <b>Primary Content Type</b>. Should be marked as <b>Required</b></u>.'),
   );
-  
-  $form['entity']['booking_timeslots_3rd_content_type'] = array(
+
+  $form['entity']['ct3']['booking_timeslots_3rd_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#default_value' => variable_get('booking_timeslots_3rd_title', 'Secondary'),
+    '#description' => t('Title of the content type displayed in various forms'),
+  );
+
+  $form['entity']['ct3']['booking_timeslots_3rd_content_type'] = array(
     '#type' => 'select',
     '#title' => t('Tertiary content type'),
     '#default_value' => variable_get('booking_timeslots_3rd_content_type', ''),
     '#options' => $content_types,
     '#description' => t('Content type which is associated with the secondary content type. Select None to disable the feature. E.g. Class'),
   );
-  
+
   // 3rd content type capacity field
-  $form['entity']['booking_timeslots_3rd_capacity_field'] = array(
+  $form['entity']['ct3']['booking_timeslots_3rd_capacity_field'] = array(
     '#type' => 'select',
     '#title' => t('Tertiary content type capacity field'),
     '#default_value' => variable_get('booking_timeslots_3rd_capacity_field', ''),
     '#options' => $fields,
-    '#description' => t('Field acting as a capacity indicator for a 3rd content type'),
+    '#description' => t('Field acting as a capacity indicator for a 3rd content type. <u>Must be of type <b>Integer</b>, using <b>Text field</b> widget and be marked as <b>Required</b>. Hint: Use "1" for <b>Minimum</b> and <b>Default value</b>.</u>'),
   );
-  
+
 
   // Reference from the 3rd to 2nd content type
-  $form['entity']['booking_timeslots_3rd_to_2nd_ref_field'] = array(
+  $form['entity']['ct3']['booking_timeslots_3rd_to_2nd_ref_field'] = array(
     '#type' => 'select',
     '#title' => t('Tertiary to secondary content type reference field'),
     '#default_value' => variable_get('booking_timeslots_3rd_to_2nd_ref_field', ''),
     '#options' => $fields,
-    '#description' => t('Field acting as a reference from the 3rd to 2nd content type'),
+    '#description' => t('Field acting as a reference from the 3rd to 2nd content type. <u>Must be of type <b>Entity Reference</b>. Should use <b>Select list</b> widget and be related to <b>Secondary Content Type</b>. Should be marked as <b>Required</b></u>.'),
   );
-  
+
   // Reference from the 3rd to 4th content type
-  $form['entity']['booking_timeslots_3rd_to_4th_ref_field'] = array(
+  $form['entity']['ct3']['booking_timeslots_3rd_to_4th_ref_field'] = array(
     '#type' => 'select',
     '#title' => t('Tertiary to quaternary content type reference field'),
     '#default_value' => variable_get('booking_timeslots_3rd_to_4th_ref_field', ''),
     '#options' => $fields,
-    '#description' => t('Field acting as a reference from the 3rd to 4th content type'),
+    '#description' => t('Field acting as a reference from the 3rd to 4th content type. <u>Must be of type <b>Entity Reference</b>. Should use <b>Select list</b> widget and be related to <b>Quaternary Content Type</b>. Should be marked as <b>Required</b></u>.'),
   );
-  
-  $form['entity']['booking_timeslots_4th_content_type'] = array(
+
+  $form['entity']['ct4']['booking_timeslots_4th_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#default_value' => variable_get('booking_timeslots_4th_title', 'Secondary'),
+    '#description' => t('Title of the content type displayed in various forms'),
+  );
+
+  $form['entity']['ct4']['booking_timeslots_4th_content_type'] = array(
     '#type' => 'select',
     '#title' => t('Quaternary content type'),
     '#default_value' => variable_get('booking_timeslots_4th_content_type', ''),
     '#options' => $content_types,
     '#description' => t('Content type which is associated with the tertiary content type. Select None to disable the feature. E.g. Instructor'),
   );
-  
-  
+
+
 
   $form['views'] = array(
     '#type' => 'fieldset',
@@ -214,15 +328,7 @@ function booking_timeslots_settings_form($form_state) {
   );
 
   /* FIND ALL VIEWS WITH HAS CALENDAR AS A STYLE */
-  $list_views = array();
-  foreach (views_get_all_views() as $view) {
-    if (!empty($view->disabled)) {
-      continue;
-    }
-    if (strpos($view->display['default']->display_options['style_plugin'], 'calendar') !== FALSE) {
-      $list_views[$view->name] = $view->name; 
-    }
-  }
+  $list_views = booking_timeslots_get_calendars();
 
   /* CHECK IF DEFAULT CALENDAR VIEW IS ENABLED */
   if (empty($list_views)) {
@@ -250,7 +356,7 @@ function booking_timeslots_settings_form($form_state) {
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
-  
+
   $form['config']['date_first_day'] = array(
     '#type' => 'select',
     '#title' => t('First day of week'),
@@ -258,17 +364,17 @@ function booking_timeslots_settings_form($form_state) {
     '#options' => array(0 => t('Sunday'), 1 => t('Monday'), 2 => t('Tuesday'), 3 => t('Wednesday'), 4 => t('Thursday'), 5 => t('Friday'), 6 => t('Saturday')),
     '#weight' => -2
   );
-  
+
   $form['config']['date_default_timezone'] = array(
     '#type' => 'select',
-    '#title' => st('Default time zone'),
+    '#title' => t('Default time zone'),
     '#default_value' => variable_get('date_default_timezone', date_default_timezone_get()),
     '#options' => system_time_zones(),
-    '#description' => st('By default, dates in this site will be displayed in the chosen time zone.'),
+    '#description' => t('By default, dates in this site will be displayed in the chosen time zone.'),
     '#weight' => -1,
     '#attributes' => array('class' => array('timezone-detect')),
   );
-  
+
   $form['config']['booking_timeslots_calendar_granularity'] = array(
     '#type' => 'select',
     '#title' => t('Calendar granularity'),
@@ -283,15 +389,15 @@ function booking_timeslots_settings_form($form_state) {
     '#default_value' => variable_get('booking_timeslots_enable_booking_for_past_dates', '1'),
     '#description' => t('By enabling this options you will allow normal users to book slots in past. Venue managers will we able to book such slots anyway.'),
   );
-  
-  
+
+
   $form['config']['booking_timeslots_durations'] = array(
     '#type' => 'textarea',
     '#title' => t('Enabled durations'),
     '#default_value' => variable_get('booking_timeslots_durations', "15|15 min\n30|30 min\n45|45 min\n60|60 min\n120|120 min"),
     '#description' => t("List of enabled durations. Each line should contain number of minutes and title separated by '|' character. Note that those durations must be a multiple of the calendar granularity and be greater or equal to that granularity."),
   );
-  
+
   /*
   $form['config']['booking_timeslots_past_booking'] = array(
     '#type' => 'checkbox',
@@ -309,7 +415,7 @@ function booking_timeslots_settings_form($form_state) {
     '#collapsed' => FALSE,
   );
   */
-  
+
   /*
   $form['other']['booking_timeslots_show_warnings'] = array(
     '#type' => 'checkbox',
@@ -428,3 +534,16 @@ function booking_timeslots_check_admin_options() {
   */
 }
 
+
+/**
+ *  Menu callback for the tutorial form.
+ */
+function booking_timeslots_tutorial_form($form, $form_state) {
+  drupal_add_css(drupal_get_path('module', 'booking_timeslots') .'/css/booking_timeslots_tutorial.css');
+
+  ob_start();
+  $dir = drupal_get_path('module', 'booking_timeslots');
+  include $dir . '/templates/tutorial.tpl.php';
+  $form['tutorial']['#markup'] = ob_get_clean();
+  return $form;
+}

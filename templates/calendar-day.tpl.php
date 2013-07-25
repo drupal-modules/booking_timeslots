@@ -3,7 +3,7 @@
  * @file
  * Template to display a view as a calendar day, grouped by time
  * and optionally organized into columns by a field value.
- * 
+ *
  * @see template_preprocess_calendar_day.
  *
  * $rows: The rendered data for this day.
@@ -16,15 +16,15 @@
  * $rows['items'][$time_period]['ampm'] - the formatted ampm value, if any for a time period.
  * $rows['items'][$time_period][$column]['values'] - An array of formatted
  *   items for a time period and field column.
- * 
+ *
  * $view: The view.
  * $columns: an array of column names.
  * $min_date_formatted: The minimum date for this calendar in the format YYYY-MM-DD HH:MM:SS.
  * $max_date_formatted: The maximum date for this calendar in the format YYYY-MM-DD HH:MM:SS.
- * 
- * The width of the columns is dynamically set using <col></col> 
+ *
+ * The width of the columns is dynamically set using <col></col>
  * based on the number of columns presented. The values passed in will
- * work to set the 'hour' column to 10% and split the remaining columns 
+ * work to set the 'hour' column to 10% and split the remaining columns
  * evenly over the remaining 90% of the table.
  */
 //dsm('Display: '. $display_type .': '. $min_date_formatted .' to '. $max_date_formatted);
@@ -49,7 +49,7 @@
           <td class="calendar-agenda-hour">
             <span class="calendar-hour"><?php print $hour['hour']; ?></span><span class="calendar-ampm"><?php print $hour['ampm']; ?></span>
           </td>
-          <?php if (!@$hour['values'][0]['hidden']): ?>          
+          <?php if (!@$hour['values'][0]['hidden']): ?>
             <td <?php if(isset($hour['values'][0]['attributes'])): ?> <?php echo $hour['values'][0]['attributes']; ?> <?php endif; ?> <?php if (isset($hour['values'][0]['records'][0]['rowspan'])): ?> rowspan="<?php echo $hour['values'][0]['records'][0]['rowspan'] ?>" <?php endif; ?>  class="calendar-agenda-items single-day  <?php if (isset($hour['values'][0]['class'])) echo $hour['values'][0]['class'] ?>" >
               <?php if (isset($hour['values'][0]['records'])) foreach ($hour['values'][0]['records'] as $record): ?>
                 <?php print isset($record['entry']) ? $record['entry'] : '&nbsp;'; ?>
