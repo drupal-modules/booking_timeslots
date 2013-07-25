@@ -3,7 +3,7 @@ description = Booking timeslots module
 core = 7.x
 package = Date/Time
 php = 5.3
-version = 7.x-1.x
+version = 7.x-1.0
 project = booking_timeslots
 dependencies[] = addressfield
 dependencies[] = calendar
@@ -11,17 +11,38 @@ dependencies[] = date
 dependencies[] = entity
 dependencies[] = entityreference
 dependencies[] = features
-; TODO: to remove?
 dependencies[] = hierarchical_select
-; TODO: it is needed?
 dependencies[] = hs_taxonomy
-; TODO: it is needed?
 dependencies[] = hs_taxonomy_views
+dependencies[] = list
+dependencies[] = number
 dependencies[] = opening_hours
+dependencies[] = options
 dependencies[] = taxonomy
-; TODO: it is needed?
+dependencies[] = text
 dependencies[] = views
 dependencies[] = workflow
-features[features_api][] = api:1
+features[features_api][] = api:2
+features[field_base][] = comment_body
+features[field_base][] = field_bt_ct_ref_1
+features[field_base][] = field_bt_ct_ref_2
+features[field_base][] = field_bt_ct_ref_3
+features[field_base][] = field_bt_ct_ref_4
+features[field_base][] = field_bt_first_name
+features[field_base][] = field_bt_last_name
+features[field_base][] = field_bt_number_of_people
+features[field_base][] = field_bt_status
+features[field_base][] = field_bt_time_finish
+features[field_base][] = field_bt_time_start
+features[field_base][] = field_bt_user
+features[field_instance][] = booking-booking-field_bt_ct_ref_1
+features[field_instance][] = booking-booking-field_bt_ct_ref_2
+features[field_instance][] = booking-booking-field_bt_ct_ref_3
+features[field_instance][] = booking-booking-field_bt_ct_ref_4
+features[field_instance][] = booking-booking-field_bt_first_name
+features[field_instance][] = booking-booking-field_bt_last_name
+features[field_instance][] = booking-booking-field_bt_number_of_people
+features[field_instance][] = booking-booking-field_bt_status
+features[field_instance][] = booking-booking-field_bt_user
+features[field_instance][] = comment-comment_node_instructor-comment_body
 files [] = booking_timeslots.module
-

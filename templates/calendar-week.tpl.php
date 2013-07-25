@@ -2,12 +2,12 @@
 /**
  * @file
  * Template to display a view as a calendar week.
- * 
+ *
  * @see template_preprocess_calendar_week.
  *
  * $day_names: An array of the day of week names for the table header.
  * $rows: The rendered data for this week.
- * 
+ *
  * For each day of the week, you have:
  * $rows['date'] - the date for this day, formatted as YYYY-MM-DD.
  * $rows['datebox'] - the formatted datebox for this day.
@@ -17,16 +17,15 @@
  * $rows['items'][$time_period]['hour'] - the formatted hour for a time period.
  * $rows['items'][$time_period]['ampm'] - the formatted ampm value, if any for a time period.
  * $rows['items'][$time_period]['values'] - An array of formatted items for a time period.
- * 
+ *
  * $view: The view.
  * $min_date_formatted: The minimum date for this calendar in the format YYYY-MM-DD HH:MM:SS.
  * $max_date_formatted: The maximum date for this calendar in the format YYYY-MM-DD HH:MM:SS.
- * 
+ *
  */
 //dsm('Display: '. $display_type .': '. $min_date_formatted .' to '. $max_date_formatted);
 //dsm($rows);
 //dsm($items);
-
 $index = 0;
 $header_ids = array();
 foreach ($day_names as $key => $value) {
@@ -49,8 +48,8 @@ foreach ($day_names as $key => $value) {
   </thead>
   <tbody>
     <?php for ($i = 0; $i < $multiday_rows; $i++): ?>
-    <?php 
-      $colpos = 0; 
+    <?php
+      $colpos = 0;
       $rowclass = "all-day";
       if( $i == 0) {
         $rowclass .= " first";
@@ -78,12 +77,12 @@ foreach ($day_names as $key => $value) {
           </td>
           <?php $colpos = $cell['wday'] + $cell['colspan']; ?>
         <?php endif; ?>
-      <?php endfor; ?>  
+      <?php endfor; ?>
       <?php for($j = $colpos; $j < 7; $j++) : ?>
       <td class="multi-day no-entry"><div class="inner">&nbsp;</div></td>
       <?php endfor;?>
     </tr>
-    <?php endfor; ?>  
+    <?php endfor; ?>
     <?php foreach ($items as $time_id => $time): if (isset($time['hide'])) { continue; } ?>
     <tr class="not-all-day <?php if (isset($time['tr-class'])) echo $time['tr-class'] ?>">
       <td class="calendar-agenda-hour">
@@ -98,16 +97,16 @@ foreach ($day_names as $key => $value) {
             <div class="inner">&nbsp</div>
           </div>
         </td>
-        <?php endfor; ?>   
+        <?php endfor; ?>
         <?php $curpos = $colpos + 1;?>
         <?php
           $td_visible = true;
-        
+
           if (@$items[$time_id]['values'][$column]['hidden'] == true) {
             $td_visible = false;
           }
         ?>
-        
+
         <?php if ($td_visible): ?>
           <td <?php if(isset($time['values'][$column]['attributes'])): ?> <?php echo $time['values'][$column]['attributes']; ?> <?php endif; ?>  <?php if (isset($time['values'][$column]['records'][0]['rowspan'])): ?> rowspan="<?php echo $time['values'][$column]['records'][0]['rowspan'] ?>" <?php endif; ?> class="calendar-agenda-items single-day <?php if (isset($time['values'][$column]['class'])) echo $time['values'][$column]['class'] ?>" headers="<?php print $header_ids[$index] ?>">
           <?php if(!empty($time['values'][$column]['records'])) :?>
@@ -117,16 +116,16 @@ foreach ($day_names as $key => $value) {
           <?php endif; ?>
           </td>
       <?php endif; ?>
-      <?php endforeach; ?>   
+      <?php endforeach; ?>
       <?php for ($i = $curpos; $i < 7; $i++): ?>
         <td class="calendar-agenda-items single-day">
           <div class="calendar">
             <div class="inner">&nbsp</div>
           </div>
         </td>
-      <?php endfor; ?>   
+      <?php endfor; ?>
     </tr>
-   <?php endforeach; ?>   
+   <?php endforeach; ?>
   </tbody>
 </table>
 </div></div>

@@ -1,0 +1,63 @@
+#booking-timeslots-tutorial-form > div> ol > li {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#booking-timeslots-tutorial-form > div > ol > ul > li {
+  font-weight: bold;
+  color: #08f;
+}
+
+#booking-timeslots-tutorial-form div.installation {
+  background: none repeat scroll 0 0 #FBFBFB;
+  border: 1px solid #CDCDCD;
+  border-radius: 3px 3px 3px 3px;
+  box-shadow: 0 2px 2px -2px #CCCCCC;
+  margin-bottom: 20px;
+  color: #000;
+}
+
+#booking-timeslots-tutorial-form div.installation h2 {
+  margin-bottom: 12px !important;
+}
+
+#booking-timeslots-tutorial-form div.installation > h2 {
+  margin-bottom: 0px !important;
+}
+
+
+#booking-timeslots-tutorial-form div.installation > h2,
+#booking-timeslots-tutorial-form div.installation h2 {
+  font-size: 12px;
+  border-bottom: 1px solid #CDCDCD;
+  color: #000;
+  font-weight: 600;
+  text-shadow: 0 1px white;
+  padding: 8px;
+  vertical-align: middle;
+  margin: 0;
+}
+
+#booking-timeslots-tutorial-form div.installation > h2 {
+  background: -moz-linear-gradient(center top , #eee, #ddd) repeat scroll 0 0 / 100% auto #ddd;
+  border-bottom: 1px solid #CDCDCD;
+}
+
+#booking-timeslots-tutorial-form div.installation p {
+  font-size: 12px;
+  color: #000;
+  margin: 0 !important;
+  padding: 6px 9px;
+}
+
+#booking-timeslots-tutorial-form div.installation div.table {
+  margin: 5px 10px;
+}
+
+
+#booking-timeslots-tutorial-form img {
+}
+
+div.clear-both {
+  clear: both;
+}
