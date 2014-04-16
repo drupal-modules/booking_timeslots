@@ -373,7 +373,7 @@ function booking_timeslots_get_configuration() {
   if ($category_field) {
     $field_info = field_info_field($category_field);
     $category_field_vocabulary_name = $field_info['settings']['allowed_values'][0]['vocabulary'];
-    $category_table = reset(array_keys($field_info['storage']['details']['sql'][FIELD_LOAD_CURRENT]));
+    $category_table = reset(array_keys($field_info['storage']['details']['sql'][FIELD_LOAD_CURRENT])); // FIXME: Strict warning: Only variables should be passed by reference
     $category_vocabulary = taxonomy_vocabulary_machine_name_load($category_field_vocabulary_name);
     $category_vid = $category_vocabulary->vid;
     $category_title = variable_get('booking_timeslots_filter_title_category', 'Category');
@@ -737,7 +737,7 @@ function booking_timeslots_filter_get_durations(&$duration, $id_ct_1, $id_ct_2, 
   ksort($durations);
 
   if (!is_numeric($duration) || !isset($durations[$duration])) {
-    $duration = reset(array_keys($durations));
+    $duration = reset(array_keys($durations)); // FIXME: Strict warning: Only variables should be passed by reference in booking_timeslots_filter_get_durations() 
   }
 
 
