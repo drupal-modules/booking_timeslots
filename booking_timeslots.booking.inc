@@ -152,15 +152,15 @@ function booking_timeslots_booking_entity_property_info_alter(&$info) {
 }
 
 function booking_timeslots_field_booking_link_view($x) {
-  dsm ($x);
+  function_exists('dsm') ? dsm ($x) : NULL;
 }
 
 function booking_timeslots_field_booking_link_edit($x) {
-  dsm ($x);
+  function_exists('dsm') ? dsm ($x) : NULL;
 }
 
 function booking_timeslots_field_booking_link_delete($x) {
-  dsm ($x);
+  function_exists('dsm') ? dsm ($x) : NULL;
 }
 
 

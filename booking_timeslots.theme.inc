@@ -346,7 +346,7 @@ function template_preprocess_booking_timeslots_general(&$vars, $view_mode, $star
     $today = date('Y-m-d');
     $today_unix = strtotime($today);
 
-    dsm ($vars);
+    // dsm ($vars);
 
     foreach($data_matrix['month_data'] as $date => $day) {
       $check_minutes = true;
