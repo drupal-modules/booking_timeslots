@@ -12,8 +12,9 @@ function booking_timeslots_booking_entity_info(&$info) {
     'controller class' => 'BookingController',
     'views controller class' => 'EntityDefaultViewsController',
     'base table'       => 'booking',
-    'uri callback'     => 'entity_class_uri',
-    'label callback'   => 'entity_class_label',
+    'uri callback'     => 'booking_timeslots_booking_uri',
+    'label callback'   => 'booking_timeslots_booking_page_title',
+    'access callback'  => 'booking_timeslots_booking_access',
     'fieldable'        => TRUE,
     'entity keys' => array(
       'id' => 'pid'
@@ -36,7 +37,7 @@ function booking_timeslots_booking_entity_info(&$info) {
     ),
     'admin ui' => array(
       'path'             => 'admin/structure/booking',
-      'file'             => 'booking_timeslots.booking.controller.inc',
+      'file path'        => __DIR__ . '/booking_timeslots.booking.controller.inc',
       'controller class' => 'BookingUIController',
     ),
 
@@ -77,6 +78,10 @@ function booking_timeslots_booking_field_extra_fields(&$return) {
       'remove_link' => array(
         'label'       => t('Remove link'),
         'description' => t('Remove link'),
+      ),
+      'view_link' => array(
+        'label'       => t('View link'),
+        'description' => t('View link'),
       ),
     ),
     'display' => array(
@@ -245,8 +250,16 @@ function booking_timeslots_booking_form_edit($form, &$form_state, $entity) {
 
   // We can no longer change content type references.
   $form['field_bt_ct_ref_1'][$form['field_bt_ct_ref_1']['#language']]['#attributes'] = array('disabled' => 'disabled');
-  $form['field_bt_ct_ref_2'][$form['field_bt_ct_ref_2']['#language']]['#attributes'] = array('disabled' => 'disabled');
-  $form['field_bt_ct_ref_3'][$form['field_bt_ct_ref_3']['#language']]['#attributes'] = array('disabled' => 'disabled');
+
+  if (isset($form['field_bt_ct_ref_2'])) {
+    $form['field_bt_ct_ref_2'][$form['field_bt_ct_ref_2']['#language']]['#attributes'] = array('disabled' => 'disabled');
+  }
+  if (isset($form['field_bt_ct_ref_3'])) {
+    $form['field_bt_ct_ref_3'][$form['field_bt_ct_ref_3']['#language']]['#attributes'] = array('disabled' => 'disabled');
+  }
+  if (isset($form['field_bt_ct_ref_4'])) {
+    $form['field_bt_ct_ref_4'][$form['field_bt_ct_ref_4']['#language']]['#attributes'] = array('disabled' => 'disabled');
+  }
 
   // We can no longer change number of people.
   $form['field_bt_number_of_people'][$form['field_bt_number_of_people']['#language']][0]['value']['#attributes'] = array('disabled' => 'disabled');
@@ -321,6 +334,13 @@ function booking_timeslots_booking_edit_save($form, &$form_state) {
   $booking = booking_timeslots_booking_save($entity);
 
   return $form;
+}
+
+/**
+ * Form of entity creation.
+ */
+function booking_form($form, &$form_state, $entity, $input) {
+  return booking_timeslots_booking_form($form, $form_state, $entity, $input);
 }
 
 /**
@@ -418,10 +438,11 @@ function booking_timeslots_booking_form_validate($form, &$form_state) {
 
   $entity = $form_state['values']['booking'];
 
-  $fid = reset($form_state['values']['field_bt_ct_ref_3']['und'][0]);
-
-  if (!$fid) {
-    $fid = reset($form_state['values']['field_bt_ct_ref_2']['und'][0]);
+  if (!empty($form_state['values']['field_bt_ct_ref_3']['und'][0]['target_id'])) {
+    $fid = reset($form_state['values']['field_bt_ct_ref_3']['und'][0]['target_id']);
+  }
+  elseif (!empty($form_state['values']['field_bt_ct_ref_2']['und'][0]['target_id'])) {
+    $fid = $form_state['values']['field_bt_ct_ref_2']['und'][0]['target_id'];
   }
 
   $players = $form_state['values']['field_bt_number_of_people']['und'][0]['value'];
@@ -515,8 +536,7 @@ function booking_timeslots_booking_form_submit($form, &$form_state) {
   $tertiary_to_quaternary_name = $settings['ct_field_3_4'];
   $tertiary_capacity_name      = $settings['ct_field_3_cap'];
 
-
-  $booked_node = node_load(reset($form_state['values']['field_bt_ct_ref_2']['und'][0]));
+  $booked_node = node_load($entity->secondary_id ? $entity->secondary_id : $entity->tertiary_id);
 
   if ($booked_node -> type == $secondary_name)
   {
@@ -544,6 +564,7 @@ function booking_timeslots_booking_form_add($input) {
   // since slot_time is separated from entity itself it needs to be assigned from the form
   list($primary_id, $secondary_id, $tertiary_id, $cid, $datetime, $duration) = $input;
   //var_dump($fid, $cid, $datetime, $entity);
+
   $entity->slot_time = $datetime;
   $entity->cid = $cid;
   $entity->primary_id = $primary_id;
@@ -583,7 +604,6 @@ function booking_timeslots_booking_list_entities() {
  * Entity management pages paths.
  */
 function booking_timeslots_booking_menu(&$items) {
-
   $items['admin/structure/booking'] = array(
     'title'            => 'Bookings',
     'description'      => 'Manage bookings',
@@ -676,6 +696,8 @@ function booking_timeslots_booking_access($op, $task, $account = NULL, $entity_t
   if (!isset($account)) {
     $account = $user;
   }
+
+
   switch ($op) {
     case 'create':
       return user_access('administer bookings', $account)
