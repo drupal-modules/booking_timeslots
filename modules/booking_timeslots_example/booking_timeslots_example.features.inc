@@ -1,29 +1,31 @@
 <?php
 /**
  * @file
- * booking_timeslots_features.features.inc
+ * booking_timeslots_example.features.inc
  */
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function booking_timeslots_example_ctools_plugin_api() {
+  list($module, $api) = func_get_args();
+  if ($module == "strongarm" && $api == "strongarm") {
+    return array("version" => "1");
+  }
+}
 
 /**
  * Implements hook_views_api().
  */
-function booking_timeslots_features_views_api() {
-  return array("api" => "3.0");
+function booking_timeslots_example_views_api() {
+  return array("version" => "3.0");
 }
 
 /**
  * Implements hook_node_info().
  */
-function booking_timeslots_features_node_info() {
+function booking_timeslots_example_node_info() {
   $items = array(
-    'booking_slot' => array(
-      'name' => t('Booking Slot'),
-      'base' => 'node_content',
-      'description' => '',
-      'has_title' => '1',
-      'title_label' => t('Title'),
-      'help' => '',
-    ),
     'booking_timeslots_xmp_class' => array(
       'name' => t('Booking Timeslots Example Class'),
       'base' => 'node_content',

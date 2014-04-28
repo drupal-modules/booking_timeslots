@@ -243,11 +243,12 @@ function booking_timeslots_schema() {
   * Implementation of hook_install().
   */
 function booking_timeslots_install() {
-  $schema = drupal_get_schema('opening_hours');
+  $schema['opening_hours'] = drupal_get_schema('opening_hours');
   booking_timeslots_schema_alter($schema);
 
   db_add_field('opening_hours', 'capacity', $schema['opening_hours']['fields']['capacity']);
   db_add_field('opening_hours', 'slot_length', $schema['opening_hours']['fields']['slot_length']);
+  db_change_field('opening_hours', 'notice', 'notice', $schema['opening_hours']['fields']['notice']);
 }
 
 /**
@@ -255,7 +256,7 @@ function booking_timeslots_install() {
   */
 function booking_timeslots_uninstall() {
   $ret = array();
-  $schema = drupal_get_schema('opening_hours');
+  $schema['opening_hours'] = drupal_get_schema('opening_hours');
   booking_timeslots_schema_alter($schema);
   db_drop_field('opening_hours', 'capacity');
   db_drop_field('opening_hours', 'slot_length');
