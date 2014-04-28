@@ -1,8 +1,9 @@
 Booking Time Slots
 ==================
 
-Drupal project page: http://drupal.org/project/booking_timeslots
-GitHub project page: https://github.com/kenorb/booking_timeslots
+Drupal project page: http://drupal.org/project/booking_timeslots.
+
+GitHub project page: https://github.com/kenorb/booking_timeslots.
 
 Requirements
 ------------
