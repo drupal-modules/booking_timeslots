@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Booking Time Slots Example feature.
+ */
+
+include_once 'booking_timeslots_example.features.inc';

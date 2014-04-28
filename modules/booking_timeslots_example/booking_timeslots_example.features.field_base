@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * booking_timeslots_features.features.field_base.inc
+ * booking_timeslots_example.features.field_base.inc
  */
 
 /**
  * Implements hook_field_default_field_bases().
  */
-function booking_timeslots_features_field_default_field_bases() {
+function booking_timeslots_example_field_default_field_bases() {
   $field_bases = array();
 
   // Exported field_base: 'body'

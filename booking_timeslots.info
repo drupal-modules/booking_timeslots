@@ -30,5 +30,5 @@ features[field][] = booking-booking-field_bt_ct_ref_3
 features[field][] = booking-booking-field_bt_ct_ref_4
 features[field][] = booking-booking-field_bt_number_of_people
 features[field][] = booking-booking-field_bt_user
-features[variable][] = field_bundle_settings_booking__booking
+features[taxonomy][] = booking_type
 files [] = booking_timeslots.module

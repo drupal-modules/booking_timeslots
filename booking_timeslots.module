@@ -10,6 +10,7 @@
  *   Rafal Wieczorek <kenorb+nospam@gmail.com>
  */
 
+require_once 'booking_timeslots.features.inc';
 require_once 'booking_timeslots.booking.inc';
 
 /**

@@ -1,14 +1,35 @@
 <?php
 /**
  * @file
- * booking_timeslots_features.strongarm.inc
+ * booking_timeslots_example.strongarm.inc
  */
 
 /**
  * Implements hook_strongarm().
  */
-function booking_timeslots_features_strongarm() {
+function booking_timeslots_example_strongarm() {
   $export = array();
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'additional_settings__active_tab_booking_timeslots_xmp_class';
+  $strongarm->value = 'edit-opening-hours';
+  $export['additional_settings__active_tab_booking_timeslots_xmp_class'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'additional_settings__active_tab_booking_timeslots_xmp_facility';
+  $strongarm->value = 'edit-opening-hours';
+  $export['additional_settings__active_tab_booking_timeslots_xmp_facility'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'admin_theme_opening_hours_opening_hours';
+  $strongarm->value = 1;
+  $export['admin_theme_opening_hours_opening_hours'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -23,13 +44,6 @@ function booking_timeslots_features_strongarm() {
   $strongarm->name = 'booking_timeslots_1st_title';
   $strongarm->value = 'Primary';
   $export['booking_timeslots_1st_title'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'booking_timeslots_2nd_content_type';
-  $strongarm->value = 'booking_timeslots_xmp_facility';
-  $export['booking_timeslots_2nd_content_type'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -146,6 +160,53 @@ function booking_timeslots_features_strongarm() {
   $strongarm->name = 'booking_timeslots_view_booking_timeslots';
   $strongarm->value = '';
   $export['booking_timeslots_view_booking_timeslots'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'field_bundle_settings_booking__booking';
+  $strongarm->value = array(
+    'view_modes' => array(),
+    'extra_fields' => array(
+      'form' => array(
+        'created' => array(
+          'weight' => '0',
+        ),
+        'slot_time' => array(
+          'weight' => '2',
+        ),
+        'view_link' => array(
+          'weight' => '7',
+        ),
+        'edit_link' => array(
+          'weight' => '8',
+        ),
+        'remove_link' => array(
+          'weight' => '9',
+        ),
+        'btb_user' => array(
+          'weight' => '1',
+        ),
+        'btb_ref_1st' => array(
+          'weight' => '3',
+        ),
+        'btb_ref_2nd' => array(
+          'weight' => '4',
+        ),
+        'btb_ref_3rd' => array(
+          'weight' => '5',
+        ),
+        'btb_ref_4th' => array(
+          'weight' => '6',
+        ),
+        'uid' => array(
+          'weight' => '1',
+        ),
+      ),
+      'display' => array(),
+    ),
+  );
+  $export['field_bundle_settings_booking__booking'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */

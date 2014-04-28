@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * booking_timeslots_features.features.field_instance.inc
+ * booking_timeslots_example.features.field_instance.inc
  */
 
 /**
  * Implements hook_field_default_field_instances().
  */
-function booking_timeslots_features_field_default_field_instances() {
+function booking_timeslots_example_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance: 'comment-comment_node_booking_timeslots_xmp_class-comment_body'
