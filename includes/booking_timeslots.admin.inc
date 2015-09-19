@@ -322,29 +322,33 @@ function booking_timeslots_settings_form($form, $form_state) {
   $form['views'] = array(
     '#type' => 'fieldset',
     '#title' => t('Views integration'),
-    '#description' => t('Here you can associate content type used for booking with calendar view which is used for time slots. You have to choose at least one view to use booking time slots properly.'),
+    '#description' => t('Please select content type on which schedule tabs will be displayed. <u>Preferably the <b>Primary Content Type</b></u>.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
 
-  /* FIND ALL VIEWS WITH HAS CALENDAR AS A STYLE */
-  $list_views = booking_timeslots_get_calendars();
+  // Using built-in calendar view.
+  $calendar_view_name = 'bt_schedule';
+  $calendar_view_path = 'admin/structure/views/view/bt_schedule/edit';
 
   /* CHECK IF DEFAULT CALENDAR VIEW IS ENABLED */
-  if (empty($list_views)) {
-    drupal_set_message(t('Please enable at least one calendar based view i.e. <a href="@url">Calendar View.</a>', array('@url' => url('admin/build/views/list'))), 'warning');
+  if (!views_get_view($calendar_view_name) || views_get_view($calendar_view_name)->disabled) {
+    $form['views']['booking_timeslots_view_' . $calendar_view_name] = array(
+      '#type' => 'select',
+      '#disabled' => TRUE,
+      '#options' => array(
+        '' => t('Please enable built-in "Bookings Schedule" (bt_schedule) view')
+      )
+    );
   }
   else {
-    foreach ($list_views as $key => $value) {
-      $view_path = booking_timeslots_calendar_view_path($key);
-      $form['views']['booking_timeslots_view_' . $key] = array(
-          '#type' => 'select',
-          '#title' => t('View: %view', array('%view' => $key)),
-          '#description' => t('Choose which content type should be associated with your <a target=_blank href="@url">calendar view</a>.', array('@url' => url($view_path))),
-          '#default_value' => variable_get('booking_timeslots_view_' . $key, ''),
-          '#options' => array_merge(array('' => t('- None -')), $content_types),
-        );
-    }
+    $form['views']['booking_timeslots_view_' . $calendar_view_name] = array(
+        '#type' => 'select',
+        '#title' => t('View: %view', array('%view' => $calendar_view_name)),
+        '#description' => t('Choose which content type should be associated with your <a target=_blank href="@url">calendar view</a>.', array('@url' => url($calendar_view_path))),
+        '#default_value' => variable_get('booking_timeslots_view_' . $calendar_view_name, ''),
+        '#options' => array_merge(array('' => t('- None -')), $content_types),
+      );
   }
   if (isset($form['views']['booking_timeslots_view_booking_calendar']) && empty($form['views']['booking_timeslots_view_booking_calendar']['#default_value'])) {
     $form['views']['booking_timeslots_view_booking_calendar']['#default_value'] = array('booking_slot');
@@ -435,6 +439,7 @@ function booking_timeslots_settings_form($form, $form_state) {
   !variable_get('booking_timeslots_show_warnings', FALSE) ?  booking_timeslots_check_admin_options() : NULL; // Check for configuration issues
   */
   $form['#validate'][] = 'booking_timeslots_settings_form_validate';
+  $form['#submit'][]   = 'booking_timeslots_settings_form_submit';
   return system_settings_form($form);
 }
 
@@ -466,6 +471,11 @@ function booking_timeslots_form_validate($form, &$form_state) {
  */
 function booking_timeslots_settings_form_validate($form, &$form_state) {
   $values = $form_state['values'];
+
+  $calendar_view_name = 'bt_schedule';
+  if (!views_get_view($calendar_view_name) || views_get_view($calendar_view_name)->disabled) {
+    form_set_error('booking_timeslots_view_' . $calendar_view_name, t('Please enable built-in <b>Bookings Schedule</b> (bt_schedule) view.'));
+  }
 
   /*
   // MAKE THE LIST OF ACTIVATED VIEWS
@@ -509,6 +519,29 @@ function booking_timeslots_settings_form_validate($form, &$form_state) {
     form_set_error('booking_timeslots_limited_dates', t("You can't use the same field %field for limiting dates, which is already used for non-available dates!", array('%field' => current($wrong_fields))));
   }
   */
+}
+
+/**
+ * Form API callback to validate the admin settings form.
+ */
+function booking_timeslots_settings_form_submit($form, &$form_state) {
+  $values = $form_state['values'];
+
+  $calendar_view_name    = 'bt_schedule';
+  $schedule_content_type = $values['booking_timeslots_view_' . $calendar_view_name];
+  $calendar_view         = views_get_view($calendar_view_name, TRUE);
+
+  dsm ($schedule_content_type);
+
+  foreach ($calendar_view->display as $display) {
+    if (empty($display->display_options['arguments']['nid'])) {
+      continue;
+    }
+
+    $display->display_options['arguments']['nid']['validate']['type'] = 'node';
+    $display->display_options['arguments']['nid']['validate_options']['types'] = array($schedule_content_type => $schedule_content_type);
+    views_save_view($calendar_view);
+  }
 }
 
 /**

@@ -221,6 +221,15 @@
         </div>
 
       </p>
+
+      <li id="views-integration">Views integration</li>
+      <p>
+        Currently module supports displaying schedule only on the <u>Primary Content Type</u> pages, so please just select content type used as the primary one.
+      </p>
+      <p>
+        There is a <u>built-in</u> calendar view <b>Bookings Schedule</b> (bt_schedule) already in the module's features which is used to display tabs on the content type's pages. Just make sure the view is enabled and if there is no such view - upgrade the module and clear the cache.
+      </p>
+
     </ul>
     
   </p>
@@ -269,7 +278,14 @@
 
   <li>Calendar view</li>
   <p>
-    <i>TODO</i>
+    As noted in <a href="#views-integration">views integration</a> point, there is a <u>built-in</u> calendar view <b>Bookings Schedule</b> (bt_schedule) already in the module's features which is used to display tabs on the content type's pages. Just make sure the view is enabled and if there is no such view - upgrade the module and clear the cache.
+  </p>
+  <p>
+  	Note the opening hours for Primary Content Type <b>restricts opening hours</b> of Secondary Content Type. That mean if a Venue (Primary Content Type) is open from 8 AM to 6 PM then Court (Secondary Content Type) cannot be open before 8 AM or closed after 6 PM.
+  </p>
+  <p>
+  	After proper setup, you should be able to see something more like this:<br/><br/>
+	<img src="/<?php print $dir; ?>/images/tutorial_how_it_should_look.png" style="border: 0;" />
   </p>
 
   <li>Managing bookings</li>

@@ -738,7 +738,8 @@ function booking_timeslots_filter_get_durations(&$duration, $id_ct_1, $id_ct_2, 
   ksort($durations);
 
   if (!is_numeric($duration) || !isset($durations[$duration])) {
-    $duration = reset(array_keys($durations));
+    $keys = array_keys($durations);
+    $duration = reset($keys);
   }
 
 
