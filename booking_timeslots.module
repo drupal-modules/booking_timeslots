@@ -1571,3 +1571,25 @@ function booking_timeslots_helper_calculate_month_view_range($month) {
 
   return array( $time_start, $time_end );
 }
+
+/**
+ * Chooses on which content types the bt_schedule view will appear
+ */
+function booking_timeslots_choose_schedule_content_type($content_type_name) {
+  $calendar_view_name    = 'bt_schedule';
+  $schedule_content_type = $content_type_name;
+  $calendar_view         = views_get_view($calendar_view_name, TRUE);
+
+  foreach ($calendar_view->display as $display) {
+    if (empty($display->display_options['arguments']['nid'])) {
+      continue;
+    }
+
+    $display->display_options['arguments']['nid']['validate']['type'] = 'node';
+    $display->display_options['arguments']['nid']['specify_validation'] = TRUE;
+    if (empty($display->display_options['arguments']['nid']['validate_options']['types'][$schedule_content_type])) {
+      $display->display_options['arguments']['nid']['validate_options']['types'] = array($schedule_content_type => $schedule_content_type);
+      views_save_view($calendar_view);
+    }
+  }
+}

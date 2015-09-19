@@ -522,26 +522,15 @@ function booking_timeslots_settings_form_validate($form, &$form_state) {
 }
 
 /**
- * Form API callback to validate the admin settings form.
+ * Form API callback to submit the admin settings form.
  */
 function booking_timeslots_settings_form_submit($form, &$form_state) {
   $values = $form_state['values'];
 
   $calendar_view_name    = 'bt_schedule';
   $schedule_content_type = $values['booking_timeslots_view_' . $calendar_view_name];
-  $calendar_view         = views_get_view($calendar_view_name, TRUE);
 
-  dsm ($schedule_content_type);
-
-  foreach ($calendar_view->display as $display) {
-    if (empty($display->display_options['arguments']['nid'])) {
-      continue;
-    }
-
-    $display->display_options['arguments']['nid']['validate']['type'] = 'node';
-    $display->display_options['arguments']['nid']['validate_options']['types'] = array($schedule_content_type => $schedule_content_type);
-    views_save_view($calendar_view);
-  }
+  booking_timeslots_choose_schedule_content_type($schedule_content_type);
 }
 
 /**
