@@ -10,7 +10,221 @@
 function booking_timeslots_example_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'comment-comment_node_booking_timeslots_xmp_class-comment_body'
+  // Exported field_instance: 'booking-booking-field_bt_ct_ref_1'
+  $field_instances['booking-booking-field_bt_ct_ref_1'] = array(
+    'bundle' => 'booking',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 1,
+      ),
+    ),
+    'entity_type' => 'booking',
+    'field_name' => 'field_bt_ct_ref_1',
+    'label' => 'Reference to 1st level node',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'booking-booking-field_bt_ct_ref_2'
+  $field_instances['booking-booking-field_bt_ct_ref_2'] = array(
+    'bundle' => 'booking',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 2,
+      ),
+    ),
+    'entity_type' => 'booking',
+    'field_name' => 'field_bt_ct_ref_2',
+    'label' => 'Reference to 2nd level node',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 12,
+    ),
+  );
+
+  // Exported field_instance: 'booking-booking-field_bt_ct_ref_3'
+  $field_instances['booking-booking-field_bt_ct_ref_3'] = array(
+    'bundle' => 'booking',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 3,
+      ),
+    ),
+    'entity_type' => 'booking',
+    'field_name' => 'field_bt_ct_ref_3',
+    'label' => 'Reference to 3rd level node',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 13,
+    ),
+  );
+
+  // Exported field_instance: 'booking-booking-field_bt_ct_ref_4'
+  $field_instances['booking-booking-field_bt_ct_ref_4'] = array(
+    'bundle' => 'booking',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 4,
+      ),
+    ),
+    'entity_type' => 'booking',
+    'field_name' => 'field_bt_ct_ref_4',
+    'label' => 'Reference to 4th level node',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 14,
+    ),
+  );
+
+  // Exported field_instance: 'booking-booking-field_bt_number_of_people'
+  $field_instances['booking-booking-field_bt_number_of_people'] = array(
+    'bundle' => 'booking',
+    'default_value' => array(
+      0 => array(
+        'value' => 1,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => ' ',
+        ),
+        'type' => 'number_integer',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'booking',
+    'field_name' => 'field_bt_number_of_people',
+    'label' => 'Number of people',
+    'required' => 1,
+    'settings' => array(
+      'max' => 1000,
+      'min' => 1,
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 10,
+    ),
+  );
+
+  // Exported field_instance: 'booking-booking-field_bt_user'
+  $field_instances['booking-booking-field_bt_user'] = array(
+    'bundle' => 'booking',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 5,
+      ),
+    ),
+    'entity_type' => 'booking',
+    'field_name' => 'field_bt_user',
+    'label' => 'User',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 15,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'comment-comment_node_booking_timeslots_xmp_class-comment_body'
   $field_instances['comment-comment_node_booking_timeslots_xmp_class-comment_body'] = array(
     'bundle' => 'comment_node_booking_timeslots_xmp_class',
     'default_value' => NULL,
@@ -43,7 +257,8 @@ function booking_timeslots_example_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'comment-comment_node_booking_timeslots_xmp_facility-comment_body'
+  // Exported field_instance:
+  // 'comment-comment_node_booking_timeslots_xmp_facility-comment_body'
   $field_instances['comment-comment_node_booking_timeslots_xmp_facility-comment_body'] = array(
     'bundle' => 'comment_node_booking_timeslots_xmp_facility',
     'default_value' => NULL,
@@ -76,7 +291,8 @@ function booking_timeslots_example_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'comment-comment_node_booking_timeslots_xmp_instructor-comment_body'
+  // Exported field_instance:
+  // 'comment-comment_node_booking_timeslots_xmp_instructor-comment_body'
   $field_instances['comment-comment_node_booking_timeslots_xmp_instructor-comment_body'] = array(
     'bundle' => 'comment_node_booking_timeslots_xmp_instructor',
     'default_value' => NULL,
@@ -109,7 +325,8 @@ function booking_timeslots_example_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'comment-comment_node_booking_timeslots_xmp_venue-comment_body'
+  // Exported field_instance:
+  // 'comment-comment_node_booking_timeslots_xmp_venue-comment_body'
   $field_instances['comment-comment_node_booking_timeslots_xmp_venue-comment_body'] = array(
     'bundle' => 'comment_node_booking_timeslots_xmp_venue',
     'default_value' => NULL,
@@ -142,96 +359,8 @@ function booking_timeslots_example_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-booking_slot-body'
-  $field_instances['node-booking_slot-body'] = array(
-    'bundle' => 'booking_slot',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 1,
-      ),
-      'teaser' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(
-          'trim_length' => 600,
-        ),
-        'type' => 'text_summary_or_trimmed',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'body',
-    'label' => 'Description',
-    'required' => 0,
-    'settings' => array(
-      'display_summary' => 1,
-      'text_processing' => 1,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 20,
-        'summary_rows' => 5,
-      ),
-      'type' => 'text_textarea_with_summary',
-      'weight' => 1,
-    ),
-  );
-
-  // Exported field_instance: 'node-booking_timeslots_xmp_class-body'
-  $field_instances['node-booking_timeslots_xmp_class-body'] = array(
-    'bundle' => 'booking_timeslots_xmp_class',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 0,
-      ),
-      'teaser' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(
-          'trim_length' => 600,
-        ),
-        'type' => 'text_summary_or_trimmed',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'body',
-    'label' => 'Body',
-    'required' => FALSE,
-    'settings' => array(
-      'display_summary' => TRUE,
-      'text_processing' => 1,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 20,
-        'summary_rows' => 5,
-      ),
-      'type' => 'text_textarea_with_summary',
-      'weight' => 31,
-    ),
-  );
-
-  // Exported field_instance: 'node-booking_timeslots_xmp_class-field_bt_xmp_capacity'
+  // Exported field_instance:
+  // 'node-booking_timeslots_xmp_class-field_bt_xmp_capacity'
   $field_instances['node-booking_timeslots_xmp_class-field_bt_xmp_capacity'] = array(
     'bundle' => 'booking_timeslots_xmp_class',
     'default_value' => array(
@@ -252,7 +381,7 @@ function booking_timeslots_example_field_default_field_instances() {
           'thousand_separator' => ' ',
         ),
         'type' => 'number_integer',
-        'weight' => 1,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -266,7 +395,7 @@ function booking_timeslots_example_field_default_field_instances() {
     'label' => 'Capacity',
     'required' => 1,
     'settings' => array(
-      'max' => 1000,
+      'max' => '',
       'min' => 1,
       'prefix' => '',
       'suffix' => '',
@@ -277,172 +406,14 @@ function booking_timeslots_example_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 32,
+      'weight' => 11,
     ),
   );
 
-  // Exported field_instance: 'node-booking_timeslots_xmp_class-field_bt_xmp_facility'
-  $field_instances['node-booking_timeslots_xmp_class-field_bt_xmp_facility'] = array(
+  // Exported field_instance:
+  // 'node-booking_timeslots_xmp_class-field_bt_xmp_ref_3rd_to_2nd'
+  $field_instances['node-booking_timeslots_xmp_class-field_bt_xmp_ref_3rd_to_2nd'] = array(
     'bundle' => 'booking_timeslots_xmp_class',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 2,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_bt_xmp_facility',
-    'label' => 'Facility',
-    'required' => 1,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(),
-      'type' => 'options_select',
-      'weight' => 34,
-    ),
-  );
-
-  // Exported field_instance: 'node-booking_timeslots_xmp_class-field_bt_xmp_instructor'
-  $field_instances['node-booking_timeslots_xmp_class-field_bt_xmp_instructor'] = array(
-    'bundle' => 'booking_timeslots_xmp_class',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 3,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_bt_xmp_instructor',
-    'label' => 'Instructor',
-    'required' => 1,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(),
-      'type' => 'options_select',
-      'weight' => 35,
-    ),
-  );
-
-  // Exported field_instance: 'node-booking_timeslots_xmp_facility-body'
-  $field_instances['node-booking_timeslots_xmp_facility-body'] = array(
-    'bundle' => 'booking_timeslots_xmp_facility',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 0,
-      ),
-      'teaser' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(
-          'trim_length' => 600,
-        ),
-        'type' => 'text_summary_or_trimmed',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'body',
-    'label' => 'Body',
-    'required' => FALSE,
-    'settings' => array(
-      'display_summary' => TRUE,
-      'text_processing' => 1,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 20,
-        'summary_rows' => 5,
-      ),
-      'type' => 'text_textarea_with_summary',
-      'weight' => 31,
-    ),
-  );
-
-  // Exported field_instance: 'node-booking_timeslots_xmp_facility-field_bt_xmp_category'
-  $field_instances['node-booking_timeslots_xmp_facility-field_bt_xmp_category'] = array(
-    'bundle' => 'booking_timeslots_xmp_facility',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'taxonomy',
-        'settings' => array(),
-        'type' => 'taxonomy_term_reference_link',
-        'weight' => 2,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_bt_xmp_category',
-    'label' => 'Category',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(),
-      'type' => 'options_select',
-      'weight' => 33,
-    ),
-  );
-
-  // Exported field_instance: 'node-booking_timeslots_xmp_facility-field_bt_xmp_venue'
-  $field_instances['node-booking_timeslots_xmp_facility-field_bt_xmp_venue'] = array(
-    'bundle' => 'booking_timeslots_xmp_facility',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -464,8 +435,8 @@ function booking_timeslots_example_field_default_field_instances() {
       ),
     ),
     'entity_type' => 'node',
-    'field_name' => 'field_bt_xmp_venue',
-    'label' => 'Venue',
+    'field_name' => 'field_bt_xmp_ref_3rd_to_2nd',
+    'label' => 'Related Facility',
     'required' => 1,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -475,108 +446,103 @@ function booking_timeslots_example_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 32,
+      'weight' => 12,
     ),
   );
 
-  // Exported field_instance: 'node-booking_timeslots_xmp_instructor-body'
-  $field_instances['node-booking_timeslots_xmp_instructor-body'] = array(
-    'bundle' => 'booking_timeslots_xmp_instructor',
+  // Exported field_instance:
+  // 'node-booking_timeslots_xmp_class-field_bt_xmp_ref_3rd_to_4th'
+  $field_instances['node-booking_timeslots_xmp_class-field_bt_xmp_ref_3rd_to_4th'] = array(
+    'bundle' => 'booking_timeslots_xmp_class',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 0,
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 2,
       ),
       'teaser' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(
-          'trim_length' => 600,
-        ),
-        'type' => 'text_summary_or_trimmed',
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 0,
       ),
     ),
     'entity_type' => 'node',
-    'field_name' => 'body',
-    'label' => 'Body',
-    'required' => FALSE,
+    'field_name' => 'field_bt_xmp_ref_3rd_to_4th',
+    'label' => 'Related Instructor',
+    'required' => 1,
     'settings' => array(
-      'display_summary' => TRUE,
-      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 20,
-        'summary_rows' => 5,
-      ),
-      'type' => 'text_textarea_with_summary',
-      'weight' => 31,
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 13,
     ),
   );
 
-  // Exported field_instance: 'node-booking_timeslots_xmp_venue-body'
-  $field_instances['node-booking_timeslots_xmp_venue-body'] = array(
-    'bundle' => 'booking_timeslots_xmp_venue',
+  // Exported field_instance:
+  // 'node-booking_timeslots_xmp_facility-field_bt_xmp_ref_2nd_to_1st'
+  $field_instances['node-booking_timeslots_xmp_facility-field_bt_xmp_ref_2nd_to_1st'] = array(
+    'bundle' => 'booking_timeslots_xmp_facility',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
         'weight' => 0,
       ),
       'teaser' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(
-          'trim_length' => 600,
-        ),
-        'type' => 'text_summary_or_trimmed',
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 0,
       ),
     ),
     'entity_type' => 'node',
-    'field_name' => 'body',
-    'label' => 'Body',
-    'required' => FALSE,
+    'field_name' => 'field_bt_xmp_ref_2nd_to_1st',
+    'label' => 'Related Venue',
+    'required' => 1,
     'settings' => array(
-      'display_summary' => TRUE,
-      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 20,
-        'summary_rows' => 5,
-      ),
-      'type' => 'text_textarea_with_summary',
-      'weight' => 31,
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 11,
     ),
   );
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Body');
   t('Capacity');
-  t('Category');
   t('Comment');
-  t('Description');
-  t('Facility');
-  t('Instructor');
-  t('Venue');
+  t('Number of people');
+  t('Reference to 1st level node');
+  t('Reference to 2nd level node');
+  t('Reference to 3rd level node');
+  t('Reference to 4th level node');
+  t('Related Facility');
+  t('Related Instructor');
+  t('Related Venue');
+  t('User');
 
   return $field_instances;
 }
