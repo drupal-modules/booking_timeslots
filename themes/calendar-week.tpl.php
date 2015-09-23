@@ -26,6 +26,10 @@
 //dsm('Display: '. $display_type .': '. $min_date_formatted .' to '. $max_date_formatted);
 //dsm($rows);
 //dsm($items);
+
+module_load_include('inc', 'booking_timeslots');
+$module_link = booking_timeslots_get_ctype_name(NULL, TRUE);
+
 ?>
 
 <div class="calendar-calendar">
@@ -51,8 +55,7 @@
              <?php print $day['datebox']; ?>
              <div class="calendar">
              <div class="inner">
-               <?php $cid = arg(0); ?>
-               <?php $link = $cid . '/' . $day['date']; ?>
+               <?php $link = $module_link . '/' . $day['date'] .' '. variable_get('booking_timeslot_hour_from', 8) .':00:00'; ?>
                <?php $content_slot = l($bt_text['book_now'], $link); ?>
                <?php print (array_key_exists('all_day', $day) && count($day['all_day']) || $weekly_off[strtolower($bt_day_of_week)] != '0' ? implode($day['all_day']) : $content_slot); ?>
              </div>

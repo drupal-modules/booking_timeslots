@@ -18,6 +18,11 @@
  *
  */
 //dsm('Display: '. $display_type .': '. $min_date_formatted .' to '. $max_date_formatted);
+
+module_load_include('inc', 'booking_timeslots');
+$module_link = booking_timeslots_get_ctype_name(NULL, TRUE);
+$view_name = $variables['view']->name;
+
 ?>
 <div class="calendar-calendar">
   <div class="month-view">
