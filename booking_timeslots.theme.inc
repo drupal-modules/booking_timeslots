@@ -159,10 +159,10 @@ function template_preprocess_booking_timeslots_month(&$vars) {
   foreach ($vars['rows'] as $weekno => $row) {
     foreach ($row as $day => $data) {
       $cell = $data['data'];
-      $date = str_replace($cid.'-', $cid.'/',$data['id']);
-      if (!is_array($cell) && $data['class'] != 'week' && strpos($data['class'], 'empty') === FALSE) {
-        // FIXME: && booking_timeslots_day_not_available($date)) { // If this cell is already rendered...
-        $link = l($vars['bt_text']['book_now'], $date);
+      $date = str_replace($cid.'-', '', $data['id']);
+      $link = str_replace($cid.'-', $cid.'/', $data['id']);
+      if (!is_array($cell) && $data['class'] != 'week' && strpos($data['class'], 'empty') === FALSE && booking_timeslots_day_not_available($date)) { // If this cell is already rendered...
+        $link = l($vars['bt_text']['book_now'], $link);
         $vars['rows'][$weekno][$day]['data'] .= "<div class='slot_free'>$link</div>"; // ...and which is free
       }
     }
