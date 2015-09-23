@@ -87,7 +87,30 @@ function booking_timeslots_settings_timeslots_form(&$form_state) {
         'sunday' => t('Sunday')
     )
   );
-   
+
+  $disallow_within_options = array(
+    0 => t('0 hours (Disabled)'),
+  );
+  // 168 hours == 1 week
+  for ($i = 24; $i <= 168; $i = ($i + 24)) {
+    // The key is in seconds, 3600 is 60 seconds * 60 minutes.
+    // 3600 * $i = number of seconds in $i hours.
+    $disallow_within_options[(3600 * $i)] = t($i . ' hours');
+  }
+  $form['timeslot_length']['booking_timeslot_disallow_within'] = array(
+    '#type' => 'select',
+    '#title' => t('Disallow booking within X hours'),
+    '#default_value' => variable_get('booking_timeslot_disallow_within', 0),
+    '#options' => $disallow_within_options,
+  );
+
+  $form['timeslot_length']['booking_timeslot_disallow_weekends'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Disallow booking over weekends'),
+    '#description' => t('Disallow booking on Monday if today is Friday, Saturday, or Sunday.'),
+    '#default_value' => variable_get('booking_timeslot_disallow_weekends', FALSE),
+  );
+
   $form['#validate'][] = 'booking_timeslots_form_validate';
   return system_settings_form($form);
 }
