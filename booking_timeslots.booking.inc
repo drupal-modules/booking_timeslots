@@ -244,6 +244,16 @@ function booking_timeslots_booking_form_edit($form, &$form_state, $entity) {
 
   field_attach_form('booking', $entity, $form, $form_state);
 
+  if (user_access('administer bookings')) {
+    if (!isset($form_state['input']['field_bt_user']['und'])) {
+      $user = user_load($entity->uid);
+      $form['field_bt_user'][$form['field_bt_user']['#language']][0]['target_id']['#value'] = $user -> name . ' (' . $user -> uid . ')';
+    }
+  }
+  else
+  {
+    $form['field_bt_user'][$form['field_bt_user']['#language']]['#access'] = false;
+  }
 
   $configuration = booking_timeslots_get_configuration();
 
