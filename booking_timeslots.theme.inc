@@ -705,32 +705,29 @@ EOT;
         if (!empty($data['bookings'])) {
           foreach ($data['bookings'] as $booking) {
 
-            if ($vars['granularity'] !== NULL && $booking -> duration == $vars['granularity'])
-            {
-              $duration = $data['duration'];
+            $duration = $data['duration'];
 
-              $vars['items'][$hour]['values'][$i]['records'][] = array (
-                'entry'    => '
-                  <div class="tipsy-title">Price: <b>' .  $price. '</b> per <b>' . $duration . '</b>min</div>
-                  <div class="views-field views-field-title booking-item" style="text-align: center">
-                    <div class="title">' . t('booked for') . '</div>
-                    <span class="field-content">
-                      ' . t('<b>%num</b> player(s)', array ('%num' => $booking -> players_original)) . '
-                    </span>
-                    <div class="link">
-                      <a class="" href="' . url('booking/' . $booking -> pid . '/edit') . '">' . t('Edit booking') . '</a>
-                    </div>
+            $vars['items'][$hour]['values'][$i]['records'][] = array (
+              'entry'    => '
+                <div class="tipsy-title">Price: <b>' .  $price. '</b> per <b>' . $duration . '</b>min</div>
+                <div class="views-field views-field-title booking-item" style="text-align: center">
+                  <div class="title">' . t('booked for') . '</div>
+                  <span class="field-content">
+                    ' . t('<b>%num</b> player(s)', array ('%num' => $booking -> players_original)) . '
+                  </span>
+                  <div class="link">
+                    <a class="" href="' . url('booking/' . $booking -> pid . '/edit') . '">' . t('Edit booking') . '</a>
                   </div>
-                ',
-                'title'    => '',
-                'rendered' => '',
-                'colspan'  => 1,
-                'rowspan'  => 1,
-                'filled'   => FALSE,
-                'avail'    => TRUE,
-                'wday'     => $i,
-              );
-            }
+                </div>
+              ',
+              'title'    => '',
+              'rendered' => '',
+              'colspan'  => 1,
+              'rowspan'  => 1,
+              'filled'   => FALSE,
+              'avail'    => TRUE,
+              'wday'     => $i,
+            );
           }
         }
 
