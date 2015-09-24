@@ -488,6 +488,17 @@ function booking_timeslots_get_nodes_default_query($category_id = NULL, $ct_id =
   $joins = array();
   $group = array();
 
+  // Added support for Organic Groups module: https://www.drupal.org/project/og
+  if ($configuration['ct_on_2']) {
+    // 2nd to 1st reference is a reference to organic groups's module group. As
+    // the table with reference values are empty, we need to make a subquery.
+    if ($configuration['ct_field_2_1'] === 'og_group_ref') {
+      // Adding support for OG reference. We must use special join as the field_og_group_ref table is empty.
+      $configuration['ct_table_2_1'] = "(SELECT R2_R1.etid AS entity_id, R2_R1.gid AS ref_target_id FROM og_membership R2_R1 WHERE R2_R1.entity_type = 'node')";
+      $configuration['ct_field_2_1'] = 'ref'; // OG_R2_R1.ref_target_id
+    }
+  }
+
   if ($configuration['ct_on_1']) {
     $where[] = "(C1.nid IS NULL OR C1.type = '$configuration[ct_name_1]')";
 
