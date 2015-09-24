@@ -1287,7 +1287,7 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
 
   $daily_settings['days'] = array();
 
-  $settings_query = db_query("
+  $query = "
     SELECT
       H.instance_id,
       H.nid,
@@ -1300,12 +1300,43 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
       H.original_instance_id,
       H.customised,
       H.slot_length,
-      CASE WHEN H.nid = :tertiary_id THEN C.{$tertiary_capacity_name}_value ELSE H.capacity END AS capacity,
-      DATEDIFF(H.date, DATE(:time_start)) AS day, CASE WHEN H.nid = :primary_id THEN '1' WHEN H.nid IN ( :secondary_id ) THEN '2' WHEN H.nid = :tertiary_id THEN '3' ELSE '0' END AS type
+    ";
+
+  $id_ct_3 = !empty($tertiary_capacity_name) ? $id_ct_3 : NULL;
+
+  if ($id_ct_3 !== NULL) {
+    $query .= "CASE WHEN H.nid = :tertiary_id THEN C.{$tertiary_capacity_name}_value ELSE H.capacity END AS capacity,";
+  }
+  else {
+    $query .= "H.capacity AS capacity,";
+  }
+
+  $query .= "DATEDIFF(H.date, DATE(:time_start)) AS day, CASE WHEN H.nid = :primary_id THEN '1' WHEN H.nid IN ( :secondary_id ) THEN '2' ";
+
+  if ($id_ct_3 !== NULL) {
+    $query .= "WHEN H.nid = :tertiary_id THEN '3'";
+  }
+
+  $query .= "ELSE '0' END AS type ";
+
+  $query .= "
       FROM {opening_hours} H
-      LEFT JOIN field_data_{$tertiary_capacity_name} C ON C.entity_id = H.nid
+  ";
+
+  if ($id_ct_3 !== NULL) {
+    $query .= "LEFT JOIN field_data_{$tertiary_capacity_name} C ON C.entity_id = H.nid ";
+  }
+
+  $query .= "
       WHERE
-        (nid = :primary_id OR nid IN (:secondary_id) OR nid = :tertiary_id) AND (
+        (nid = :primary_id OR nid IN (:secondary_id) ";
+
+  if ($id_ct_3 !== NULL) {
+    $query .= "OR nid = :tertiary_id ";
+  }
+
+
+  $query .= ") AND (
             (H.repeat_end_date IS NULL AND H.date BETWEEN :time_start AND :time_end) OR
             (H.repeat_end_date IS NOT NULL
                 AND (
@@ -1313,8 +1344,17 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
                 )
             )
        )
-      ORDER BY nid = :primary_id DESC, nid IN ( :secondary_id ) DESC, nid = :tertiary_id DESC, H.repeat_end_date DESC, H.date ASC
-  ", array(
+      ORDER BY nid = :primary_id DESC, nid IN ( :secondary_id ) DESC, ";
+
+  if ($id_ct_3 !== NULL) {
+    $query .= "nid = :tertiary_id DESC, ";
+  }
+
+  $query .= "
+    H.repeat_end_date DESC, H.date ASC
+  ";
+
+  $settings_query = db_query($query, array(
     ':primary_id'   => $id_ct_1,
     ':secondary_id' => $id_ct_2,
     ':tertiary_id'  => $id_ct_3,
