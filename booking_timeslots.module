@@ -300,6 +300,10 @@ function booking_timeslots_form_views_exposed_form_alter(&$form, $form_state, $f
     $items_ct_3 = booking_timeslots_filter_get_items($category_id, 3, $id_ct_1, $id_ct_2, $id_ct_3, $id_ct_4);
     $items_ct_4 = booking_timeslots_filter_get_items($category_id, 4, $id_ct_1, $id_ct_2, $id_ct_3, $id_ct_4);
 
+    if (is_array($id_ct_2) && variable_get('booking_timeslots_force_select_ct_2nd', FALSE)) {
+      $id_ct_2 = reset($id_ct_2);
+    }
+
     if ($id_ct_3) {
       // We don't want duration to show on CT3's calendar.
       $durations = array(
@@ -325,6 +329,10 @@ function booking_timeslots_form_views_exposed_form_alter(&$form, $form_state, $f
       '#validated' => TRUE,
       '#access' => $configuration['cat_on'] && $configuration['ct_on_' . $configuration['cat_ct']],
     );
+
+    if (variable_get('booking_timeslots_force_select_ct_2nd', FALSE)) {
+      unset($items_ct_2['All']);
+    }
 
     $form['booking']['secondaries'] = array(
       '#title' => check_plain($configuration['ct_title_2']),

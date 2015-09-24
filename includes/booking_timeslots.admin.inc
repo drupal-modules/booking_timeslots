@@ -402,6 +402,13 @@ function booking_timeslots_settings_form($form, $form_state) {
     '#description' => t("List of enabled durations. Each line should contain number of minutes and title separated by '|' character. Note that those durations must be a multiple of the calendar granularity and be greater or equal to that granularity."),
   );
 
+  $form['config']['booking_timeslots_force_select_ct_2nd'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Force users to select secondary content type."),
+    '#description' => t("If enabled, there won't be a mixed view for all secondary content type's nodes. Currently <b>you are very encouraged to enable this option</b>."),
+    '#default_value' => variable_get('booking_timeslots_force_select_ct_2nd', FALSE),
+  );
+
   /*
   $form['config']['booking_timeslots_past_booking'] = array(
     '#type' => 'checkbox',
