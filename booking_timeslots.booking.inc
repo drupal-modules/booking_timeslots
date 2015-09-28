@@ -244,6 +244,16 @@ function booking_timeslots_booking_form_edit($form, &$form_state, $entity) {
 
   field_attach_form('booking', $entity, $form, $form_state);
 
+  if (user_access('administer bookings')) {
+    if (!isset($form_state['input']['field_bt_user']['und'])) {
+      $user = user_load($entity->uid);
+      $form['field_bt_user'][$form['field_bt_user']['#language']][0]['target_id']['#value'] = $user -> name . ' (' . $user -> uid . ')';
+    }
+  }
+  else
+  {
+    $form['field_bt_user'][$form['field_bt_user']['#language']]['#access'] = false;
+  }
 
   $configuration = booking_timeslots_get_configuration();
 
@@ -662,7 +672,8 @@ function booking_timeslots_booking_menu(&$items) {
     'title'            => 'Edit',
     'page callback'    => array('drupal_get_form'),
     'page arguments'   => array('booking_timeslots_booking_form_edit', 1),
-    'access arguments' => array('edit booking entities'),
+    'access callback'  => 'booking_timeslots_booking_access',
+    'access arguments' => array('edit', 1),
     'file'             => 'booking_timeslots.booking.inc',
     'type'             => MENU_LOCAL_TASK,
     'context'          => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,

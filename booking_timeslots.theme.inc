@@ -167,9 +167,11 @@ function template_preprocess_booking_timeslots_general(&$vars, $view_mode, $star
           if ($new_matrix['data'][$day])
           foreach($new_matrix['data'][$day] as $hour => $hour_data)
           {
-            if(isset($current_matrix[$day]) && is_object($hour_data['affected_settings']) && in_array($hour_data['affected_settings']->nid, $invalid))
-            {
-              unset($new_matrix['data'][$day][$hour]);
+            if (isset($hour_data['affected_settings'])) {
+              if(isset($current_matrix[$day]) && is_object($hour_data['affected_settings']) && in_array($hour_data['affected_settings']->nid, $invalid))
+              {
+                unset($new_matrix['data'][$day][$hour]);
+              }
             }
           }
         }
@@ -490,7 +492,7 @@ EOT;
         ';
 
       }
-      elseif (!booking_timeslots_can_book_past_dates() && $date_time < booking_timeslots_get_server_time () && ($data['type'] != 'green_box' || $data['affected_settings'] -> type == 3)) {
+      elseif (!booking_timeslots_can_book_past_dates() && $date_time < booking_timeslots_get_server_time () && ((!empty($data['type']) && $data['type'] != 'green_box') || (isset($data['affected_settings']) && $data['affected_settings'] -> type == 3))) {
 
         // Past date slot
         $vars['items'][$hour]['values'][$i]['class']     = 'closed';
@@ -703,32 +705,29 @@ EOT;
         if (!empty($data['bookings'])) {
           foreach ($data['bookings'] as $booking) {
 
-            if ($vars['granularity'] !== NULL && $booking -> duration == $vars['granularity'])
-            {
-              $duration = $data['duration'];
+            $duration = $data['duration'];
 
-              $vars['items'][$hour]['values'][$i]['records'][] = array (
-                'entry'    => '
-                  <div class="tipsy-title">Price: <b>' .  $price. '</b> per <b>' . $duration . '</b>min</div>
-                  <div class="views-field views-field-title booking-item" style="text-align: center">
-                    <div class="title">' . t('booked for') . '</div>
-                    <span class="field-content">
-                      ' . t('<b>%num</b> player(s)', array ('%num' => $booking -> players_original)) . '
-                    </span>
-                    <div class="link">
-                      <a class="" href="' . url('booking/' . $booking -> pid . '/edit') . '">' . t('Edit booking') . '</a>
-                    </div>
+            $vars['items'][$hour]['values'][$i]['records'][] = array (
+              'entry'    => '
+                <div class="tipsy-title">Price: <b>' .  $price. '</b> per <b>' . $duration . '</b>min</div>
+                <div class="views-field views-field-title booking-item" style="text-align: center">
+                  <div class="title">' . t('booked for') . '</div>
+                  <span class="field-content">
+                    ' . t('<b>%num</b> player(s)', array ('%num' => $booking -> players_original)) . '
+                  </span>
+                  <div class="link">
+                    <a class="" href="' . url('booking/' . $booking -> pid . '/edit') . '">' . t('Edit booking') . '</a>
                   </div>
-                ',
-                'title'    => '',
-                'rendered' => '',
-                'colspan'  => 1,
-                'rowspan'  => 1,
-                'filled'   => FALSE,
-                'avail'    => TRUE,
-                'wday'     => $i,
-              );
-            }
+                </div>
+              ',
+              'title'    => '',
+              'rendered' => '',
+              'colspan'  => 1,
+              'rowspan'  => 1,
+              'filled'   => FALSE,
+              'avail'    => TRUE,
+              'wday'     => $i,
+            );
           }
         }
 
