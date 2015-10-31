@@ -1,9 +1,8 @@
 Booking Time Slots
 ==================
 
-Drupal project page: http://drupal.org/project/booking_timeslots.
-
-GitHub project page: https://github.com/kenorb/booking_timeslots.
+Drupal project page: http://drupal.org/project/booking_timeslots
+GitHub project page: https://github.com/mycognitive/booking_timeslots
 
 Requirements
 ------------
@@ -14,7 +13,6 @@ Installation
 ------------
 
 Please download and enable booking_timeslots module manually or via drush:
-  drush -y dl booking_timeslots
   drush -y en booking_timeslots
 
 Configuration
@@ -25,7 +23,7 @@ To properly configure the module, please look at the tutorial available at /admi
 Demo
 ----
 
-1. Enable booking_timeslots_example module.
+1. Enable Booking Timeslots Example module.
 2. Go to "Add content" and then to "Booking Timeslots Example Venue". Enter any title and save node. Now go to the "Opening Hours" tab.
 3. Click on some day of week to add venue opening hours.
 4. Enter start time e.g. 08:00 and end time e.g. 20:00. It will restrict facilities' and classes' opening hours to be lay between specified hours.
