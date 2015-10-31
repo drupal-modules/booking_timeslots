@@ -1,14 +1,12 @@
 name = Booking Time Slots Examples
-description = Provides example features for Booking Time Slots
+description = Provides demo features for Booking Time Slots module.
 core = 7.x
 package = Booking Time Slots
-version = 7.x-1.0-alpha1
 project = booking_timeslots_example
 dependencies[] = booking_timeslots
 dependencies[] = calendar
 dependencies[] = ctools
-dependencies[] = date
-dependencies[] = date_views
+dependencies[] = date_views:date
 dependencies[] = entityreference
 dependencies[] = features
 dependencies[] = number
