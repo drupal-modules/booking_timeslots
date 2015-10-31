@@ -875,32 +875,39 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
     if ($cids) {
 
-      $bookings = db_query('
-        SELECT pid, slot_time, duration, players, DATEDIFF(B.slot_time, :time_start) AS day
-        FROM {booking} B
-        WHERE B.slot_time BETWEEN :time_start
-          AND :time_end
-          AND B.primary_id = :primary_id
-          AND B.secondary_id IN ( :secondary_id )
-          AND (
-            (:tertiary_id IS NULL     AND B.tertiary_id = 0) OR
-            (:tertiary_id IS NOT NULL AND B.tertiary_id = :tertiary_id)
-          )
+      $query =
+         db_select('booking', 'B')
+            ->fields('B', array('pid', 'slot_time', 'duration', 'players'))
+            ->condition('B.slot_time', array($time_start, $time_end), 'BETWEEN')
+            ->condition('B.primary_id', $id_ct_1)
+            ->condition('B.secondary_id', is_array($id_ct_2) ? $id_ct_2 : array($id_ct_2), 'IN')
+            ->condition(db_or()
+               ->condition(db_and()
+                  ->isNull(is_null($id_ct_3) ? 'null' : $id_ct_3)
+                  ->condition('B.tertiary_id', 0)
+               )
+               ->condition(db_and()
+                  ->isNotNull(is_null($id_ct_3) ? 'null' : $id_ct_3)
+                  ->condition('B.tertiary_id', $id_ct_3)
+               )
+            );
 
-      ', array(
-        'time_start'    => $time_start,
-        'time_end'      => $time_end,
-        ':primary_id'   => $id_ct_1,
-        ':secondary_id' => $id_ct_2,
-        ':tertiary_id'  => $id_ct_3
-      ))->fetchAllAssoc('pid');
+      $query->addExpression(
+         'DATEDIFF(' .
+            ( db_driver() != 'pgsql' ? '' : '\'mi\', ' ) .
+            'B.slot_time,  ' .
+            ':time_start ) ',
+         'day',
+         array(':time_start' => $time_start));
 
-    }
-    else
+      $bookings = $query->execute()->fetchAllAssoc('pid');
+
+    } else {
       $bookings = array();
-  }
-  else
+    }
+  } else {
     $bookings = array();
+  }
 
   foreach ($bookings as $booking) {
 
@@ -1289,12 +1296,11 @@ function booking_timeslots_get_data_price($data, $duration) {
 
 function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $time_start, $time_end) {
 
-  $tertiary_capacity_name      = variable_get('booking_timeslots_3rd_capacity_field');
-
+  $tertiary_capacity_name = variable_get('booking_timeslots_3rd_capacity_field');
   $daily_settings = array();
-
   $daily_settings['days'] = array();
 
+  /*
   $query = "
     SELECT
       H.instance_id,
@@ -1319,7 +1325,7 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
     $query .= "H.capacity AS capacity,";
   }
 
-  $query .= "DATEDIFF(H.date, DATE(:time_start)) AS day, CASE WHEN H.nid = :primary_id THEN '1' WHEN H.nid IN ( :secondary_id ) THEN '2' ";
+  $query .= "DATEDIFF(" . ( db_driver() != 'pgsql' ? "" : "'mi', " ) . "H.date, DATE(:time_start)) AS day, CASE WHEN H.nid = :primary_id THEN '1' WHEN H.nid IN ( :secondary_id ) THEN '2' ";
 
   if ($id_ct_3 !== NULL) {
     $query .= "WHEN H.nid = :tertiary_id THEN '3'";
@@ -1369,6 +1375,90 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
     ':time_start'   => $time_start,
     ':time_end'     => $time_end
   ));
+  */
+
+
+  // @todo: Add tertiary content type when enabled (as shown above), see: https://github.com/mycognitive/booking_timeslots/commit/0787d506863309a1991fc260f53050cdfb43b0ed
+  $query =
+    db_select('opening_hours', 'H')
+      ->fields('H', array(
+         'instance_id',
+         'nid',
+         'date',
+         'start_time',
+         'end_time',
+         'notice',
+         'repeat_rule',
+         'repeat_end_date',
+         'original_instance_id',
+         'customised',
+         'slot_length'))
+      ->condition(db_and()
+         ->condition(db_or()
+            ->condition('nid', $id_ct_1)
+            ->condition('nid', is_array($id_ct_2) ? $id_ct_2 : array($id_ct_2), 'IN')
+            ->condition('nid', $id_ct_3)
+         )
+         ->condition(db_or()
+            ->condition(db_and()
+               ->isNull('H.repeat_end_date')
+               ->condition('H.date', array($time_start, $time_end), 'BETWEEN')
+            )
+            ->condition(db_and()
+               ->isNotNull('H.repeat_end_date')
+               ->where(
+                  "CONCAT(H.date, ' ', H.start_time) BETWEEN :time_start AND :time_end",
+                  array(
+                     ':time_start' => $time_start,
+                     ':time_end'   => $time_end
+                  )
+               )
+            )
+         )
+      )
+      ->orderBy('nid = '   . $id_ct_1, 'DESC')
+      ->orderBy('nid IN (' . (is_array($id_ct_2) ? implode(',', $id_ct_2) : $id_ct_2) . ')', 'DESC')
+      ->orderBy('nid = '   . (is_null($id_ct_3) ? 0 : $id_ct_3), 'DESC')
+      ->orderBy('H.repeat_end_date', 'DESC')
+      ->orderBy('H.date', 'ASC');
+  /*
+   * Note:
+   *   The ->orderBy() method has not placeholders, so I just concatenated the values.
+   *   It might be a good idea to add aliased expressions and order by them.
+   *   This will clean a warning created at PgSQL orderBy override, which tries to alias the unaliased orderBy fields:
+   *   See: https://api.drupal.org/SelectQuery_pgsql::orderBy
+   */
+
+  $query->leftJoin("field_data_{$tertiary_capacity_name}", 'C', 'C.entity_id = H.nid');
+  $query->addExpression(
+      "CASE
+         WHEN H.nid = :tertiary_id THEN C.{$tertiary_capacity_name}_value
+         ELSE H.capacity
+         END",
+      'capacity',
+      array(':tertiary_id' => $id_ct_3));
+   $query->addExpression(
+      'DATEDIFF(' .
+         ( db_driver() != 'pgsql' ? '' : '\'mi\', ' ) .
+         'H.date,  ' .
+         ':time_start )',
+      'day',
+      array(':time_start' => $time_start));
+  $query->addExpression(
+      "CASE
+         WHEN H.nid = :primary_id THEN '1'
+         WHEN H.nid IN ( :secondary_id ) THEN '2'
+         WHEN H.nid = :tertiary_id THEN '3'
+         ELSE '0'
+         END",
+      'type',
+      array(
+         ':primary_id'   => $id_ct_1,
+         ':secondary_id' => $id_ct_2,
+         ':tertiary_id'  => $id_ct_3,
+         ));
+
+  $settings_query = $query->execute();
 
   while ($row = $settings_query->fetch(PDO::FETCH_OBJ)) {
     $daily_settings['days'][$row->day]['slots'][] = $row;
@@ -1380,10 +1470,6 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
 
 
   booking_timeslots_populate_daily_settings_min_max_time($daily_settings);
-
-//  echo '<pre>'; print_r ($daily_settings); exit;
-
-
 
   return $daily_settings;
 }
