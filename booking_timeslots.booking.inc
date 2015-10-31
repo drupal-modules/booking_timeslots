@@ -123,7 +123,7 @@ function booking_timeslots_booking_entity_property_info_alter(&$info) {
   );
   $properties['slot_time'] = array(
     'label' => t("Date"),
-    'type' => 'text',
+    'type' => 'date',
     'description' => t("Date and time of the slot being reserved."),
     'setter callback' => 'entity_property_verbatim_set',
     'setter permission' => 'administer nodes',
