@@ -10,8 +10,10 @@ addons:
   apt:
     packages:
     # - drush # See: https://github.com/travis-ci/apt-package-whitelist/issues/1611
+    - wget
     - realpath
     - tree
+    - html2text
 
 notifications:
   email:
@@ -24,6 +26,8 @@ sudo: false
 env:
   global:
     - MODULES="booking_timeslots"
+    - REVIEWS="upgrade7x,comment,druplart,i18n,i18n_po,production,security,sniffer,sql,style"
+    - URL="http://$HOSTNAME:8080/"
     - COMPOSER_BIN_DIR=~/bin
     - PATH=${PATH//:\.\/node_modules\/\.bin/} # Fixes Travis bug: https://github.com/travis-ci/travis-ci/issues/4862
 
@@ -38,23 +42,30 @@ mysql:
 before_install:
   - env
   - set -e # Fail build on first error.
-  - echo "sendmail_path='true'" | tee -a $(php --ini | grep "Loaded Configuration" | awk '{print $4}')
 
 install:
-  - composer require drush/drush:dev-master
-  - drush -y dl coder --destination=~/.drush && drush cc drush
+  - gem install mailcatcher
+  - mailcatcher -v && echo 'sendmail_path="/usr/bin/env catchmail"' | tee -a "$(php --ini | grep "Loaded Configuration" | awk '{print $4}')"
+  - composer global require drush/drush:dev-master && drush --version
+  - drush qd --yes --server=$URL --no-server --watchdog --core=drupal-$CORE testsite $MODULES && cd testsite/drupal-*
 
 before_script:
-  - drush qd --yes --server=:80 --watchdog --core=drupal-$CORE testsite $MODULES && cd drupal-*
+  - drush -v rs $URL &
+  - drush dl coder --destination=~/.drush && drush cc drush
+  - drush -vy en $DRUSH_EN
+  - html2text <(wget -O- --retry-connrefused $URL)
 
 script:
-  - drush core-requirements --severity=2
-  - drush review summary major comment,i18n,security,sql,style $MODULES
+  - drush -vd status --full
+# - drush -vd coder --reviews=$REVIEWS --severity=major --no-empty $MODULES
+  - drush core-requirements --severity=2 | grep -i error
 
 after_success:
+ - html2text <(curl http://localhost:1080)
+ - html2text <(wget -qO- $URL)
 
 after_failure:
- - sudo wget -qO- http://$HOSTNAME/ | cat
+ - sudo wget -qO- $URL | html2text
  - drush --version
  - drush core-requirements --severity=2
  - drush status --full
