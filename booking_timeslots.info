@@ -16,6 +16,7 @@ dependencies[] = options
 dependencies[] = opening_hours
 dependencies[] = strongarm
 dependencies[] = workflow
+simplytest_dependencies[] = booking_timeslots_example
 features[ctools][] = strongarm:strongarm:1
 features[ctools][] = views:views_default:3.0
 features[features_api][] = api:2
