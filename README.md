@@ -2,7 +2,7 @@ Booking Time Slots
 ==================
 
 Drupal project page: http://drupal.org/project/booking_timeslots
-GitHub project page: https://github.com/mycognitive/booking_timeslots
+GitHub project page: https://github.com/drupal-modules/booking_timeslots
 
 Requirements
 ------------

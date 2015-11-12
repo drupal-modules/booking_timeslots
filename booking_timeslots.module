@@ -1187,7 +1187,6 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
   }
 
   // Sending bookings on to the data matrix array
-
   $settingsArr = array();
 
   // Calculating real availability based on the slot bookings
@@ -1210,25 +1209,23 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
       $min   = substr ('0' . ((int) $m % 60), -2);
       $date  = $hour . ':' . $min;
 
-      $settings = @$data_matrix['data'][$d][$date]['affected_settings'];
+      $settings = !empty($data_matrix['data'][$d][$date]['affected_settings']) ? $data_matrix['data'][$d][$date]['affected_settings'] : NULL;
 
       if ($settings === NULL) {
-        // This shouldn't happen.
+        // This shouldn't happen, of course.
         continue;
       }
 
-      $data = json_decode ($settings->notice);
+      $data = json_decode($settings->notice);
 
-      if($settings != NULL && $settings->capacity == 0)
-      {
+      if ($settings != NULL && $settings->capacity == 0) {
         $orginal_id = $settings->original_instance_id;
 
         if (!$orginal_id) {
           $orginal_id = $settings->instance_id;
         }
 
-        if(!isset($settingsArr[$orginal_id]))
-        {
+        if (!isset($settingsArr[$orginal_id])) {
           $result = db_query('
               SELECT slot_length, capacity FROM {opening_hours} WHERE instance_id = :id',
               array(
@@ -1280,7 +1277,6 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
   }
 
   $data_matrix['day_week_start'] = date('w', strtotime($time_start));
-
   return $data_matrix;
 
 }
@@ -1296,89 +1292,12 @@ function booking_timeslots_get_data_price($data, $duration) {
 
 function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $time_start, $time_end) {
 
-  $tertiary_capacity_name = variable_get('booking_timeslots_3rd_capacity_field');
   $daily_settings = array();
   $daily_settings['days'] = array();
-
-  /*
-  $query = "
-    SELECT
-      H.instance_id,
-      H.nid,
-      H.date,
-      H.start_time,
-      H.end_time,
-      H.notice,
-      H.repeat_rule,
-      H.repeat_end_date,
-      H.original_instance_id,
-      H.customised,
-      H.slot_length,
-    ";
-
+  $tertiary_capacity_name = variable_get('booking_timeslots_3rd_capacity_field');
   $id_ct_3 = !empty($tertiary_capacity_name) ? $id_ct_3 : NULL;
 
-  if ($id_ct_3 !== NULL) {
-    $query .= "CASE WHEN H.nid = :tertiary_id THEN C.{$tertiary_capacity_name}_value ELSE H.capacity END AS capacity,";
-  }
-  else {
-    $query .= "H.capacity AS capacity,";
-  }
-
-  $query .= "DATEDIFF(" . ( db_driver() != 'pgsql' ? "" : "'mi', " ) . "H.date, DATE(:time_start)) AS day, CASE WHEN H.nid = :primary_id THEN '1' WHEN H.nid IN ( :secondary_id ) THEN '2' ";
-
-  if ($id_ct_3 !== NULL) {
-    $query .= "WHEN H.nid = :tertiary_id THEN '3'";
-  }
-
-  $query .= "ELSE '0' END AS type ";
-
-  $query .= "
-      FROM {opening_hours} H
-  ";
-
-  if ($id_ct_3 !== NULL) {
-    $query .= "LEFT JOIN field_data_{$tertiary_capacity_name} C ON C.entity_id = H.nid ";
-  }
-
-  $query .= "
-      WHERE
-        (nid = :primary_id OR nid IN (:secondary_id) ";
-
-  if ($id_ct_3 !== NULL) {
-    $query .= "OR nid = :tertiary_id ";
-  }
-
-
-  $query .= ") AND (
-            (H.repeat_end_date IS NULL AND H.date BETWEEN :time_start AND :time_end) OR
-            (H.repeat_end_date IS NOT NULL
-                AND (
-                    CONCAT(H.date, ' ', H.start_time) BETWEEN :time_start AND :time_end
-                )
-            )
-       )
-      ORDER BY nid = :primary_id DESC, nid IN ( :secondary_id ) DESC, ";
-
-  if ($id_ct_3 !== NULL) {
-    $query .= "nid = :tertiary_id DESC, ";
-  }
-
-  $query .= "
-    H.repeat_end_date DESC, H.date ASC
-  ";
-
-  $settings_query = db_query($query, array(
-    ':primary_id'   => $id_ct_1,
-    ':secondary_id' => $id_ct_2,
-    ':tertiary_id'  => $id_ct_3,
-    ':time_start'   => $time_start,
-    ':time_end'     => $time_end
-  ));
-  */
-
-
-  // @todo: Add tertiary content type when enabled (as shown above), see: https://github.com/mycognitive/booking_timeslots/commit/0787d506863309a1991fc260f53050cdfb43b0ed
+  // @todo: Needs some manual testing, see the change: https://github.com/mycognitive/booking_timeslots/commit/0787d506863309a1991fc260f53050cdfb43b0ed
   $query =
     db_select('opening_hours', 'H')
       ->fields('H', array(
@@ -1429,21 +1348,53 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
    *   See: https://api.drupal.org/SelectQuery_pgsql::orderBy
    */
 
-  $query->leftJoin("field_data_{$tertiary_capacity_name}", 'C', 'C.entity_id = H.nid');
+  if ($id_ct_3 !== NULL) {
+    $query->leftJoin("field_data_{$tertiary_capacity_name}", 'C', 'C.entity_id = H.nid');
+    $query->addExpression(
+        "CASE
+          WHEN H.nid = :tertiary_id THEN C.{$tertiary_capacity_name}_value
+          ELSE H.capacity
+          END",
+        'capacity',
+        array(':tertiary_id' => $id_ct_3));
+
+    /* @todo: Do we need?:
+
+      $query .= "
+          WHERE
+            (nid = :primary_id OR nid IN (:secondary_id) ";
+      if ($id_ct_3 !== NULL) {
+        $query .= "OR nid = :tertiary_id ";
+      }
+
+      $query .= ") AND (
+                (H.repeat_end_date IS NULL AND H.date BETWEEN :time_start AND :time_end) OR
+                (H.repeat_end_date IS NOT NULL
+                    AND (
+                        CONCAT(H.date, ' ', H.start_time) BETWEEN :time_start AND :time_end
+                    )
+                )
+          )
+          ORDER BY nid = :primary_id DESC, nid IN ( :secondary_id ) DESC, ";
+      if ($id_ct_3 !== NULL) {
+        $query .= "nid = :tertiary_id DESC, ";
+      }
+      $query .= "
+        H.repeat_end_date DESC, H.date ASC
+      ";
+    */
+
+  }
+
   $query->addExpression(
-      "CASE
-         WHEN H.nid = :tertiary_id THEN C.{$tertiary_capacity_name}_value
-         ELSE H.capacity
-         END",
-      'capacity',
-      array(':tertiary_id' => $id_ct_3));
-   $query->addExpression(
-      'DATEDIFF(' .
-         ( db_driver() != 'pgsql' ? '' : '\'mi\', ' ) .
-         'H.date,  ' .
-         ':time_start )',
-      'day',
-      array(':time_start' => $time_start));
+    'DATEDIFF(' .
+        ( db_driver() != 'pgsql' ? '' : '\'mi\', ' ) .
+        'H.date,  ' .
+        ':time_start )',
+    'day',
+    array(':time_start' => $time_start));
+
+  // @todo: Do we need extra condition: if ($id_ct_3 !== NULL) $query .= "WHEN H.nid = :tertiary_id THEN '3'"; ?
   $query->addExpression(
       "CASE
          WHEN H.nid = :primary_id THEN '1'
@@ -1457,6 +1408,16 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
          ':secondary_id' => $id_ct_2,
          ':tertiary_id'  => $id_ct_3,
          ));
+
+  /* @todo: Do we need?:
+      $settings_query = db_query($query, array(
+        ':primary_id'   => $id_ct_1,
+        ':secondary_id' => $id_ct_2,
+        ':tertiary_id'  => $id_ct_3,
+        ':time_start'   => $time_start,
+        ':time_end'     => $time_end
+      ));
+  */
 
   $settings_query = $query->execute();
 
