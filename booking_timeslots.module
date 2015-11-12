@@ -837,6 +837,7 @@ function booking_timeslots_views_ajax_data_alter(&$object, $view) {
  * Returns the total number of available capacity to book based on the granularity specified
  * For the 'week' view it returns the data matrix for all the week days
  * For the 'month view, it returns the data matrix composed of total availabilites in a given day
+ *
  * @param int $nid Nid of the node we use to determine opening hours information
  * @param string $granularity 'week', 'month'
  * @param int|string $value Number of week or month
@@ -1336,6 +1337,7 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
          )
       )
       ->orderBy('nid = '   . $id_ct_1, 'DESC')
+      // @fixme: SQLSTATE[42000]: Syntax error near 'DESC, nid IN () DESC, nid = 0 DESC, H.repeat_end_date DESC, on some other calendar views
       ->orderBy('nid IN (' . (is_array($id_ct_2) ? implode(',', $id_ct_2) : $id_ct_2) . ')', 'DESC')
       ->orderBy('nid = '   . (is_null($id_ct_3) ? 0 : $id_ct_3), 'DESC')
       ->orderBy('H.repeat_end_date', 'DESC')
