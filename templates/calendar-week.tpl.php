@@ -21,11 +21,10 @@
  * $view: The view.
  * $min_date_formatted: The minimum date for this calendar in the format YYYY-MM-DD HH:MM:SS.
  * $max_date_formatted: The maximum date for this calendar in the format YYYY-MM-DD HH:MM:SS.
- *
  */
-//dsm('Display: '. $display_type .': '. $min_date_formatted .' to '. $max_date_formatted);
-//dsm($rows);
-//dsm($items);
+// dsm('Display: '. $display_type .': '. $min_date_formatted .' to '. $max_date_formatted);
+// dsm($rows);
+// dsm($items);
 $index = 0;
 $header_ids = array();
 foreach ($day_names as $key => $value) {
@@ -51,10 +50,10 @@ foreach ($day_names as $key => $value) {
     <?php
       $colpos = 0;
       $rowclass = "all-day";
-      if( $i == 0) {
+      if($i == 0) {
         $rowclass .= " first";
       }
-      if( $i == $multiday_rows - 1) {
+      if($i == $multiday_rows - 1) {
         $rowclass .= " last";
       }
     ?>
@@ -100,15 +99,15 @@ foreach ($day_names as $key => $value) {
         <?php endfor; ?>
         <?php $curpos = $colpos + 1;?>
         <?php
-          $td_visible = true;
+          $td_visible = TRUE;
 
-          if (@$items[$time_id]['values'][$column]['hidden'] == true) {
-            $td_visible = false;
+          if (@$items[$time_id]['values'][$column]['hidden'] == TRUE) {
+            $td_visible = FALSE;
           }
         ?>
 
         <?php if ($td_visible): ?>
-          <td <?php if(isset($time['values'][$column]['attributes'])): ?> <?php echo $time['values'][$column]['attributes']; ?> <?php endif; ?>  <?php if (isset($time['values'][$column]['records'][0]['rowspan'])): ?> rowspan="<?php echo $time['values'][$column]['records'][0]['rowspan'] ?>" <?php endif; ?> class="calendar-agenda-items single-day <?php if (isset($time['values'][$column]['class'])) echo $time['values'][$column]['class'] ?>" headers="<?php print $header_ids[$index] ?>">
+          <td <?php if(isset($time['values'][$column]['attributes'])): ?> <?php echo $time['values'][$column]['attributes']; ?> <?php endif; ?>  <?php if (isset($time['values'][$column]['records'][0]['rowspan'])): ?> rowspan="<?php echo $time['values'][$column]['records'][0]['rowspan'] ?>" <?php endif; ?> class="calendar-agenda-items single-day <?php if (isset($time['values'][$column]['class'])) {echo $time['values'][$column]['class'];} ?>" headers="<?php print $header_ids[$index] ?>">
           <?php if(!empty($time['values'][$column]['records'])) :?>
                   <?php foreach($time['values'][$column]['records'] as $item) :?>
                     <?php print $item['entry'] ?>

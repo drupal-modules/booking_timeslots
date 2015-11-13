@@ -7,7 +7,7 @@
  * markup necessary to render the opening hours interface.
  */
 
-  drupal_add_css(drupal_get_path('module', 'booking_timeslots') .'/templates/booking_timeslots.css');
+  drupal_add_css(drupal_get_path('module', 'booking_timeslots') . '/templates/booking_timeslots.css');
   drupal_add_js(array('booking_timeslots_calendar_granularity' => booking_timeslots_get_calendar_granularity()), 'setting');
 
   $configuration = booking_timeslots_get_configuration();
@@ -102,7 +102,7 @@
 
     var slotLength = jQuery('input#oho-extra-length').val();
 
-    <?php if($node -> type == $configuration['ct_name_3']): ?>
+    <?php if($node->type == $configuration['ct_name_3']): ?>
 
       var startHour = parseFloat (this.model.attributes.start_time.substr (0, 2));
       var startMin  = parseFloat (this.model.attributes.start_time.substr (3, 6));
@@ -224,7 +224,7 @@
 
       %>
 
-      <?php if($node -> type != $configuration['ct_name_1']): ?>
+      <?php if($node->type != $configuration['ct_name_1']): ?>
 
       <fieldset class="details">
         <label><?php print t('Price'); ?></label>
@@ -248,7 +248,7 @@
 
         </div>
 
-        <?php if($node -> type != $configuration['ct_name_3']): ?>
+        <?php if($node->type != $configuration['ct_name_3']): ?>
 
         <br />
 
@@ -317,7 +317,7 @@
 
       </fieldset>
 
-      <?php if($node -> type != $configuration['ct_name_3']): ?>
+      <?php if($node->type != $configuration['ct_name_3']): ?>
 
       <fieldset class="details">
         <table class="simple">

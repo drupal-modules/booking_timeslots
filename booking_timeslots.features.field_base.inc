@@ -10,7 +10,7 @@
 function booking_timeslots_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'comment_body'
+  // Exported field_base: 'comment_body'.
   $field_bases['comment_body'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -39,7 +39,7 @@ function booking_timeslots_field_default_field_bases() {
     'type' => 'text_long',
   );
 
-  // Exported field_base: 'field_bt_ct_ref_1'
+  // Exported field_base: 'field_bt_ct_ref_1'.
   $field_bases['field_bt_ct_ref_1'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -80,7 +80,7 @@ function booking_timeslots_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_bt_ct_ref_2'
+  // Exported field_base: 'field_bt_ct_ref_2'.
   $field_bases['field_bt_ct_ref_2'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -121,7 +121,7 @@ function booking_timeslots_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_bt_ct_ref_3'
+  // Exported field_base: 'field_bt_ct_ref_3'.
   $field_bases['field_bt_ct_ref_3'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -162,7 +162,7 @@ function booking_timeslots_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_bt_ct_ref_4'
+  // Exported field_base: 'field_bt_ct_ref_4'.
   $field_bases['field_bt_ct_ref_4'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -203,7 +203,7 @@ function booking_timeslots_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_bt_first_name'
+  // Exported field_base: 'field_bt_first_name'.
   $field_bases['field_bt_first_name'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -232,7 +232,7 @@ function booking_timeslots_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_bt_last_name'
+  // Exported field_base: 'field_bt_last_name'.
   $field_bases['field_bt_last_name'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -261,7 +261,7 @@ function booking_timeslots_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_bt_number_of_people'
+  // Exported field_base: 'field_bt_number_of_people'.
   $field_bases['field_bt_number_of_people'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -277,7 +277,7 @@ function booking_timeslots_field_default_field_bases() {
     'type' => 'number_integer',
   );
 
-  // Exported field_base: 'field_bt_status'
+  // Exported field_base: 'field_bt_status'.
   $field_bases['field_bt_status'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -304,7 +304,7 @@ function booking_timeslots_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'field_bt_time_finish'
+  // Exported field_base: 'field_bt_time_finish'.
   $field_bases['field_bt_time_finish'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -334,7 +334,7 @@ function booking_timeslots_field_default_field_bases() {
     'type' => 'datetime',
   );
 
-  // Exported field_base: 'field_bt_time_start'
+  // Exported field_base: 'field_bt_time_start'.
   $field_bases['field_bt_time_start'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -364,7 +364,7 @@ function booking_timeslots_field_default_field_bases() {
     'type' => 'datetime',
   );
 
-  // Exported field_base: 'field_bt_user'
+  // Exported field_base: 'field_bt_user'.
   $field_bases['field_bt_user'] = array(
     'active' => 1,
     'cardinality' => 1,

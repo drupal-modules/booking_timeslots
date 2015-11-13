@@ -10,7 +10,7 @@
 function booking_timeslots_example_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_bt_ct_ref_1'
+  // Exported field_base: 'field_bt_ct_ref_1'.
   $field_bases['field_bt_ct_ref_1'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -43,7 +43,7 @@ function booking_timeslots_example_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_bt_ct_ref_2'
+  // Exported field_base: 'field_bt_ct_ref_2'.
   $field_bases['field_bt_ct_ref_2'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -76,7 +76,7 @@ function booking_timeslots_example_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_bt_ct_ref_3'
+  // Exported field_base: 'field_bt_ct_ref_3'.
   $field_bases['field_bt_ct_ref_3'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -109,7 +109,7 @@ function booking_timeslots_example_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_bt_ct_ref_4'
+  // Exported field_base: 'field_bt_ct_ref_4'.
   $field_bases['field_bt_ct_ref_4'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -142,7 +142,7 @@ function booking_timeslots_example_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_bt_number_of_people'
+  // Exported field_base: 'field_bt_number_of_people'.
   $field_bases['field_bt_number_of_people'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -157,7 +157,7 @@ function booking_timeslots_example_field_default_field_bases() {
     'type' => 'number_integer',
   );
 
-  // Exported field_base: 'field_bt_user'
+  // Exported field_base: 'field_bt_user'.
   $field_bases['field_bt_user'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -190,7 +190,7 @@ function booking_timeslots_example_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_bt_xmp_capacity'
+  // Exported field_base: 'field_bt_xmp_capacity'.
   $field_bases['field_bt_xmp_capacity'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -205,7 +205,7 @@ function booking_timeslots_example_field_default_field_bases() {
     'type' => 'number_integer',
   );
 
-  // Exported field_base: 'field_bt_xmp_ref_2nd_to_1st'
+  // Exported field_base: 'field_bt_xmp_ref_2nd_to_1st'.
   $field_bases['field_bt_xmp_ref_2nd_to_1st'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -240,7 +240,7 @@ function booking_timeslots_example_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_bt_xmp_ref_3rd_to_2nd'
+  // Exported field_base: 'field_bt_xmp_ref_3rd_to_2nd'.
   $field_bases['field_bt_xmp_ref_3rd_to_2nd'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -275,7 +275,7 @@ function booking_timeslots_example_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_bt_xmp_ref_3rd_to_4th'
+  // Exported field_base: 'field_bt_xmp_ref_3rd_to_4th'.
   $field_bases['field_bt_xmp_ref_3rd_to_4th'] = array(
     'active' => 1,
     'cardinality' => 1,

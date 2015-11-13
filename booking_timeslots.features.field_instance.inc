@@ -10,7 +10,7 @@
 function booking_timeslots_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'booking-booking-field_bt_ct_ref_1'
+  // Exported field_instance: 'booking-booking-field_bt_ct_ref_1'.
   $field_instances['booking-booking-field_bt_ct_ref_1'] = array(
     'bundle' => 'booking',
     'default_value' => NULL,
@@ -47,7 +47,7 @@ function booking_timeslots_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'booking-booking-field_bt_ct_ref_2'
+  // Exported field_instance: 'booking-booking-field_bt_ct_ref_2'.
   $field_instances['booking-booking-field_bt_ct_ref_2'] = array(
     'bundle' => 'booking',
     'default_value' => NULL,
@@ -84,7 +84,7 @@ function booking_timeslots_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'booking-booking-field_bt_ct_ref_3'
+  // Exported field_instance: 'booking-booking-field_bt_ct_ref_3'.
   $field_instances['booking-booking-field_bt_ct_ref_3'] = array(
     'bundle' => 'booking',
     'default_value' => NULL,
@@ -117,7 +117,7 @@ function booking_timeslots_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'booking-booking-field_bt_ct_ref_4'
+  // Exported field_instance: 'booking-booking-field_bt_ct_ref_4'.
   $field_instances['booking-booking-field_bt_ct_ref_4'] = array(
     'bundle' => 'booking',
     'default_value' => NULL,
@@ -150,7 +150,7 @@ function booking_timeslots_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'booking-booking-field_bt_first_name'
+  // Exported field_instance: 'booking-booking-field_bt_first_name'.
   $field_instances['booking-booking-field_bt_first_name'] = array(
     'bundle' => 'booking',
     'default_value' => NULL,
@@ -184,7 +184,7 @@ function booking_timeslots_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'booking-booking-field_bt_last_name'
+  // Exported field_instance: 'booking-booking-field_bt_last_name'.
   $field_instances['booking-booking-field_bt_last_name'] = array(
     'bundle' => 'booking',
     'default_value' => NULL,
@@ -218,7 +218,7 @@ function booking_timeslots_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'booking-booking-field_bt_number_of_people'
+  // Exported field_instance: 'booking-booking-field_bt_number_of_people'.
   $field_instances['booking-booking-field_bt_number_of_people'] = array(
     'bundle' => 'booking',
     'default_value' => array(
@@ -262,7 +262,7 @@ function booking_timeslots_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'booking-booking-field_bt_status'
+  // Exported field_instance: 'booking-booking-field_bt_status'.
   $field_instances['booking-booking-field_bt_status'] = array(
     'bundle' => 'booking',
     'default_value' => array(
@@ -297,7 +297,7 @@ function booking_timeslots_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'booking-booking-field_bt_user'
+  // Exported field_instance: 'booking-booking-field_bt_user'.
   $field_instances['booking-booking-field_bt_user'] = array(
     'bundle' => 'booking',
     'default_value' => NULL,
@@ -334,7 +334,7 @@ function booking_timeslots_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'comment-comment_node_instructor-comment_body'
+  // Exported field_instance: 'comment-comment_node_instructor-comment_body'.
   $field_instances['comment-comment_node_instructor-comment_body'] = array(
     'bundle' => 'comment_node_instructor',
     'default_value' => NULL,

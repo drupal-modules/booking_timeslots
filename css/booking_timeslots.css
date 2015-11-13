@@ -65,13 +65,13 @@ button.ui-button span                                   { padding: 3px 10px !imp
 
 
 /*
-  _|_|_|    _|                      _|                        _|                    _|_|_|                        _|        _|                      
-_|        _|_|_|_|  _|    _|    _|_|_|    _|_|_|    _|_|_|  _|_|_|_|    _|_|        _|    _|    _|_|      _|_|    _|  _|        _|_|_|      _|_|_|  
-  _|_|      _|      _|    _|  _|    _|  _|    _|  _|    _|    _|      _|_|_|_|      _|_|_|    _|    _|  _|    _|  _|_|      _|  _|    _|  _|    _|  
-      _|    _|      _|    _|  _|    _|  _|    _|  _|    _|    _|      _|            _|    _|  _|    _|  _|    _|  _|  _|    _|  _|    _|  _|    _|  
-_|_|_|        _|_|    _|_|_|    _|_|_|    _|_|_|    _|_|_|      _|_|    _|_|_|      _|_|_|      _|_|      _|_|    _|    _|  _|  _|    _|    _|_|_|  
-                                              _|                                                                                                _|  
-                                          _|_|                                                                                              _|_|    
+   _|_|_|                        _|        _|                      
+   _|    _|    _|_|      _|_|    _|  _|        _|_|_|      _|_|_|  
+   _|_|_|    _|    _|  _|    _|  _|_|      _|  _|    _|  _|    _|  
+   _|    _|  _|    _|  _|    _|  _|  _|    _|  _|    _|  _|    _|  
+   _|_|_|      _|_|      _|_|    _|    _|  _|  _|    _|    _|_|_|  
+                                                               _|  
+                                                           _|_|    
 */
 
 
@@ -200,13 +200,11 @@ div.calendar-calendar table                               { border-collapse: col
   border: 0px !important;
 }
 .calendar-item-greenbox-virtualslot tr,
-.calendar-item-greenbox-virtualslot td
-{
+.calendar-item-greenbox-virtualslot td {
   margin: 0 !important; padding: 0 !important; border: 0 !important;
 }
 
-.calendar-item-greenbox-virtualslot td
-{
+.calendar-item-greenbox-virtualslot td {
   color: #000 !important;
 }
 
@@ -228,10 +226,6 @@ background: linear-gradient(to bottom, #fdd153 0%,#e5cc4e 100%); /* W3C */
 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fdd153', endColorstr='#e5cc4e',GradientType=0 ); /* IE6-9 */
 position: relative !important;
 margin-top: 0px !important;
-/*
-margin-left: -2px !important;
-margin-right: -4px !important;
-*/
 }
 
 .calendar-calendar .month-view .full td, .calendar-calendar .week-view .full td, .calendar-calendar .day-view td { padding: 3px 1px; }

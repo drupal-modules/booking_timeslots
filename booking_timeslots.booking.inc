@@ -1,9 +1,13 @@
 <?php
 
+/**
+ * @file
+ */
+
 require_once 'booking_timeslots.booking.controller.inc';
 
 /**
- * Entity general information
+ * Entity general information.
  */
 function booking_timeslots_booking_entity_info(&$info) {
   $info['booking'] = array(
@@ -17,11 +21,11 @@ function booking_timeslots_booking_entity_info(&$info) {
     'access callback'  => 'booking_timeslots_booking_access',
     'fieldable'        => TRUE,
     'entity keys' => array(
-      'id' => 'pid'
+      'id' => 'pid',
     ),
     'static cache' => TRUE,
     'bundles' => array(
-      'booking'=> array(
+      'booking' => array(
         'label' => 'Booking',
         'admin' => array(
           'path'             => 'admin/structure/booking',
@@ -32,7 +36,7 @@ function booking_timeslots_booking_entity_info(&$info) {
     'view modes' => array(
       'full' => array(
         'label'           => t('Full Booking'),
-        'custom settings' =>  FALSE,
+        'custom settings' => FALSE,
       ),
     ),
     'admin ui' => array(
@@ -52,6 +56,7 @@ function booking_timeslots_booking_entity_info(&$info) {
 
 /**
  * Adds custom fields into the entity.
+ *
  * @NOTE (LT): I'm not sure how does it work.
  */
 function booking_timeslots_booking_field_extra_fields(&$return) {
@@ -156,16 +161,25 @@ function booking_timeslots_booking_entity_property_info_alter(&$info) {
 
 }
 
+/**
+ *
+ */
 function booking_timeslots_field_booking_link_view($x) {
-  function_exists('dsm') ? dsm ($x) : NULL;
+  function_exists('dsm') ? dsm($x) : NULL;
 }
 
+/**
+ *
+ */
 function booking_timeslots_field_booking_link_edit($x) {
-  function_exists('dsm') ? dsm ($x) : NULL;
+  function_exists('dsm') ? dsm($x) : NULL;
 }
 
+/**
+ *
+ */
 function booking_timeslots_field_booking_link_delete($x) {
-  function_exists('dsm') ? dsm ($x) : NULL;
+  function_exists('dsm') ? dsm($x) : NULL;
 }
 
 
@@ -181,12 +195,15 @@ function booking_timeslots_booking_info() {
  */
 function booking_timeslots_booking_uri($entity) {
   return array(
-    'path' => 'booking/' . $entity -> id,
+    'path' => 'booking/' . $entity->id,
   );
 }
 
+/**
+ *
+ */
 function booking_timeslots_booking_page_title($entity) {
-  return $entity -> pid;
+  return $entity->pid;
 }
 
 /**
@@ -214,7 +231,7 @@ function booking_timeslots_booking_page_view($entity, $view_mode = 'full') {
   // Now field_attach_view() generates the content for the fields.
   $entity->content += field_attach_view($entity_type, $entity, $view_mode);
 
-  return $entity -> content;
+  return $entity->content;
 }
 
 /**
@@ -224,11 +241,11 @@ function booking_timeslots_booking_form_edit($form, &$form_state, $entity) {
 
   /*
   $form['created'] = array(
-    '#type'          => 'value',
-    '#date_format'   => 'Y-m-d H:i',
-    '#default_value' => $datetime,
+  '#type'          => 'value',
+  '#date_format'   => 'Y-m-d H:i',
+  '#default_value' => $datetime,
   );
-  */
+   */
 
   $form['slot_time'] = array(
     '#title'         => t('Booking date'),
@@ -247,16 +264,14 @@ function booking_timeslots_booking_form_edit($form, &$form_state, $entity) {
   if (user_access('administer bookings')) {
     if (!isset($form_state['input']['field_bt_user']['und'])) {
       $user = user_load($entity->uid);
-      $form['field_bt_user'][$form['field_bt_user']['#language']][0]['target_id']['#value'] = $user -> name . ' (' . $user -> uid . ')';
+      $form['field_bt_user'][$form['field_bt_user']['#language']][0]['target_id']['#value'] = $user->name . ' (' . $user->uid . ')';
     }
   }
-  else
-  {
-    $form['field_bt_user'][$form['field_bt_user']['#language']]['#access'] = false;
+  else {
+    $form['field_bt_user'][$form['field_bt_user']['#language']]['#access'] = FALSE;
   }
 
   $configuration = booking_timeslots_get_configuration();
-
 
   // We can no longer change content type references.
   $form['field_bt_ct_ref_1'][$form['field_bt_ct_ref_1']['#language']]['#attributes'] = array('disabled' => 'disabled');
@@ -276,7 +291,7 @@ function booking_timeslots_booking_form_edit($form, &$form_state, $entity) {
 
   // Fix for broken autocomplete path when editing the entity.
   $user_autocomplete_path = &$form['field_bt_user'][$form['field_bt_user']['#language']][0]['target_id']['#autocomplete_path'];
-  $user_autocomplete_path = str_replace (arg(1), 'NULL', $user_autocomplete_path);
+  $user_autocomplete_path = str_replace(arg(1), 'NULL', $user_autocomplete_path);
 
   $form['submit'] = array(
     '#type'    => 'submit',
@@ -321,12 +336,18 @@ function booking_timeslots_booking_form_remove($form, &$form_state, $entity) {
   return $form;
 }
 
+/**
+ *
+ */
 function booking_timeslots_booking_edit_delete($form, &$form_state) {
   $entity = &$form_state['values']['booking'];
   booking_timeslots_booking_delete($entity);
   $form_state['redirect'] = "admin/bookings";
 }
 
+/**
+ *
+ */
 function booking_timeslots_booking_edit_save($form, &$form_state) {
   global $user;
 
@@ -361,9 +382,9 @@ function booking_timeslots_booking_form($form, &$form_state, $entity, $input) {
   list($primary_id, $secondary_id, $tertiary_id, $cid, $datetime, $duration) = $input;
 
   $data       = booking_timeslots_get_form_data_matrix($tertiary_id ? $tertiary_id : $secondary_id, $datetime);
-  $price_data = json_decode($data['affected_settings'] -> notice);
+  $price_data = json_decode($data['affected_settings']->notice);
   $price_key  = 'members';
-  $price      = $price_data -> price -> type == 'regular' ? $price_data -> price -> regular -> $price_key : $price_data -> price -> non_regular -> { $duration } -> $price_key;
+  $price      = $price_data->price->type == 'regular' ? $price_data->price->regular->$price_key : $price_data->price->non_regular->{$duration}->$price_key;
 
   $form['book_price'] = array(
     '#type'          => 'item',
@@ -384,7 +405,7 @@ function booking_timeslots_booking_form($form, &$form_state, $entity, $input) {
     '#type'          => module_exists('date_popup') ? 'date_popup' : 'date_select',
     '#date_format'   => 'Y-m-d H:i',
     '#default_value' => $datetime,
-    '#attributes'    => array( 'disabled' => 'disabled' )
+    '#attributes'    => array('disabled' => 'disabled'),
   );
 
   $form['booking'] = array(
@@ -398,14 +419,12 @@ function booking_timeslots_booking_form($form, &$form_state, $entity, $input) {
 
   if (user_access('administer bookings')) {
     if (!isset($form_state['input']['field_bt_user']['und'])) {
-      $form['field_bt_user'][$form['field_bt_user']['#language']][0]['target_id']['#value'] = $user -> name . ' (' . $user -> uid . ')';
+      $form['field_bt_user'][$form['field_bt_user']['#language']][0]['target_id']['#value'] = $user->name . ' (' . $user->uid . ')';
     }
   }
-  else
-  {
-    $form['field_bt_user'][$form['field_bt_user']['#language']]['#access'] = false;
+  else {
+    $form['field_bt_user'][$form['field_bt_user']['#language']]['#access'] = FALSE;
   }
-
 
   $configuration = booking_timeslots_get_configuration();
 
@@ -423,12 +442,12 @@ function booking_timeslots_booking_form($form, &$form_state, $entity, $input) {
 
   if (is_numeric($tertiary_id)) {
     $form['field_bt_ct_ref_2'][$form['field_bt_ct_ref_2']['#language']]['#access'] = FALSE;
-  } else {
+  }
+  else {
     $form['field_bt_ct_ref_3'][$form['field_bt_ct_ref_3']['#language']]['#access'] = FALSE;
   }
 
   $form['field_bt_ct_ref_4'][$form['field_bt_ct_ref_4']['#language']]['#access'] = FALSE;
-
 
   $form['field_bt_number_of_people'][LANGUAGE_NONE][0]['value']['#description'] = t('Maximum of !num people.', array('!num' => $data['capacity']));
 
@@ -457,11 +476,10 @@ function booking_timeslots_booking_form_validate($form, &$form_state) {
 
   $players = $form_state['values']['field_bt_number_of_people']['und'][0]['value'];
 
-  // custom validation for booking slots
+  // Custom validation for booking slots.
   $data = booking_timeslots_get_form_data_matrix($fid, $entity->slot_time);
 
-  if($data['capacity'] < $players)
-  {
+  if ($data['capacity'] < $players) {
     form_set_error('field_bt_number_of_people', t('There is not enough slots to book that many players.'));
   }
 
@@ -469,13 +487,13 @@ function booking_timeslots_booking_form_validate($form, &$form_state) {
 }
 
 /**
- * Helper function to get booking data from database
+ * Helper function to get booking data from database.
  */
 function booking_timeslots_get_form_data_matrix($fid, $slot_time) {
   $start_time = substr($slot_time, 0, 10) . " 00:00:00";
   $end_time = substr($slot_time, 0, 10) . " 23:59:59";
-  $book_time = substr($slot_time, 11, 5); // HH:MM
-
+  $book_time = substr($slot_time, 11, 5);
+  // HH:MM.
   module_load_include('inc', 'booking_timeslots', 'booking_timeslots.theme');
 
   $settings = booking_timeslots_get_configuration();
@@ -490,27 +508,26 @@ function booking_timeslots_get_form_data_matrix($fid, $slot_time) {
 
   $node = node_load($fid);
 
-  if ($node -> type == $secondary_name) {
-    $vid = $node -> $secondary_to_primary_name;
+  if ($node->type == $secondary_name) {
+    $vid = $node->$secondary_to_primary_name;
     $vid = reset($vid[LANGUAGE_NONE][0]);
-    $fid = $node -> vid;
-    $cid = null;
+    $fid = $node->vid;
+    $cid = NULL;
   }
-  elseif ($node -> type == $tertiary_name) {
-    $fid = $node -> $tertiary_to_secondary_name;
+  elseif ($node->type == $tertiary_name) {
+    $fid = $node->$tertiary_to_secondary_name;
 
     $fid = reset($fid[LANGUAGE_NONE][0]);
 
-    $facility = node_load ($fid);
+    $facility = node_load($fid);
 
-    $vid = $facility -> $secondary_to_primary_name;
+    $vid = $facility->$secondary_to_primary_name;
     $vid = reset($vid[LANGUAGE_NONE][0]);
-    $cid = $node -> vid;
+    $cid = $node->vid;
   }
 
-
   $data_matrix = booking_timeslots_get_availability_data_matrix($vid, $fid, $cid, 'full', $start_time, $end_time, NULL, NULL, 15);
-  //dsm($data_matrix);
+  // dsm($data_matrix);
   return $data_matrix['data'][0][$book_time];
 }
 
@@ -519,14 +536,13 @@ function booking_timeslots_get_form_data_matrix($fid, $slot_time) {
  */
 function booking_timeslots_booking_form_submit($form, &$form_state) {
   $entity = $form_state['values']['booking'];
-  //var_dump($form_state['values']); exit;
-
-  // the value of players is stored in separate table, so copy the value into entity table as well.
+  // var_dump($form_state['values']); exit;
+  // The value of players is stored in separate table, so copy the value into entity table as well.
   $entity->players = $form_state['values']['field_bt_number_of_people']['und'][0]['value'];
 
   global $user;
 
-  $uid = $user -> uid;
+  $uid = $user->uid;
 
   if (user_access('administer bookings')) {
     $uid = $form_state['values']['field_bt_user'][LANGUAGE_NONE][0]['target_id'];
@@ -548,18 +564,18 @@ function booking_timeslots_booking_form_submit($form, &$form_state) {
 
   $booked_node = node_load($entity->secondary_id ? $entity->secondary_id : $entity->tertiary_id);
 
-  if ($booked_node -> type == $secondary_name)
-  {
-    $field                = $booked_node -> $secondary_to_primary_name;
+  if ($booked_node->type == $secondary_name) {
+    $field                = $booked_node->$secondary_to_primary_name;
     $entity->primary_id   = reset($field[LANGUAGE_NONE][0]);
-    $entity->secondary_id = $booked_node -> vid;
-  } elseif ($booked_node -> type == $tertiary_name) {
-    $field                = $booked_node -> $tertiary_to_secondary_name;
+    $entity->secondary_id = $booked_node->vid;
+  }
+  elseif ($booked_node->type == $tertiary_name) {
+    $field                = $booked_node->$tertiary_to_secondary_name;
     $fid_node = node_load(reset($field[LANGUAGE_NONE][0]));
-    $field                = $fid_node -> $secondary_to_primary_name;
+    $field                = $fid_node->$secondary_to_primary_name;
     $entity->primary_id   = reset($field[LANGUAGE_NONE][0]);
-    $entity->secondary_id = $fid_node -> vid;
-    $entity->tertiary_id  = $booked_node -> vid;
+    $entity->secondary_id = $fid_node->vid;
+    $entity->tertiary_id  = $booked_node->vid;
   }
 
   field_attach_submit('booking', $entity, $form, $form_state);
@@ -567,14 +583,17 @@ function booking_timeslots_booking_form_submit($form, &$form_state) {
   $form_state['redirect'] = "booking/$booking->pid";
 }
 
+/**
+ *
+ */
 function booking_timeslots_booking_form_add($input) {
-  is_array($input) ?: drupal_not_found(); // Page not found on wrong booking
+  is_array($input) ?: drupal_not_found();
+  // Page not found on wrong booking.
   $entity = entity_get_controller('booking')->create();
 
-  // since slot_time is separated from entity itself it needs to be assigned from the form
+  // Since slot_time is separated from entity itself it needs to be assigned from the form.
   list($primary_id, $secondary_id, $tertiary_id, $cid, $datetime, $duration) = $input;
-  //var_dump($fid, $cid, $datetime, $entity);
-
+  // var_dump($fid, $cid, $datetime, $entity);.
   $entity->slot_time = $datetime;
   $entity->cid = $cid;
   $entity->primary_id = $primary_id;
@@ -593,7 +612,7 @@ function booking_timeslots_booking_admin_page() {
   $content = array();
   $content[] = array(
     '#type' => 'item',
-    '#markup' => t('Administration page for bookings.')
+    '#markup' => t('Administration page for bookings.'),
   );
 
   $content[] = array(
@@ -606,6 +625,9 @@ function booking_timeslots_booking_admin_page() {
   return $content;
 }
 
+/**
+ *
+ */
 function booking_timeslots_booking_list_entities() {
   return array();
 }
@@ -629,7 +651,7 @@ function booking_timeslots_booking_menu(&$items) {
     'file'             => 'booking_timeslots.booking.inc',
   );
 
-  // This will enforce using of booking_load to be used as 1st argument replacement callback
+  // This will enforce using of booking_load to be used as 1st argument replacement callback.
   $items['booking/%booking'] = array(
     'title callback'   => 'booking_timeslots_booking_page_title',
     'title arguments'  => array(1),
@@ -637,7 +659,7 @@ function booking_timeslots_booking_menu(&$items) {
     'page arguments'   => array(1),
     'access arguments' => array('view bookings'),
     'file'             => 'booking_timeslots.booking.inc',
-    'type'             => MENU_CALLBACK
+    'type'             => MENU_CALLBACK,
   );
 
   $items['booking/%booking/view'] = array(
@@ -655,18 +677,18 @@ function booking_timeslots_booking_menu(&$items) {
     'context'          => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
 
-/*
+  /*
   $items[$booking_uri . '/delete'] = array(
-    'title'            => 'Delete booking',
-    'title callback'   => 'booking_timeslots_label_booking',
-    'title arguments'  => array($booking_uri_argument_position),
-    'page callback'    => 'drupal_get_form',
-    'page arguments'   => array('booking_timeslots_delete_form_booking', $booking_uri_argument_position),
-    'access callback'  => 'entity_access',
-    'access arguments' => array('edit', 'booking_timeslots_booking', $booking_uri_argument_position),
-    'file'             => 'booking_timeslots_booking.inc',
+  'title'            => 'Delete booking',
+  'title callback'   => 'booking_timeslots_label_booking',
+  'title arguments'  => array($booking_uri_argument_position),
+  'page callback'    => 'drupal_get_form',
+  'page arguments'   => array('booking_timeslots_delete_form_booking', $booking_uri_argument_position),
+  'access callback'  => 'entity_access',
+  'access arguments' => array('edit', 'booking_timeslots_booking', $booking_uri_argument_position),
+  'file'             => 'booking_timeslots_booking.inc',
   );
-*/
+   */
 
   $items['booking/%booking/edit'] = array(
     'title'            => 'Edit',
@@ -682,13 +704,16 @@ function booking_timeslots_booking_menu(&$items) {
 }
 
 /**
- * Menu callback; loads a json object encoded by base64
+ * Menu callback; loads a json object encoded by base64.
  */
 function booking_b64json_load($arg) {
   return json_decode(base64_decode($arg));
 }
 
-function booking_timeslots_booking_permission(&$permissions){
+/**
+ *
+ */
+function booking_timeslots_booking_permission(&$permissions) {
   $permissions['administer bookings']       = array('title' => t('Administer bookings'), 'restrict access' => TRUE);
   $permissions['view bookings']             = array('title' => t('View bookings'));
   $permissions['create booking entities']   = array('title' => t('Create booking'));
@@ -708,18 +733,19 @@ function booking_timeslots_booking_access($op, $task, $account = NULL, $entity_t
     $account = $user;
   }
 
-
   switch ($op) {
     case 'create':
       return user_access('administer bookings', $account)
           || user_access('create booking entities', $account);
+
     case 'view':
       return user_access('administer bookings', $account)
           || user_access('view bookings', $account);
+
     case 'edit':
       return user_access('administer bookings')
           || user_access('edit any booking entity')
-          || (user_access('edit own booking entities') && ($task -> uid == $account -> uid));
+          || (user_access('edit own booking entities') && ($task->uid == $account->uid));
   }
 }
 
@@ -739,6 +765,7 @@ function booking_timeslots_booking_access($op, $task, $account = NULL, $entity_t
  *   Integer specifying the basic entity id.
  * @param $reset
  *   A boolean indicating that the internal cache should be reset.
+ *
  * @return
  *   A fully-loaded $basic object or FALSE if it cannot be loaded.
  *
@@ -758,6 +785,7 @@ function booking_load($basic_id = NULL, $reset = FALSE) {
  *   Integer specifying the entity id.
  * @param $reset
  *   A boolean indicating that the internal cache should be reset.
+ *
  * @return
  *   A fully-loaded $basic object or FALSE if it cannot be loaded.
  *
@@ -766,11 +794,11 @@ function booking_load($basic_id = NULL, $reset = FALSE) {
  */
 /*
 function booking_timeslots_booking_load($pid = NULL, $reset = FALSE) {
-  $ids = (isset($pid) ? array($pid) : array());
-  $res = booking_timeslots_booking_load_multiple($ids, array(), $reset);
-  return $res ? reset($res) : FALSE;
+$ids = (isset($pid) ? array($pid) : array());
+$res = booking_timeslots_booking_load_multiple($ids, array(), $reset);
+return $res ? reset($res) : FALSE;
 }
-*/
+ */
 
 /**
  * Loads multiple basic entities.
@@ -800,23 +828,23 @@ function booking_timeslots_booking_load_multiple($pids = array(), $conditions = 
 }
 
 /**
-* Saves booking entity.
-*/
+ * Saves booking entity.
+ */
 function booking_timeslots_booking_save($entity) {
   entity_save('booking', $entity);
   return $entity;
 }
 
 /**
-* Deletes a single booking.
-*/
+ * Deletes a single booking.
+ */
 function booking_timeslots_booking_delete($id) {
-  entity_delete('booking', entity_id('booking' ,$id));
+  entity_delete('booking', entity_id('booking', $id));
 }
 
 /**
-* Deletes multiple bookings.
-*/
+ * Deletes multiple bookings.
+ */
 function booking_timeslots_booking_delete_multiple($ids) {
   entity_delete_multiple('booking', $ids);
 }
