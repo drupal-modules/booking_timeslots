@@ -3,10 +3,6 @@
  * @file
  *   Theme include file
  *
- * @version
- *
- * @developers
- *   Rafal Wieczorek <kenorb+nospam@gmail.com>
  */
 
 /**
