@@ -2,7 +2,6 @@
 /**
  * @file
  *   Main module file.
- *
  */
 
 require_once 'booking_timeslots.features.inc';
@@ -1214,7 +1213,8 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
       $data = json_decode($settings->notice);
 
-      if ($settings != NULL && $settings->capacity == 0) {
+      // @todo: Better way of checking $settings->capacity rather than via property_exists().
+      if ($settings != NULL && property_exists($settings, 'capacity') && $settings->capacity == 0) {
         $orginal_id = $settings->original_instance_id;
 
         if (!$orginal_id) {
@@ -1234,10 +1234,9 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
         $settings->slot_length = $settingsArr[$orginal_id]->slot_length;
       }
 
-      if($view_mode == 'month') {
+      if ($view_mode == 'month') {
         $data_matrix['month_data'][$day]['total_free_minutes'] += $settings->capacity * $grid_granularity;
-      }
-      else {
+      } else {
         $data_matrix['data'][$d][$date]['capacity_max'] = $settings->capacity;
         $data_matrix['data'][$d][$date]['capacity']     = $settings->capacity;
       }
