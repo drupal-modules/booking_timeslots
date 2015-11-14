@@ -1213,8 +1213,7 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
       $data = json_decode($settings->notice);
 
-      // @todo: Better way of checking $settings->capacity rather than via property_exists().
-      if ($settings != NULL && property_exists($settings, 'capacity') && $settings->capacity == 0) {
+      if (empty($settings->capacity)) {
         $orginal_id = $settings->original_instance_id;
 
         if (!$orginal_id) {
