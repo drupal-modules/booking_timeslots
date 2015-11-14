@@ -402,10 +402,6 @@ function template_preprocess_booking_timeslots_general(&$vars, $view_mode, $star
 
   //dsm($vars['day_items']);
 
-
-
-  $start = booking_timeslots_helper_hour_min_to_minutes($data_matrix['daily_settings']['start_time_hm']);
-
   for ($m = 0; $m < 1440; $m += $grid_granularity) {
     $hour  = substr ('0' . ((int)($m / 60)), -2);
     $min   = substr ('0' . ((int)$m % 60), -2);
@@ -416,8 +412,8 @@ function template_preprocess_booking_timeslots_general(&$vars, $view_mode, $star
 
   $vars['view'] -> date_info -> style_groupby_times = $times;
   $vars['start_times'] = $times;
-
-
+  $format = variable_get('date_format_short', 'm/d/Y - H:i');
+  $format_ampm = strstr($format, 'a') ? 'a' : (strstr($format, 'A') ? 'A' : '');
 
   $html_item_day_closed = <<<EOT
     <div class="views-field views-field-created" style="text-align: center">
@@ -444,10 +440,10 @@ EOT;
   }
 
   for ($i = 0; $i < (strtotime($end_time) - strtotime($start_time) + 1) / 86400; $i++) {
-
     foreach ($vars['start_times'] as $hour) {
 
-      $vars['items'][$hour]['hour']  = substr($hour, 0, 5);
+      $chour = date(end((explode(" ", $format))), strtotime($hour)); // @fixme: Would this break if date_format_short has no space character?
+      $vars['items'][$hour]['hour']  = $chour ?: $hour;
       $vars['items'][$hour]['ampm']  = '';
       $vars['items'][$hour]['time']  = $hour;
 
@@ -459,12 +455,11 @@ EOT;
 
       if (isset($data['affected_settings'])) {
         if ($data['affected_settings'] -> type == 3) {
-          // It's a class
+          // @todo: It's a class
         }
       }
 
-      if ($data)
-      {
+      if ($data) {
         $sid = $data['affected_settings'] -> instance_id;
 
         $args = base64_encode(json_encode(array($vid, $data['affected_settings'] -> nid, $cid, $sid, $date_time, $data['affected_settings']->slot_length)));
