@@ -18,13 +18,22 @@ function booking_timeslots_example_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
-          'link' => FALSE,
+          'link' => 1,
         ),
         'type' => 'entityreference_label',
         'weight' => 1,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 4,
       ),
     ),
     'entity_type' => 'booking',
@@ -39,7 +48,7 @@ function booking_timeslots_example_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 11,
+      'weight' => 28,
     ),
   );
 
@@ -51,13 +60,22 @@ function booking_timeslots_example_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
-          'link' => FALSE,
+          'link' => 1,
         ),
         'type' => 'entityreference_label',
         'weight' => 2,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 5,
       ),
     ),
     'entity_type' => 'booking',
@@ -72,7 +90,7 @@ function booking_timeslots_example_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 12,
+      'weight' => 29,
     ),
   );
 
@@ -84,13 +102,22 @@ function booking_timeslots_example_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
         'weight' => 3,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 6,
       ),
     ),
     'entity_type' => 'booking',
@@ -105,7 +132,7 @@ function booking_timeslots_example_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 13,
+      'weight' => 33,
     ),
   );
 
@@ -117,13 +144,22 @@ function booking_timeslots_example_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
         'weight' => 4,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 7,
       ),
     ),
     'entity_type' => 'booking',
@@ -138,7 +174,7 @@ function booking_timeslots_example_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 14,
+      'weight' => 34,
     ),
   );
 
@@ -154,16 +190,28 @@ function booking_timeslots_example_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'number',
         'settings' => array(
           'decimal_separator' => '.',
-          'prefix_suffix' => TRUE,
+          'prefix_suffix' => 1,
           'scale' => 0,
-          'thousand_separator' => ' ',
+          'thousand_separator' => ',',
         ),
         'type' => 'number_integer',
         'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => 1,
+          'scale' => 0,
+          'thousand_separator' => ',',
+        ),
+        'type' => 'number_integer',
+        'weight' => 3,
       ),
     ),
     'entity_type' => 'booking',
@@ -182,7 +230,7 @@ function booking_timeslots_example_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 10,
+      'weight' => 30,
     ),
   );
 
@@ -194,13 +242,22 @@ function booking_timeslots_example_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
-          'link' => FALSE,
+          'link' => 1,
         ),
         'type' => 'entityreference_label',
         'weight' => 5,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 8,
       ),
     ),
     'entity_type' => 'booking',
@@ -219,7 +276,7 @@ function booking_timeslots_example_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 15,
+      'weight' => 35,
     ),
   );
 

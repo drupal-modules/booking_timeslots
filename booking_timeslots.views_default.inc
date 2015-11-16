@@ -11,6 +11,87 @@ function booking_timeslots_views_default_views() {
   $export = array();
 
   $view = new view();
+  $view->name = 'bookings';
+  $view->description = 'Administer Bookings';
+  $view->tag = 'default';
+  $view->base_table = 'booking';
+  $view->human_name = 'Bookings';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Bookings';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['perm'] = 'administer bookings';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '50';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'pid' => 'pid',
+  );
+  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['info'] = array(
+    'pid' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+  );
+  $handler->display->display_options['style_options']['sticky'] = TRUE;
+  /* Field: Booking: URL */
+  $handler->display->display_options['fields']['url']['id'] = 'url';
+  $handler->display->display_options['fields']['url']['table'] = 'views_entity_booking';
+  $handler->display->display_options['fields']['url']['field'] = 'url';
+  $handler->display->display_options['fields']['url']['label'] = '';
+  $handler->display->display_options['fields']['url']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['url']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['url']['display_as_link'] = FALSE;
+  $handler->display->display_options['fields']['url']['link_to_entity'] = 0;
+  /* Field: Booking: Booking ID */
+  $handler->display->display_options['fields']['pid']['id'] = 'pid';
+  $handler->display->display_options['fields']['pid']['table'] = 'booking';
+  $handler->display->display_options['fields']['pid']['field'] = 'pid';
+  $handler->display->display_options['fields']['pid']['alter']['make_link'] = TRUE;
+  $handler->display->display_options['fields']['pid']['alter']['path'] = '[url]';
+  /* Field: Booking: Booking Type */
+  $handler->display->display_options['fields']['field_booking_type']['id'] = 'field_booking_type';
+  $handler->display->display_options['fields']['field_booking_type']['table'] = 'field_data_field_booking_type';
+  $handler->display->display_options['fields']['field_booking_type']['field'] = 'field_booking_type';
+  /* Field: Booking: Date */
+  $handler->display->display_options['fields']['slot_time']['id'] = 'slot_time';
+  $handler->display->display_options['fields']['slot_time']['table'] = 'booking';
+  $handler->display->display_options['fields']['slot_time']['field'] = 'slot_time';
+  $handler->display->display_options['fields']['slot_time']['date_format'] = 'short';
+  $handler->display->display_options['fields']['slot_time']['second_date_format'] = 'long';
+  /* Field: Booking: Duration */
+  $handler->display->display_options['fields']['duration']['id'] = 'duration';
+  $handler->display->display_options['fields']['duration']['table'] = 'booking';
+  $handler->display->display_options['fields']['duration']['field'] = 'duration';
+  /* Field: Booking: User */
+  $handler->display->display_options['fields']['uid']['id'] = 'uid';
+  $handler->display->display_options['fields']['uid']['table'] = 'booking';
+  $handler->display->display_options['fields']['uid']['field'] = 'uid';
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['path'] = 'admin/content/bookings';
+  $handler->display->display_options['menu']['type'] = 'tab';
+  $handler->display->display_options['menu']['title'] = 'Bookings';
+  $handler->display->display_options['menu']['description'] = 'Administer Bookings';
+  $handler->display->display_options['menu']['weight'] = '0';
+  $handler->display->display_options['menu']['context'] = 0;
+  $handler->display->display_options['menu']['context_only_inline'] = 0;
+  $export['bookings'] = $view;
+
+  $view = new view();
   $view->name = 'bt_schedule';
   $view->description = '';
   $view->tag = 'Calendar';

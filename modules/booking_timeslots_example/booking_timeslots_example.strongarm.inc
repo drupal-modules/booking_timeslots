@@ -35,84 +35,84 @@ function booking_timeslots_example_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_1st_content_type';
-  $strongarm->value = 'booking_timeslots_xmp_venue';
+  $strongarm->value = 'location';
   $export['booking_timeslots_1st_content_type'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_1st_title';
-  $strongarm->value = 'Primary';
+  $strongarm->value = 'Location';
   $export['booking_timeslots_1st_title'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_2nd_content_type';
-  $strongarm->value = 'booking_timeslots_xmp_facility';
+  $strongarm->value = 'resource';
   $export['booking_timeslots_2nd_content_type'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_2nd_title';
-  $strongarm->value = 'Secondary';
+  $strongarm->value = 'Resource';
   $export['booking_timeslots_2nd_title'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_2nd_to_1st_ref_field';
-  $strongarm->value = 'field_bt_xmp_ref_2nd_to_1st';
+  $strongarm->value = 'og_group_ref';
   $export['booking_timeslots_2nd_to_1st_ref_field'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_3rd_capacity_field';
-  $strongarm->value = 'field_bt_xmp_capacity';
+  $strongarm->value = '0';
   $export['booking_timeslots_3rd_capacity_field'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_3rd_content_type';
-  $strongarm->value = 'booking_timeslots_xmp_class';
+  $strongarm->value = '0';
   $export['booking_timeslots_3rd_content_type'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_3rd_title';
-  $strongarm->value = 'Tertiary';
+  $strongarm->value = 'Resource';
   $export['booking_timeslots_3rd_title'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_3rd_to_2nd_ref_field';
-  $strongarm->value = 'field_bt_xmp_ref_3rd_to_2nd';
+  $strongarm->value = '0';
   $export['booking_timeslots_3rd_to_2nd_ref_field'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_3rd_to_4th_ref_field';
-  $strongarm->value = 'field_bt_xmp_ref_3rd_to_4th';
+  $strongarm->value = '0';
   $export['booking_timeslots_3rd_to_4th_ref_field'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_4th_content_type';
-  $strongarm->value = 'booking_timeslots_xmp_instructor';
+  $strongarm->value = '0';
   $export['booking_timeslots_4th_content_type'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_4th_title';
-  $strongarm->value = 'Quaternary';
+  $strongarm->value = 'Secondary';
   $export['booking_timeslots_4th_title'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -151,7 +151,7 @@ function booking_timeslots_example_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_enable_booking_for_past_dates';
-  $strongarm->value = 1;
+  $strongarm->value = 0;
   $export['booking_timeslots_enable_booking_for_past_dates'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -179,31 +179,234 @@ function booking_timeslots_example_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'booking_timeslots_view_bt_schedule';
-  $strongarm->value = 'booking_timeslots_xmp_venue';
+  $strongarm->value = 'location';
   $export['booking_timeslots_view_bt_schedule'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_anonymous_booking_timeslots_xmp_class';
+  $strongarm->value = 0;
+  $export['comment_anonymous_booking_timeslots_xmp_class'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_anonymous_booking_timeslots_xmp_facility';
+  $strongarm->value = 0;
+  $export['comment_anonymous_booking_timeslots_xmp_facility'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_anonymous_booking_timeslots_xmp_instructor';
+  $strongarm->value = 0;
+  $export['comment_anonymous_booking_timeslots_xmp_instructor'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_anonymous_booking_timeslots_xmp_venue';
+  $strongarm->value = 0;
+  $export['comment_anonymous_booking_timeslots_xmp_venue'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_booking_timeslots_xmp_class';
+  $strongarm->value = '1';
+  $export['comment_booking_timeslots_xmp_class'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_booking_timeslots_xmp_facility';
+  $strongarm->value = '1';
+  $export['comment_booking_timeslots_xmp_facility'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_booking_timeslots_xmp_instructor';
+  $strongarm->value = '1';
+  $export['comment_booking_timeslots_xmp_instructor'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_booking_timeslots_xmp_venue';
+  $strongarm->value = '1';
+  $export['comment_booking_timeslots_xmp_venue'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_mode_booking_timeslots_xmp_class';
+  $strongarm->value = 1;
+  $export['comment_default_mode_booking_timeslots_xmp_class'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_mode_booking_timeslots_xmp_facility';
+  $strongarm->value = 1;
+  $export['comment_default_mode_booking_timeslots_xmp_facility'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_mode_booking_timeslots_xmp_instructor';
+  $strongarm->value = 1;
+  $export['comment_default_mode_booking_timeslots_xmp_instructor'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_mode_booking_timeslots_xmp_venue';
+  $strongarm->value = 1;
+  $export['comment_default_mode_booking_timeslots_xmp_venue'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_per_page_booking_timeslots_xmp_class';
+  $strongarm->value = '50';
+  $export['comment_default_per_page_booking_timeslots_xmp_class'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_per_page_booking_timeslots_xmp_facility';
+  $strongarm->value = '50';
+  $export['comment_default_per_page_booking_timeslots_xmp_facility'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_per_page_booking_timeslots_xmp_instructor';
+  $strongarm->value = '50';
+  $export['comment_default_per_page_booking_timeslots_xmp_instructor'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_per_page_booking_timeslots_xmp_venue';
+  $strongarm->value = '50';
+  $export['comment_default_per_page_booking_timeslots_xmp_venue'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_form_location_booking_timeslots_xmp_class';
+  $strongarm->value = 1;
+  $export['comment_form_location_booking_timeslots_xmp_class'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_form_location_booking_timeslots_xmp_facility';
+  $strongarm->value = 1;
+  $export['comment_form_location_booking_timeslots_xmp_facility'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_form_location_booking_timeslots_xmp_instructor';
+  $strongarm->value = 1;
+  $export['comment_form_location_booking_timeslots_xmp_instructor'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_form_location_booking_timeslots_xmp_venue';
+  $strongarm->value = 1;
+  $export['comment_form_location_booking_timeslots_xmp_venue'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_preview_booking_timeslots_xmp_class';
+  $strongarm->value = '1';
+  $export['comment_preview_booking_timeslots_xmp_class'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_preview_booking_timeslots_xmp_facility';
+  $strongarm->value = '1';
+  $export['comment_preview_booking_timeslots_xmp_facility'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_preview_booking_timeslots_xmp_instructor';
+  $strongarm->value = '1';
+  $export['comment_preview_booking_timeslots_xmp_instructor'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_preview_booking_timeslots_xmp_venue';
+  $strongarm->value = '1';
+  $export['comment_preview_booking_timeslots_xmp_venue'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_subject_field_booking_timeslots_xmp_class';
+  $strongarm->value = 1;
+  $export['comment_subject_field_booking_timeslots_xmp_class'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_subject_field_booking_timeslots_xmp_facility';
+  $strongarm->value = 1;
+  $export['comment_subject_field_booking_timeslots_xmp_facility'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_subject_field_booking_timeslots_xmp_instructor';
+  $strongarm->value = 1;
+  $export['comment_subject_field_booking_timeslots_xmp_instructor'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_subject_field_booking_timeslots_xmp_venue';
+  $strongarm->value = 1;
+  $export['comment_subject_field_booking_timeslots_xmp_venue'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_booking__booking';
   $strongarm->value = array(
-    'view_modes' => array(),
+    'view_modes' => array(
+      'full' => array(
+        'custom_settings' => TRUE,
+      ),
+      'token' => array(
+        'custom_settings' => FALSE,
+      ),
+    ),
     'extra_fields' => array(
       'form' => array(
         'created' => array(
-          'weight' => '0',
+          'weight' => '1',
         ),
         'slot_time' => array(
           'weight' => '2',
         ),
         'view_link' => array(
-          'weight' => '7',
+          'weight' => '3',
         ),
         'edit_link' => array(
-          'weight' => '8',
+          'weight' => '4',
         ),
         'remove_link' => array(
-          'weight' => '9',
+          'weight' => '5',
         ),
         'btb_user' => array(
           'weight' => '1',
@@ -224,7 +427,28 @@ function booking_timeslots_example_strongarm() {
           'weight' => '1',
         ),
       ),
-      'display' => array(),
+      'display' => array(
+        'created' => array(
+          'default' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
+          'full' => array(
+            'weight' => '1',
+            'visible' => TRUE,
+          ),
+        ),
+        'slot_time' => array(
+          'default' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
+          'full' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
+        ),
+      ),
     ),
   );
   $export['field_bundle_settings_booking__booking'] = $strongarm;
@@ -310,6 +534,15 @@ function booking_timeslots_example_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'menu_options_booking_timeslots_xmp_instructor';
+  $strongarm->value = array(
+    0 => 'main-menu',
+  );
+  $export['menu_options_booking_timeslots_xmp_instructor'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'menu_options_booking_timeslots_xmp_venue';
   $strongarm->value = array(
     0 => 'main-menu',
@@ -329,6 +562,13 @@ function booking_timeslots_example_strongarm() {
   $strongarm->name = 'menu_parent_booking_timeslots_xmp_facility';
   $strongarm->value = 'main-menu:0';
   $export['menu_parent_booking_timeslots_xmp_facility'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'menu_parent_booking_timeslots_xmp_instructor';
+  $strongarm->value = 'main-menu:0';
+  $export['menu_parent_booking_timeslots_xmp_instructor'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -353,9 +593,17 @@ function booking_timeslots_example_strongarm() {
   $strongarm->name = 'node_options_booking_timeslots_xmp_facility';
   $strongarm->value = array(
     0 => 'status',
-    1 => 'promote',
   );
   $export['node_options_booking_timeslots_xmp_facility'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_options_booking_timeslots_xmp_instructor';
+  $strongarm->value = array(
+    0 => 'status',
+  );
+  $export['node_options_booking_timeslots_xmp_instructor'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -363,7 +611,6 @@ function booking_timeslots_example_strongarm() {
   $strongarm->name = 'node_options_booking_timeslots_xmp_venue';
   $strongarm->value = array(
     0 => 'status',
-    1 => 'promote',
   );
   $export['node_options_booking_timeslots_xmp_venue'] = $strongarm;
 
@@ -384,6 +631,13 @@ function booking_timeslots_example_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'node_preview_booking_timeslots_xmp_instructor';
+  $strongarm->value = '1';
+  $export['node_preview_booking_timeslots_xmp_instructor'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'node_preview_booking_timeslots_xmp_venue';
   $strongarm->value = '1';
   $export['node_preview_booking_timeslots_xmp_venue'] = $strongarm;
@@ -392,21 +646,28 @@ function booking_timeslots_example_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'node_submitted_booking_timeslots_xmp_class';
-  $strongarm->value = 1;
+  $strongarm->value = 0;
   $export['node_submitted_booking_timeslots_xmp_class'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'node_submitted_booking_timeslots_xmp_facility';
-  $strongarm->value = 1;
+  $strongarm->value = 0;
   $export['node_submitted_booking_timeslots_xmp_facility'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'node_submitted_booking_timeslots_xmp_instructor';
+  $strongarm->value = 0;
+  $export['node_submitted_booking_timeslots_xmp_instructor'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'node_submitted_booking_timeslots_xmp_venue';
-  $strongarm->value = 1;
+  $strongarm->value = 0;
   $export['node_submitted_booking_timeslots_xmp_venue'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -429,6 +690,41 @@ function booking_timeslots_example_strongarm() {
   $strongarm->name = 'opening_hours_enabled_booking_timeslots_xmp_venue';
   $strongarm->value = 1;
   $export['opening_hours_enabled_booking_timeslots_xmp_venue'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_booking_timeslots_xmp_class_pattern';
+  $strongarm->value = '';
+  $export['pathauto_node_booking_timeslots_xmp_class_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_booking_timeslots_xmp_facility_pattern';
+  $strongarm->value = '';
+  $export['pathauto_node_booking_timeslots_xmp_facility_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_booking_timeslots_xmp_instructor_pattern';
+  $strongarm->value = '';
+  $export['pathauto_node_booking_timeslots_xmp_instructor_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_booking_timeslots_xmp_venue_pattern';
+  $strongarm->value = '';
+  $export['pathauto_node_booking_timeslots_xmp_venue_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_booking_timeslots_example_categories_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_booking_timeslots_example_categories_pattern'] = $strongarm;
 
   return $export;
 }
