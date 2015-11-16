@@ -33,12 +33,50 @@ function booking_timeslots_views_default_views() {
   $handler->display->display_options['pager']['options']['items_per_page'] = '50';
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
+    'url' => 'url',
     'pid' => 'pid',
+    'field_booking_type' => 'field_booking_type',
+    'slot_time' => 'slot_time',
+    'duration' => 'duration',
+    'uid' => 'uid',
   );
-  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['default'] = 'pid';
   $handler->display->display_options['style_options']['info'] = array(
+    'url' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
     'pid' => array(
-      'sortable' => 0,
+      'sortable' => 1,
+      'default_sort_order' => 'desc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_booking_type' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'slot_time' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'duration' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'uid' => array(
+      'sortable' => 1,
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
@@ -121,6 +159,10 @@ function booking_timeslots_views_default_views() {
   $handler->display->display_options['style_options']['theme_style'] = '1';
   $handler->display->display_options['style_options']['max_items'] = '0';
   $handler->display->display_options['row_plugin'] = 'calendar_entity';
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['field_bt_xmp_ref_2nd_to_1st_target_id']['id'] = 'field_bt_xmp_ref_2nd_to_1st_target_id';
+  $handler->display->display_options['relationships']['field_bt_xmp_ref_2nd_to_1st_target_id']['table'] = 'field_data_field_bt_xmp_ref_2nd_to_1st';
+  $handler->display->display_options['relationships']['field_bt_xmp_ref_2nd_to_1st_target_id']['field'] = 'field_bt_xmp_ref_2nd_to_1st_target_id';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
