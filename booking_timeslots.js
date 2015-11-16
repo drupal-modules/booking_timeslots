@@ -93,7 +93,8 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
         var hm = $(this).find('.calendar-hour').html();
 
         if (hm < info.start_time || hm >= info.end_time) {
-          return; }
+          return;
+        }
 
         tds.push(obj = {
           y:   $(this).offset().top,
@@ -123,13 +124,13 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
             halfway.y     = halfway.yObj.y;
             halfway.ylObj = tds[tds.length - 1];
             halfway.yl    = halfway.ylObj.yl;
-            }
+          }
           else if (halfway.m <= tds[0].m) {
             halfway.yObj  = tds[0];
             halfway.y     = tds[0].m;
             halfway.ylObj = tds[Math.min(tds.length - 1, parseInt(height / Drupal.settings.booking_timeslots_calendar_granularity - 1))];
             halfway.yl    = halfway.ylObj.m;
-            }
+          }
           else {
             for (var i = k; i >= 0; i--) {
               if (halfway.m >= tds[i].m && (tds.length >= i || halfway.m < tds[i + 1].m)) {
@@ -142,7 +143,7 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
               }
             }
 
-            }
+          }
 
           // Searching half block up.
           console.log(halfway);
@@ -165,9 +166,11 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
           info.data.price.type == 'regular'     && (!info.data.price.regular     || !info.data.price.regular[price_key] || info.data.price.regular[price_key].length == 0) ||
           info.data.price.type == 'non_regular' && (!info.data.price.non_regular[height] || info.data.price.non_regular[height][price_key].length == 0)
           ) {
-        result.price = 'N/A'; }
+        result.price = 'N/A';
+      }
       else {
-        result.price = '$' + (info.data.price.type == 'regular' ? info.data.price.regular[price_key] : info.data.price.non_regular[height][price_key]); }
+        result.price = '$' + (info.data.price.type == 'regular' ? info.data.price.regular[price_key] : info.data.price.non_regular[height][price_key]);
+      }
 
       return result;
     }
@@ -211,7 +214,8 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
       console.log(result);
 
       if (!result.height) {
-        return; }
+        return;
+      }
 
       var topTd = this;
 
@@ -223,7 +227,8 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
 
       if (window.GreenBoxItem) {
         if (window.GreenBoxItem._lastDate == result.startDate) {
-          return; }
+          return;
+        }
 
         window.GreenBoxItem.parentNode.removeChild(window.GreenBoxItem);
         window.GreenBoxItem = false;
@@ -319,7 +324,8 @@ jQuery.base64=(function($){var _PADCHAR="=",_ALPHA="ABCDEFGHIJKLMNOPQRSTUVWXYZab
       console.log(jqXHR);
 
       if (!ajaxOptions.data) {
-        ajaxOptions.data = ''; }
+        ajaxOptions.data = '';
+      }
 
       var paramArr = ajaxOptions.data.split('&');
       for (var i in paramArr) {

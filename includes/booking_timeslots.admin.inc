@@ -3,7 +3,6 @@
 /**
  * @file
  * Form settings include file.
- *
  */
 
 /**

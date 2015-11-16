@@ -27,7 +27,7 @@
  * work to set the 'hour' column to 10% and split the remaining columns
  * evenly over the remaining 90% of the table.
  */
-//dsm('Display: '. $display_type .': '. $min_date_formatted .' to '. $max_date_formatted);
+// dsm('Display: '. $display_type .': '. $min_date_formatted .' to '. $max_date_formatted);
 ?>
 <div class="calendar-calendar"><div class="day-view">
 <table class="full">
@@ -44,7 +44,7 @@
     </tr>
   </thead>
   <tbody>
-    <?php foreach ($rows['items'] as $hour): if (isset($hour['hide'])) continue; ?>
+    <?php foreach ($rows['items'] as $hour): if (isset($hour['hide'])) {continue;} ?>
         <tr class="<?php if (substr($hour['hour'], 3, 2) == 0): ?>zero-minutes<?php endif; ?>">
           <td class="calendar-agenda-hour">
             <span class="calendar-hour"><?php print $hour['hour']; ?></span><span class="calendar-ampm"><?php print $hour['ampm']; ?></span>

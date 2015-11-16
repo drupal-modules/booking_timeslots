@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * @file
+ */
+?>
 <ol>
   <li>Content types</li>
   <p>

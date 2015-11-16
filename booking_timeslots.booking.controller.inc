@@ -74,8 +74,6 @@ class BookingController extends EntityAPIControllerExportable {
    * return $query;
    * }.
    */
-
-
   public function load($ids = array(), $conditions = array()) {
     return parent::load($ids, $conditions);
   }
