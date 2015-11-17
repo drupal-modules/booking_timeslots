@@ -8,20 +8,77 @@ require_once 'booking_timeslots.features.inc';
 require_once 'booking_timeslots.booking.inc';
 
 /**
- * Implements hook_entity_info().
- */
-function booking_timeslots_entity_info() {
-  $info = array();
-  booking_timeslots_booking_entity_info($info);
-  return $info;
-}
-
-/**
  * Implements hook_menu().
  */
 function booking_timeslots_menu() {
   $items = array();
-  booking_timeslots_booking_menu($items);
+
+  // Entity management pages paths.
+  $items['admin/structure/booking'] = array(
+    'title'            => 'Bookings',
+    'description'      => 'Manage bookings',
+    'page callback'    => 'booking_timeslots_booking_admin_page',
+    'access arguments' => array('administer bookings'),
+  );
+
+  $items['booking/add/%booking_b64json'] = array(
+    'title'            => 'New booking',
+    'page callback'    => 'booking_timeslots_booking_form_add',
+    'page arguments'   => array(2),
+    'access arguments' => array('create booking entities'),
+    'file'             => 'booking_timeslots.booking.inc',
+  );
+
+  // This will enforce using of booking_load to be used as 1st argument replacement callback.
+  $items['booking/%booking'] = array(
+    'title callback'   => 'booking_timeslots_booking_page_title',
+    'title arguments'  => array(1),
+    'page callback'    => 'booking_timeslots_booking_page_view',
+    'page arguments'   => array(1),
+    'access arguments' => array('view bookings'),
+    'file'             => 'booking_timeslots.booking.inc',
+    'type'             => MENU_CALLBACK,
+  );
+
+  $items['booking/%booking/view'] = array(
+    'title'            => 'View',
+    'type'             => MENU_DEFAULT_LOCAL_TASK,
+    'weight'           => -10,
+  );
+
+  $items['booking/%booking/remove'] = array(
+    'title'   => 'Delete booking',
+    'page callback'    => array('drupal_get_form'),
+    'page arguments'   => array('booking_timeslots_booking_form_remove', 1),
+    'access arguments' => array('administer bookings'),
+    'file'             => 'booking_timeslots.booking.inc',
+    'context'          => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
+  /*
+  $items[$booking_uri . '/delete'] = array(
+  'title'            => 'Delete booking',
+  'title callback'   => 'booking_timeslots_label_booking',
+  'title arguments'  => array($booking_uri_argument_position),
+  'page callback'    => 'drupal_get_form',
+  'page arguments'   => array('booking_timeslots_delete_form_booking', $booking_uri_argument_position),
+  'access callback'  => 'entity_access',
+  'access arguments' => array('edit', 'booking_timeslots_booking', $booking_uri_argument_position),
+  'file'             => 'booking_timeslots_booking.inc',
+  );
+   */
+
+  $items['booking/%booking/edit'] = array(
+    'title'            => 'Edit',
+    'page callback'    => array('drupal_get_form'),
+    'page arguments'   => array('booking_timeslots_booking_form_edit', 1),
+    'access callback'  => 'booking_timeslots_booking_access',
+    'access arguments' => array('edit', 1),
+    'file'             => 'booking_timeslots.booking.inc',
+    'type'             => MENU_LOCAL_TASK,
+    'context'          => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
 
   $items['admin/config/booking_timeslots']
     = $items['admin/config/booking_timeslots/settings'] = array(
@@ -76,11 +133,15 @@ function booking_timeslots_page_view($obj, $view_mode = 'full') {
 }
 
 /**
- * Module permissions handler.
+ * Implements hook_permission().
  */
 function booking_timeslots_permission() {
-  $permissions = array();
-  booking_timeslots_booking_permission($permissions);
+  $permissions['administer bookings']       = array('title' => t('Administer bookings'), 'restrict access' => TRUE);
+  $permissions['view bookings']             = array('title' => t('View bookings'));
+  $permissions['create booking entities']   = array('title' => t('Create booking'));
+  $permissions['edit any booking entity']   = array('title' => t('Edit any booking'));
+  $permissions['edit own booking entities'] = array('title' => t('Edit own bookings'));
+  $permissions['book past dates']           = array('title' => t('Enable booking of past dates'));
   return $permissions;
 }
 

@@ -2,14 +2,16 @@
 
 /**
  * @file
+ *   Functions to deal with booking entity.
  */
 
 require_once 'booking_timeslots.booking.controller.inc';
 
 /**
+ * Implements hook_entity_info().
  * Entity general information.
  */
-function booking_timeslots_booking_entity_info(&$info) {
+function booking_timeslots_entity_info() {
   $info['booking'] = array(
     'label'            => t('Booking'),
     'entity class'     => 'Booking',
@@ -51,6 +53,32 @@ function booking_timeslots_booking_entity_info(&$info) {
   if (module_exists('entitycache')) {
     $info['booking']['field cache']  = FALSE;
     $info['booking']['entity cache'] = TRUE;
+  }
+  return $info;
+}
+
+/**
+ * Implements entity_access().
+ * Determines whether the given user has access to an entity.
+ */
+function booking_timeslots_booking_access($op, $task, $account = NULL, $entity_type = NULL) {
+  global $user;
+
+  $account = $account ?: $user;
+
+  switch ($op) {
+    case 'create':
+      return user_access('administer bookings', $account)
+          || user_access('create booking entities', $account);
+
+    case 'view':
+      return user_access('administer bookings', $account)
+          || user_access('view bookings', $account);
+
+    case 'edit':
+      return user_access('administer bookings')
+          || user_access('edit any booking entity')
+          || (user_access('edit own booking entities') && ($task->uid == $account->uid));
   }
 }
 
@@ -633,120 +661,10 @@ function booking_timeslots_booking_list_entities() {
 }
 
 /**
- * Entity management pages paths.
- */
-function booking_timeslots_booking_menu(&$items) {
-  $items['admin/structure/booking'] = array(
-    'title'            => 'Bookings',
-    'description'      => 'Manage bookings',
-    'page callback'    => 'booking_timeslots_booking_admin_page',
-    'access arguments' => array('administer bookings'),
-  );
-
-  $items['booking/add/%booking_b64json'] = array(
-    'title'            => 'New booking',
-    'page callback'    => 'booking_timeslots_booking_form_add',
-    'page arguments'   => array(2),
-    'access arguments' => array('create booking entities'),
-    'file'             => 'booking_timeslots.booking.inc',
-  );
-
-  // This will enforce using of booking_load to be used as 1st argument replacement callback.
-  $items['booking/%booking'] = array(
-    'title callback'   => 'booking_timeslots_booking_page_title',
-    'title arguments'  => array(1),
-    'page callback'    => 'booking_timeslots_booking_page_view',
-    'page arguments'   => array(1),
-    'access arguments' => array('view bookings'),
-    'file'             => 'booking_timeslots.booking.inc',
-    'type'             => MENU_CALLBACK,
-  );
-
-  $items['booking/%booking/view'] = array(
-    'title'            => 'View',
-    'type'             => MENU_DEFAULT_LOCAL_TASK,
-    'weight'           => -10,
-  );
-
-  $items['booking/%booking/remove'] = array(
-    'title'   => 'Delete booking',
-    'page callback'    => array('drupal_get_form'),
-    'page arguments'   => array('booking_timeslots_booking_form_remove', 1),
-    'access arguments' => array('administer bookings'),
-    'file'             => 'booking_timeslots.booking.inc',
-    'context'          => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-  );
-
-  /*
-  $items[$booking_uri . '/delete'] = array(
-  'title'            => 'Delete booking',
-  'title callback'   => 'booking_timeslots_label_booking',
-  'title arguments'  => array($booking_uri_argument_position),
-  'page callback'    => 'drupal_get_form',
-  'page arguments'   => array('booking_timeslots_delete_form_booking', $booking_uri_argument_position),
-  'access callback'  => 'entity_access',
-  'access arguments' => array('edit', 'booking_timeslots_booking', $booking_uri_argument_position),
-  'file'             => 'booking_timeslots_booking.inc',
-  );
-   */
-
-  $items['booking/%booking/edit'] = array(
-    'title'            => 'Edit',
-    'page callback'    => array('drupal_get_form'),
-    'page arguments'   => array('booking_timeslots_booking_form_edit', 1),
-    'access callback'  => 'booking_timeslots_booking_access',
-    'access arguments' => array('edit', 1),
-    'file'             => 'booking_timeslots.booking.inc',
-    'type'             => MENU_LOCAL_TASK,
-    'context'          => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-  );
-
-}
-
-/**
  * Menu callback; loads a json object encoded by base64.
  */
 function booking_b64json_load($arg) {
   return json_decode(base64_decode($arg));
-}
-
-/**
- *
- */
-function booking_timeslots_booking_permission(&$permissions) {
-  $permissions['administer bookings']       = array('title' => t('Administer bookings'), 'restrict access' => TRUE);
-  $permissions['view bookings']             = array('title' => t('View bookings'));
-  $permissions['create booking entities']   = array('title' => t('Create booking'));
-  $permissions['edit any booking entity']   = array('title' => t('Edit any booking'));
-  $permissions['edit own booking entities'] = array('title' => t('Edit own bookings'));
-  $permissions['book past dates']           = array('title' => t('Enable booking of past dates'));
-  return $permissions;
-}
-
-/**
- * Access handler for the entity.
- */
-function booking_timeslots_booking_access($op, $task, $account = NULL, $entity_type = NULL) {
-  global $user;
-
-  if (!isset($account)) {
-    $account = $user;
-  }
-
-  switch ($op) {
-    case 'create':
-      return user_access('administer bookings', $account)
-          || user_access('create booking entities', $account);
-
-    case 'view':
-      return user_access('administer bookings', $account)
-          || user_access('view bookings', $account);
-
-    case 'edit':
-      return user_access('administer bookings')
-          || user_access('edit any booking entity')
-          || (user_access('edit own booking entities') && ($task->uid == $account->uid));
-  }
 }
 
 /**
