@@ -85,7 +85,7 @@ function booking_timeslots_menu() {
       'title'           => 'Booking Timeslots Settings',
       'description'     => 'Manage booking settings.',
       'page callback'   => 'drupal_get_form',
-      'access callback' => 'booking_timeslots_access_callback',
+      'access arguments' => array('administer bookings'),
       'page arguments'  => array('booking_timeslots_settings_form'),
       'file'            => 'includes/booking_timeslots.admin.inc',
       'weight'          => -50,
@@ -97,7 +97,7 @@ function booking_timeslots_menu() {
       'title'           => 'Booking Timeslots Tutorial',
       'description'     => 'Instructions how to use the module.',
       'page callback'   => 'drupal_get_form',
-      'access callback' => 'booking_timeslots_access_callback',
+      'access arguments' => array('administer bookings'),
       'page arguments'  => array('booking_timeslots_tutorial_form'),
       'file'            => 'includes/booking_timeslots.admin.inc',
       'weight'          => -50,
@@ -195,13 +195,6 @@ function booking_timeslots_alter_form_titles(&$form) {
         = $form['field_bt_ct_ref_' . $i][LANGUAGE_NONE]['#title'] = $configuration['ct_title_' . $i];
     }
   }
-}
-
-/**
- * Access callback - only admin or user with proper privileges can access it.
- */
-function booking_timeslots_access_callback() {
-  return user_access('administer booking timeslots') || user_access('edit timeslot settings');
 }
 
 /**
