@@ -223,7 +223,7 @@ function booking_timeslots_booking_info() {
  */
 function booking_timeslots_booking_uri($entity) {
   return array(
-    'path' => 'booking/' . $entity->id,
+    'path' => 'booking/' . $entity->pid,
   );
 }
 
