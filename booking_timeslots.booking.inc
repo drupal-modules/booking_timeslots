@@ -407,6 +407,7 @@ function booking_form($form, &$form_state, $entity, $input) {
  */
 function booking_timeslots_booking_form($form, &$form_state, $entity, $input) {
 
+  var_dump($input); var_dump(debug_backtrace()); exit;
   list($primary_id, $secondary_id, $tertiary_id, $cid, $datetime, $duration) = $input;
 
   $data       = booking_timeslots_get_form_data_matrix($tertiary_id ? $tertiary_id : $secondary_id, $datetime);
@@ -564,17 +565,12 @@ function booking_timeslots_get_form_data_matrix($fid, $slot_time) {
  */
 function booking_timeslots_booking_form_submit($form, &$form_state) {
   $entity = $form_state['values']['booking'];
-  // var_dump($form_state['values']); exit;
+
   // The value of players is stored in separate table, so copy the value into entity table as well.
   $entity->players = $form_state['values']['field_bt_number_of_people']['und'][0]['value'];
 
   global $user;
-
-  $uid = $user->uid;
-
-  if (user_access('administer bookings')) {
-    $uid = $form_state['values']['field_bt_user'][LANGUAGE_NONE][0]['target_id'];
-  }
+  $uid = user_access('administer bookings') ? $form_state['values']['field_bt_user'][LANGUAGE_NONE][0]['target_id'] : $user->uid;
 
   if (!$entity->uid) {
     $entity->uid = $uid;

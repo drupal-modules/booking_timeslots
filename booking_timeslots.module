@@ -254,13 +254,13 @@ function booking_timeslots_get_calendar_time_range($view, &$form) {
       return booking_timeslots_week_to_start_end_date($week);
 
     case 'day':
-      $day = isset($_GET['day']) ? $_GET['day'] : @$view->exposed_input['day'];
-
-      if (!$day) {
-        $day = @$view->args[$view->argument['date_argument']->position];
-      }
-
-      if (!$day) {
+      if (!empty($_GET['day'])) {
+        $day = $_GET['day'];
+      } elseif (!empty($view->exposed_input['day'])) {
+        $day = $view->exposed_input['day'];
+      } elseif (!empty($view->args[$view->argument['date_argument']->position])) {
+        $day = $view->args[$view->argument['date_argument']->position];
+      } else {
         $day = date('Y-m-d 00:00:00', time());
       }
 
@@ -893,29 +893,27 @@ function booking_timeslots_views_ajax_data_alter(&$object, $view) {
  */
 function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_ct_3, $view_mode, $time_start, $time_end, $start_times = array(), $granularity, $grid_granularity) {
 
-  $data_matrix    = array('data' => array());
-
   $daily_settings = booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $time_start, $time_end);
+  $data_matrix    = array('data' => array(), 'daily_settings' => $daily_settings);
 
-  $data_matrix ['daily_settings'] = $daily_settings;
-
-  if($view_mode == 'month') {
+  if ($view_mode == 'month') {
     $data_matrix['month_data'] = array();
   }
 
-  if (!is_numeric($id_ct_1))
+  if (!is_numeric($id_ct_1)) {
     return $data_matrix;
+  }
 
-  if ((!is_numeric($id_ct_2) && !is_array($id_ct_2)) && !is_numeric($id_ct_3))
+  if ((!is_numeric($id_ct_2) && !is_array($id_ct_2)) && !is_numeric($id_ct_3)) {
     return $data_matrix;
+  }
 
 
-  // Filling data matrix with untouched availabilites retrieved from the selected facility's opening hours settings
+  // Filling data matrix with untouched availabilites retrieved from the selected facility's opening hours settings.
 
   if (isset($data_matrix['daily_settings']['days'])) {
 
     $cids = array();
-
     foreach ($data_matrix['daily_settings']['days'] as $day_settings) {
       foreach ($day_settings['slots'] as $slot_settings) {
         $cids[] = $slot_settings->instance_id;
@@ -968,7 +966,7 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
     $data_matrix['data'][$booking->day][$hour]['bookings'][] = $booking;
   }
 
-  if (TRUE) {
+  if (TRUE) { // @fixme
 
     // Generating list of green boxes
 
@@ -1700,7 +1698,7 @@ function booking_timeslots_get_server_time() {
 function booking_timeslots_helper_calculate_month_view_range($month) {
 
   if (!$month) {
-    $month = date('Y-m-01 00:00:00', time ());
+    $month = date('Y-m-01 00:00:00', time());
   }
 
   $day_name = '';
@@ -1724,7 +1722,7 @@ function booking_timeslots_helper_calculate_month_view_range($month) {
 
   $time_end = date ('Y-m-d H:i:s', strtotime($time_end) + $extra_days * 86400);
 
-  return array( $time_start, $time_end );
+  return array($time_start, $time_end);
 }
 
 /**
