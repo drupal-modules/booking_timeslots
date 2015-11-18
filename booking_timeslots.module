@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- *   Main module file.
+ * Main module file.
  */
 
 require_once 'booking_timeslots.features.inc';
@@ -79,7 +79,6 @@ function booking_timeslots_menu() {
     'context'          => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
   );
 
-
   $items['admin/config/booking_timeslots']
     = $items['admin/config/booking_timeslots/settings'] = array(
       'title'           => 'Booking Timeslots Settings',
@@ -94,15 +93,14 @@ function booking_timeslots_menu() {
   $items['admin/config/booking_timeslots']['title'] = 'Booking Timeslots';
 
   $items['admin/config/booking_timeslots/tutorial'] = array(
-      'title'           => 'Booking Timeslots Tutorial',
-      'description'     => 'Instructions how to use the module.',
-      'page callback'   => 'drupal_get_form',
-      'access arguments' => array('administer bookings'),
-      'page arguments'  => array('booking_timeslots_tutorial_form'),
-      'file'            => 'includes/booking_timeslots.admin.inc',
-      'weight'          => -50,
-    );
-
+    'title'           => 'Booking Timeslots Tutorial',
+    'description'     => 'Instructions how to use the module.',
+    'page callback'   => 'drupal_get_form',
+    'access arguments' => array('administer bookings'),
+    'page arguments'  => array('booking_timeslots_tutorial_form'),
+    'file'            => 'includes/booking_timeslots.admin.inc',
+    'weight'          => -50,
+  );
 
   return $items;
 }
@@ -256,11 +254,14 @@ function booking_timeslots_get_calendar_time_range($view, &$form) {
     case 'day':
       if (!empty($_GET['day'])) {
         $day = $_GET['day'];
-      } elseif (!empty($view->exposed_input['day'])) {
+      }
+      elseif (!empty($view->exposed_input['day'])) {
         $day = $view->exposed_input['day'];
-      } elseif (!empty($view->args[$view->argument['date_argument']->position])) {
+      }
+      elseif (!empty($view->args[$view->argument['date_argument']->position])) {
         $day = $view->args[$view->argument['date_argument']->position];
-      } else {
+      }
+      else {
         $day = date('Y-m-d 00:00:00', time());
       }
 
@@ -551,7 +552,8 @@ function booking_timeslots_get_nodes_default_query($category_id = NULL, $ct_id =
     if ($configuration['ct_field_2_1'] === 'og_group_ref') {
       // Adding support for OG reference. We must use special join as the field_og_group_ref table is empty.
       $configuration['ct_table_2_1'] = "(SELECT R2_R1.etid AS entity_id, R2_R1.gid AS ref_target_id FROM og_membership R2_R1 WHERE R2_R1.entity_type = 'node')";
-      $configuration['ct_field_2_1'] = 'ref'; // OG_R2_R1.ref_target_id
+      // OG_R2_R1.ref_target_id.
+      $configuration['ct_field_2_1'] = 'ref';
     }
   }
 
@@ -628,15 +630,15 @@ function booking_timeslots_get_nodes_default_query($category_id = NULL, $ct_id =
 /**
  * Returns list of available categories based on the arguments specified.
  *
- * @param number $category_id
+ * @param int $category_id
  *   Id of the category, may be NULL
- * @param number $id_ct_1
+ * @param int $id_ct_1
  *   Primary content type Id
- * @param number $id_ct_2
+ * @param int $id_ct_2
  *   Secondary content type Id
- * @param number $id_ct_3
+ * @param int $id_ct_3
  *   Tertiary content type Id
- * @param number $id_ct_4
+ * @param int $id_ct_4
  *   Quaternary content type Id
  */
 function booking_timeslots_filter_get_categories(&$category_id = NULL, &$id_ct_1 = NULL, &$id_ct_2 = NULL, &$id_ct_3 = NULL, &$id_ct_4 = NULL) {
@@ -693,17 +695,17 @@ function booking_timeslots_filter_get_categories(&$category_id = NULL, &$id_ct_1
 /**
  * Returns items from the specified content type level.
  *
- * @param number $category_id
+ * @param int $category_id
  *   Id of the category, may be NULL
- * @param number $ct_id
+ * @param int $ct_id
  *   Content type level, from 1 to 4
- * @param number $id_ct_1
+ * @param int $id_ct_1
  *   Primary content type Id, may be NULL
- * @param number $id_ct_2
+ * @param int $id_ct_2
  *   Secondary content type Id, may be NULL
- * @param number $id_ct_3
+ * @param int $id_ct_3
  *   Tertiary content type Id, may be NULL
- * @param number $id_ct_4
+ * @param int $id_ct_4
  *   Quaternary content type Id, may be NULL
  */
 function booking_timeslots_filter_get_items(&$category_id, $ct_id, &$id_ct_1, &$id_ct_2, &$id_ct_3, &$id_ct_4) {
@@ -761,17 +763,17 @@ function booking_timeslots_filter_get_items(&$category_id, $ct_id, &$id_ct_1, &$
 /**
  * Returns list of available durations based on the specified arguments.
  *
- * @param number $duration
+ * @param int $duration
  *   Reference to the duration filter value
- * @param number $id_ct_1
+ * @param int $id_ct_1
  *   Primary content type Id, may be NULL
- * @param number $id_ct_2
+ * @param int $id_ct_2
  *   Secondary content type Id, may be NULL
- * @param number $id_ct_3
+ * @param int $id_ct_3
  *   Tertiary content type Id, may be NULL
- * @param number $time_start
+ * @param int $time_start
  *   Start time for the queried slots
- * @param number $time_end
+ * @param int $time_end
  *   End time for the queried slots
  */
 function booking_timeslots_filter_get_durations(&$duration, $id_ct_1, $id_ct_2, $id_ct_3, $time_start, $time_end) {
@@ -792,11 +794,13 @@ function booking_timeslots_filter_get_durations(&$duration, $id_ct_1, $id_ct_2, 
 
       if ($data->price->type == 'regular' && !empty($data->price->regular->$price_key)) {
         break;
-      } elseif ($data->price->type == 'non_regular') {
+      }
+      elseif ($data->price->type == 'non_regular') {
 
         foreach ($data->price->non_regular as $id => $prices) {
-          if (!empty ($prices->$price_key))
+          if (!empty($prices->$price_key)) {
             $durations[$id] = $enabled_durations[$id];
+          }
         }
       }
     }
@@ -809,7 +813,6 @@ function booking_timeslots_filter_get_durations(&$duration, $id_ct_1, $id_ct_2, 
     $duration = reset($keys);
   }
 
-
   if (!$durations) {
     $durations['N/A'] = t('Closed');
   }
@@ -817,6 +820,9 @@ function booking_timeslots_filter_get_durations(&$duration, $id_ct_1, $id_ct_2, 
   return $durations;
 }
 
+/**
+ *
+ */
 function booking_timeslots_get_user_is_member() {
   return TRUE;
 }
@@ -869,13 +875,13 @@ function booking_timeslots_theme_registry_alter(&$items) {
 
 /**
  * Implements hook_views_ajax_data_alter().
- * @param type $object
- * @param type $view
+ *
+ * @param string or int or object... $object
+ * @param string or int or object... $view
  */
 function booking_timeslots_views_ajax_data_alter(&$object, $view) {
-  // apply only to public_calendar nodes
-  if($view->name == 'public_calendar')
-  {
+  // Apply only to public_calendar nodes.
+  if ($view->name == 'public_calendar') {
     $object[1]['selector'] = '#block-system-main';
     $object[1]['data'] = '<div id="block-system-main" class="block block-system">' . $object[1]['data'] . '</div>';
   }
@@ -884,11 +890,14 @@ function booking_timeslots_views_ajax_data_alter(&$object, $view) {
 /**
  * Returns the total number of available capacity to book based on the granularity specified
  * For the 'week' view it returns the data matrix for all the week days
- * For the 'month view, it returns the data matrix composed of total availabilites in a given day
+ * For the 'month view, it returns the data matrix composed of total availabilites in a given day.
  *
- * @param int $nid Nid of the node we use to determine opening hours information
- * @param string $granularity 'week', 'month'
- * @param int|string $value Number of week or month
+ * @param int $nid
+ *   Nid of the node we use to determine opening hours information
+ * @param string $granularity
+ *   'week', 'month'
+ * @param int|string $value
+ *   Number of week or month
  * @param array $start_times
  */
 function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_ct_3, $view_mode, $time_start, $time_end, $start_times = array(), $granularity, $grid_granularity) {
@@ -908,9 +917,7 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
     return $data_matrix;
   }
 
-
   // Filling data matrix with untouched availabilites retrieved from the selected facility's opening hours settings.
-
   if (isset($data_matrix['daily_settings']['days'])) {
 
     $cids = array();
@@ -941,7 +948,7 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
       $query->addExpression(
          'DATEDIFF(' .
-            ( db_driver() != 'pgsql' ? '' : '\'mi\', ' ) .
+            (db_driver() != 'pgsql' ? '' : '\'mi\', ') .
             'B.slot_time,  ' .
             ':time_start ) ',
          'day',
@@ -949,10 +956,12 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
       $bookings = $query->execute()->fetchAllAssoc('pid');
 
-    } else {
+    }
+    else {
       $bookings = array();
     }
-  } else {
+  }
+  else {
     $bookings = array();
   }
 
@@ -968,12 +977,11 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
   if (TRUE) { // @fixme
 
-    // Generating list of green boxes
-
+    // Generating list of green boxes.
     for ($d = 0; $d < (strtotime($time_end) - strtotime($time_start) + 1) / 86400; $d++) {
 
       if (!isset($daily_settings['days'][$d])) {
-      // There is no information for this day
+        // There is no information for this day.
         continue;
       }
 
@@ -981,19 +989,19 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
       foreach ($daily_settings['days'][$d]['slots'] as $slot) {
 
-        $date = date('Y-m-d', strtotime ($time_start) + $d * 86400);
+        $date = date('Y-m-d', strtotime($time_start) + $d * 86400);
 
-        $node = node_load ($slot->nid);
+        $node = node_load($slot->nid);
 
-        if (!user_access('administer bookings') && ($time_ahead_minutes = booking_timeslots_get_reservation_minimum_time_ahead($slot)))
-        {
+        if (!user_access('administer bookings') && ($time_ahead_minutes = booking_timeslots_get_reservation_minimum_time_ahead($slot))) {
           $slot_date_time_start = $date . ' ' . $slot->start_time_hm;
           $slot_date_time_end   = $date . ' ' . $slot->end_time_hm;
 
-          if ($slot->date < date('Y-m-d', strtotime(booking_timeslots_get_server_time ()) + $time_ahead_minutes * 60)) {
+          if ($slot->date < date('Y-m-d', strtotime(booking_timeslots_get_server_time()) + $time_ahead_minutes * 60)) {
             $slot->too_late = TRUE;
             continue;
-          } elseif ($slot->date == date('Y-m-d', strtotime(booking_timeslots_get_server_time ()) + $time_ahead_minutes * 60)) {
+          }
+          elseif ($slot->date == date('Y-m-d', strtotime(booking_timeslots_get_server_time()) + $time_ahead_minutes * 60)) {
 
             if (strtotime(booking_timeslots_get_server_time()) + $time_ahead_minutes * 60 > strtotime($slot_date_time_start)) {
 
@@ -1005,26 +1013,26 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
                 $slot->start_time_hm  = booking_timeslots_helper_add_minutes_to_hour_min('00:00', $real_m);
 
-              } else {
+              }
+              else {
 
                 $slot->too_late = TRUE;
                 continue;
-                // We can't book lesson partially
-
+                // We can't book lesson partially.
               }
             }
           }
         }
 
-        if (!user_access('administer bookings') && ($time_ahead_minutes = booking_timeslots_get_reservation_maximum_time_ahead($slot)))
-        {
+        if (!user_access('administer bookings') && ($time_ahead_minutes = booking_timeslots_get_reservation_maximum_time_ahead($slot))) {
           $slot_date_time_start = $date . ' ' . $slot->start_time_hm;
           $slot_date_time_end   = $date . ' ' . $slot->end_time_hm;
 
-          if ($slot->date > date('Y-m-d', strtotime(booking_timeslots_get_server_time ()) + $time_ahead_minutes * 60)) {
+          if ($slot->date > date('Y-m-d', strtotime(booking_timeslots_get_server_time()) + $time_ahead_minutes * 60)) {
             $slot->too_late = TRUE;
             continue;
-          } elseif ($slot->date == date('Y-m-d', strtotime (booking_timeslots_get_server_time()) + $time_ahead_minutes * 60)) {
+          }
+          elseif ($slot->date == date('Y-m-d', strtotime(booking_timeslots_get_server_time()) + $time_ahead_minutes * 60)) {
 
             if (strtotime(booking_timeslots_get_server_time()) + $time_ahead_minutes * 60 < strtotime($slot_date_time_end)) {
 
@@ -1035,10 +1043,8 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
                 $slot->end_time_hm  = booking_timeslots_helper_add_minutes_to_hour_min('00:00', $real_m);
               }
-              else
-              {
-                // We can't book lesson partially
-
+              else {
+                // We can't book lesson partially.
                 $slot->too_late = TRUE;
                 continue;
 
@@ -1048,31 +1054,27 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
           }
         }
 
-        if (!booking_timeslots_can_book_past_dates() && is_numeric ($granularity)) {
+        if (!booking_timeslots_can_book_past_dates() && is_numeric($granularity)) {
 
           if ($slot->date < substr(booking_timeslots_get_server_time(), 0, 10)) {
             $slot->too_late = TRUE;
             continue;
           }
-          elseif ($slot->date == substr(booking_timeslots_get_server_time(), 0, 10))
-          {
+          elseif ($slot->date == substr(booking_timeslots_get_server_time(), 0, 10)) {
             if ($slot->end_time_hm <= substr(booking_timeslots_get_server_time(), 11, 5)) {
               $slot->too_late = TRUE;
               continue;
             }
-            else
-            if ($slot->start_time_hm >= substr(booking_timeslots_get_server_time(), 11, 5) && $slot->end_time_hm <= substr(booking_timeslots_get_server_time(), 11, 5))
-            {
-
-              // Calculating valid start time
-
-              if ($slot->type == 2)
+            elseif ($slot->start_time_hm >= substr(booking_timeslots_get_server_time(), 11, 5) && $slot->end_time_hm <= substr(booking_timeslots_get_server_time(), 11, 5)) {
+              // Calculating valid start time.
+              if ($slot->type == 2) {
                 $duration = $grid_granularity;
+              }
               else {
 
                 $slot->too_late = TRUE;
 
-                // We can't book lesson partially
+                // We can't book lesson partially.
                 continue;
               }
 
@@ -1088,12 +1090,9 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
               );
             }
 
-
-//            $slot->start_time_hm = $s;
-
+            // $slot->start_time_hm = $s;.
           }
         }
-
 
         $green_boxes[] = array(
           'start' => booking_timeslots_helper_hour_min_to_minutes($slot->start_time_hm),
@@ -1105,14 +1104,14 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
       if (isset($data_matrix['data'][$d])) {
         foreach ($data_matrix['data'][$d] as $hour) {
-            if (isset($hour['bookings'])) {
-              foreach ($hour['bookings'] as &$booking) {
-                $cutters[] = array(
-                  'start' => booking_timeslots_helper_hour_min_to_minutes($booking->start_time_hm),
-                  'end'   => booking_timeslots_helper_hour_min_to_minutes($booking->end_time_hm)
-                );
-              }
+          if (isset($hour['bookings'])) {
+            foreach ($hour['bookings'] as &$booking) {
+              $cutters[] = array(
+                'start' => booking_timeslots_helper_hour_min_to_minutes($booking->start_time_hm),
+                'end'   => booking_timeslots_helper_hour_min_to_minutes($booking->end_time_hm),
+              );
             }
+          }
         }
       }
 
@@ -1120,17 +1119,19 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
         foreach ($green_boxes as $i => &$box) {
           if ($booking_box['start'] <= $box['start'] && $booking_box['end'] >= $box['end']) {
-            // Removing the whole green box
+            // Removing the whole green box.
             unset($green_boxes[$i--]);
           }
           elseif ($booking_box['start'] <= $box['start'] && $booking_box['end'] > $box['start'] && $booking_box['end'] < $box['end']) {
             $box['start'] = $booking_box['end'];
-          } elseif ($booking_box['start'] > $box['start'] && $booking_box['start'] < $box['end'] && $booking_box['end'] >= $box['end']) {
+          }
+          elseif ($booking_box['start'] > $box['start'] && $booking_box['start'] < $box['end'] && $booking_box['end'] >= $box['end']) {
             $box['end'] = $booking_box['start'];
-          } elseif ($booking_box['start'] > $box['start'] && $booking_box['end'] < $box['end']) {
+          }
+          elseif ($booking_box['start'] > $box['start'] && $booking_box['end'] < $box['end']) {
             $green_boxes[] = array(
               'start' => $booking_box['end'],
-              'end'   => $box['end']
+              'end'   => $box['end'],
             );
             $box['end'] = $booking_box['start'];
             break;
@@ -1138,7 +1139,7 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
         }
       }
 
-      // Copying green boxes into the hour based structure
+      // Copying green boxes into the hour based structure.
       $green_boxes_hours = array();
 
       foreach ($green_boxes as &$box) {
@@ -1149,21 +1150,22 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
       ksort($green_boxes_hours);
 
-      // Iterating over all opening_hours records of a $d day
-      foreach ($daily_settings['days'][$d]['slots'] as $slot_settings)
-      {
+      // Iterating over all opening_hours records of a $d day.
+      foreach ($daily_settings['days'][$d]['slots'] as $slot_settings) {
         for ($m = booking_timeslots_helper_hour_min_to_minutes($daily_settings['start_time_hm']); $m < booking_timeslots_helper_hour_min_to_minutes($daily_settings['end_time_hm']); $m += $grid_granularity) {
 
-          $hour  = substr ('0' . ((int) ($m / 60)), -2);
-          $min   = substr ('0' . ($m % 60), -2);
+          $hour  = substr('0' . ((int) ($m / 60)), -2);
+          $min   = substr('0' . ($m % 60), -2);
           $date  = $hour . ':' . $min;
 
-          if ($date < $slot_settings->start_time_hm || $date >= $slot_settings->end_time_hm)
+          if ($date < $slot_settings->start_time_hm || $date >= $slot_settings->end_time_hm) {
             continue;
+          }
 
-          if (!$slot_settings || $date < $slot_settings->start_time_hm || $date >= $slot_settings->end_time_hm)
-          // Day not open at all or not yet open or Day just closed
+          if (!$slot_settings || $date < $slot_settings->start_time_hm || $date >= $slot_settings->end_time_hm) {
+            // Day not open at all or not yet open or Day just closed.
             continue;
+          }
 
           $data_matrix['data'][$d][$date]['affected_settings'] = $slot_settings;
 
@@ -1181,41 +1183,42 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
       }
     }
 
+  }
+  else {
 
-  } else {
-
-    // Generating list of normal slots
-
+    // Generating list of normal slots.
     for ($d = 0; $d < (strtotime($time_end) - strtotime($time_start) + 1) / 86400; $d++) {
 
       if (!isset($daily_settings['days'][$d])) {
-      // There is no information for this day
+        // There is no information for this day.
         continue;
       }
 
-      // Iterating over all opening_hours records of a $d day
-      foreach ($daily_settings['days'][$d]['slots'] as $slot_settings)
-      {
-        $data = json_decode ($slot_settings->notice);
+      // Iterating over all opening_hours records of a $d day.
+      foreach ($daily_settings['days'][$d]['slots'] as $slot_settings) {
+        $data = json_decode($slot_settings->notice);
 
-        if ($slot_settings->original_instance_id)
-          $info = (object)db_query('SELECT slot_length, capacity FROM {opening_hours} WHERE instance_id = :id',  array('id' => $slot_settings->original_instance_id))->fetchAssoc();
-        else
-          $info = (object)array('slot_length' => $slot_settings->slot_length, 'capacity' => $slot_settings->capacity);
+        if ($slot_settings->original_instance_id) {
+          $info = (object) db_query('SELECT slot_length, capacity FROM {opening_hours} WHERE instance_id = :id', array('id' => $slot_settings->original_instance_id))->fetchAssoc();
+        }
+        else {
+          $info = (object) array('slot_length' => $slot_settings->slot_length, 'capacity' => $slot_settings->capacity);
+        }
 
         for ($m = booking_timeslots_helper_hour_min_to_minutes($daily_settings['start_time_hm']); $m < booking_timeslots_helper_hour_min_to_minutes($daily_settings['end_time_hm']); $m += $info->slot_length) {
 
-          $hour  = substr ('0' . ((int) ($m / 60)), -2);
-          $min   = substr ('0' . ($m % 60), -2);
+          $hour  = substr('0' . ((int) ($m / 60)), -2);
+          $min   = substr('0' . ($m % 60), -2);
           $date  = $hour . ':' . $min;
 
-          if ($date < $slot_settings->start_time_hm || $date >= $slot_settings->end_time_hm)
+          if ($date < $slot_settings->start_time_hm || $date >= $slot_settings->end_time_hm) {
             continue;
+          }
 
-          if (!$slot_settings || $date < $slot_settings->start_time_hm || $date >= $slot_settings->end_time_hm)
-          // Day not open at all or not yet open or Day just closed
+          if (!$slot_settings || $date < $slot_settings->start_time_hm || $date >= $slot_settings->end_time_hm) {
+            // Day not open at all or not yet open or Day just closed.
             continue;
-
+          }
 
           $data_matrix['data']['cids'][$d] = $slot_settings->instance_id;
 
@@ -1233,18 +1236,18 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
     }
   }
 
-  // Sending bookings on to the data matrix array
+  // Sending bookings on to the data matrix array.
   $settingsArr = array();
 
-  // Calculating real availability based on the slot bookings
-  for ($d = 0; $d < (strtotime($time_end) - strtotime($time_start) + 1 ) / 86400; $d++) {
+  // Calculating real availability based on the slot bookings.
+  for ($d = 0; $d < (strtotime($time_end) - strtotime($time_start) + 1) / 86400; $d++) {
     $start_time_hm = booking_timeslots_helper_hour_min_to_minutes($data_matrix['daily_settings']['start_time_hm']);
     $end_time_hm = booking_timeslots_helper_hour_min_to_minutes($data_matrix['daily_settings']['end_time_hm']);
 
     $day_time = strtotime($time_start) + $d * 86400;
     $day = date("Y-m-d", $day_time);
 
-    if($view_mode == 'month') {
+    if ($view_mode == 'month') {
       $data_matrix['month_data'][$day]['total_free_minutes'] = 0;
       $data_matrix['month_data'][$day]['day_name'] = date("l", $day_time);
       $data_matrix['month_data'][$day]['day_number'] = date("j", $day_time);
@@ -1252,8 +1255,8 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
     for ($m = $start_time_hm; $m < $end_time_hm; $m += $grid_granularity) {
 
-      $hour  = substr ('0' . ((int) ($m / 60)), -2);
-      $min   = substr ('0' . ((int) $m % 60), -2);
+      $hour  = substr('0' . ((int) ($m / 60)), -2);
+      $min   = substr('0' . ((int) $m % 60), -2);
       $date  = $hour . ':' . $min;
 
       $settings = !empty($data_matrix['data'][$d][$date]['affected_settings']) ? $data_matrix['data'][$d][$date]['affected_settings'] : NULL;
@@ -1276,7 +1279,7 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
           $result = db_query('
               SELECT slot_length, capacity FROM {opening_hours} WHERE instance_id = :id',
               array(
-                'id'    => $orginal_id
+                'id'    => $orginal_id,
               ))->fetchAll();
           $settingsArr[$orginal_id] = $result[0];
         }
@@ -1287,24 +1290,25 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
       if ($view_mode == 'month') {
         $data_matrix['month_data'][$day]['total_free_minutes'] += $settings->capacity * $grid_granularity;
-      } else {
+      }
+      else {
         $data_matrix['data'][$d][$date]['capacity_max'] = $settings->capacity;
         $data_matrix['data'][$d][$date]['capacity']     = $settings->capacity;
       }
 
-      if (isset ($data_matrix['data'][$d][$date]['bookings']))
-        foreach ($data_matrix['data'][$d][$date]['bookings'] as &$booking)
-        {
+      if (isset($data_matrix['data'][$d][$date]['bookings'])) {
+        foreach ($data_matrix['data'][$d][$date]['bookings'] as &$booking) {
           $booking->players_original = $booking->players;
 
-          if ($settings->type == 2)
-          // "For the capacity, can we just make it that when someone book a court, it is no longer available for booking,
-          // capacity will be only for user information (it make sense for classes to keep track of capacity but courts is not)"
-          // THE IDEA is to mark court bookings as booked for the whole capacity available
+          if ($settings->type == 2) {
+            // "For the capacity, can we just make it that when someone book a court, it is no longer available for booking,
+            // capacity will be only for user information (it make sense for classes to keep track of capacity but courts is not)"
+            // THE IDEA is to mark court bookings as booked for the whole capacity available.
             $booking->players = $settings->capacity;
+          }
 
-          if($view_mode == 'month') {
-            $data_matrix['month_data'][$day]['total_free_minutes'] -=  $booking->players * $booking->duration;
+          if ($view_mode == 'month') {
+            $data_matrix['month_data'][$day]['total_free_minutes'] -= $booking->players * $booking->duration;
           }
           else {
             $data_matrix['data'][$d][$date]['capacity'] -= $booking->players;
@@ -1319,6 +1323,7 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
           }
 
         }
+      }
     }
   }
 
@@ -1327,6 +1332,9 @@ function booking_timeslots_get_availability_data_matrix($id_ct_1, $id_ct_2, $id_
 
 }
 
+/**
+ *
+ */
 function booking_timeslots_get_data_price($data, $duration) {
   $price_key = booking_timeslots_get_user_is_member() ? 'members' : 'non_members';
 
@@ -1336,6 +1344,9 @@ function booking_timeslots_get_data_price($data, $duration) {
       $data->price->non_regular->$duration->$price_key;
 }
 
+/**
+ *
+ */
 function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $time_start, $time_end) {
 
   $daily_settings = array();
@@ -1347,17 +1358,18 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
   $query =
     db_select('opening_hours', 'H')
       ->fields('H', array(
-         'instance_id',
-         'nid',
-         'date',
-         'start_time',
-         'end_time',
-         'notice',
-         'repeat_rule',
-         'repeat_end_date',
-         'original_instance_id',
-         'customised',
-         'slot_length'))
+        'instance_id',
+        'nid',
+        'date',
+        'start_time',
+        'end_time',
+        'notice',
+        'repeat_rule',
+        'repeat_end_date',
+        'original_instance_id',
+        'customised',
+        'slot_length',
+      ))
       ->condition(db_and()
          ->condition(db_or()
             ->condition('nid', $id_ct_1)
@@ -1374,17 +1386,17 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
                ->where(
                   "CONCAT(H.date, ' ', H.start_time) BETWEEN :time_start AND :time_end",
                   array(
-                     ':time_start' => $time_start,
-                     ':time_end'   => $time_end
+                    ':time_start' => $time_start,
+                    ':time_end'   => $time_end,
                   )
                )
             )
          )
       )
-      ->orderBy('nid = '   . $id_ct_1, 'DESC')
+      ->orderBy('nid = ' . $id_ct_1, 'DESC')
       // @fixme: SQLSTATE[42000]: Syntax error near 'DESC, nid IN () DESC, nid = 0 DESC, H.repeat_end_date DESC, on some other calendar views
       ->orderBy('nid IN (' . (is_array($id_ct_2) ? implode(',', $id_ct_2) : $id_ct_2) . ')', 'DESC')
-      ->orderBy('nid = '   . (is_null($id_ct_3) ? 0 : $id_ct_3), 'DESC')
+      ->orderBy('nid = ' . (is_null($id_ct_3) ? 0 : $id_ct_3), 'DESC')
       ->orderBy('H.repeat_end_date', 'DESC')
       ->orderBy('H.date', 'ASC');
   /*
@@ -1435,7 +1447,7 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
 
   $query->addExpression(
     'DATEDIFF(' .
-        ( db_driver() != 'pgsql' ? '' : '\'mi\', ' ) .
+        (db_driver() != 'pgsql' ? '' : '\'mi\', ') .
         'H.date,  ' .
         ':time_start )',
     'day',
@@ -1451,10 +1463,10 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
          END",
       'type',
       array(
-         ':primary_id'   => $id_ct_1,
-         ':secondary_id' => $id_ct_2,
-         ':tertiary_id'  => $id_ct_3,
-         ));
+        ':primary_id'   => $id_ct_1,
+        ':secondary_id' => $id_ct_2,
+        ':tertiary_id'  => $id_ct_3,
+      ));
 
   /* @todo: Do we need?:
       $settings_query = db_query($query, array(
@@ -1476,18 +1488,20 @@ function booking_timeslots_get_daily_settings($id_ct_1, $id_ct_2, $id_ct_3, $tim
   $daily_settings['secondary_id'] = $id_ct_2;
   $daily_settings['tertiary_id']  = $id_ct_3;
 
-
   booking_timeslots_populate_daily_settings_min_max_time($daily_settings);
 
   return $daily_settings;
 }
 
+/**
+ *
+ */
 function booking_timeslots_get_durations() {
   $content   = variable_get('booking_timeslots_durations');
   $lines     = array_map('trim', explode("\n", $content));
   $durations = array();
 
-  foreach($lines as $line) {
+  foreach ($lines as $line) {
     list($value, $title) = array_map('trim', explode('|', $line));
     $durations[$value] = $title;
   }
@@ -1497,69 +1511,81 @@ function booking_timeslots_get_durations() {
   return $durations;
 }
 
+/**
+ *
+ */
 function booking_timeslots_get_calendar_granularity() {
   return (int) variable_get('booking_timeslots_calendar_granularity', 15);
 }
 
+/**
+ *
+ */
 function booking_timeslots_populate_daily_settings_min_max_time(&$daily_settings) {
 
-    $start_all = '24:00:00';
-    $end_all   = '00:00:00';
-    $min_dur   = 120;
+  $start_all = '24:00:00';
+  $end_all   = '00:00:00';
+  $min_dur   = 120;
 
-    foreach ($daily_settings['days'] as $i => &$day_settings) {
+  foreach ($daily_settings['days'] as $i => &$day_settings) {
 
-      $start_day = '24:00:00';
-      $end_day   = '00:00:00';
+    $start_day = '24:00:00';
+    $end_day   = '00:00:00';
 
-      foreach ($day_settings['slots'] as $k => $slot) {
+    foreach ($day_settings['slots'] as $k => $slot) {
 
-        $data      = json_decode($slot->notice);
+      $data      = json_decode($slot->notice);
 
-        if ($slot->type == 1) {
-          $start_day = min($start_day, $slot->start_time);
-          $end_day   = max($end_day,   $slot->end_time);
-        }
-
-        $start_all = min($start_all, $start_day);
-        $end_all   = max($end_all,   $end_day);
-        $min_dur   = min ($min_dur,  $slot->slot_length);
-
-
-        if ($slot->type == 1 || (is_numeric($daily_settings['tertiary_id']) && $slot->type == 2) || (!is_numeric($daily_settings['tertiary_id']) && $slot->type == 3)) {
-          unset ($day_settings['slots'][$k]);
-          continue;
-        }
-
-        $slot->duration      = $slot->slot_length;
-        $slot->start_time_hm = substr($slot->start_time, 0, 5);
-        $slot->end_time_hm   = substr($slot->end_time,   0, 5);
+      if ($slot->type == 1) {
+        $start_day = min($start_day, $slot->start_time);
+        $end_day   = max($end_day, $slot->end_time);
       }
 
-      $day_settings['start_time_hm'] = substr($start_day, 0, 5);
-      $day_settings['end_time_hm']   = substr($end_day,   0, 5);
+      $start_all = min($start_all, $start_day);
+      $end_all   = max($end_all, $end_day);
+      $min_dur   = min($min_dur, $slot->slot_length);
+
+      if ($slot->type == 1 || (is_numeric($daily_settings['tertiary_id']) && $slot->type == 2) || (!is_numeric($daily_settings['tertiary_id']) && $slot->type == 3)) {
+        unset($day_settings['slots'][$k]);
+        continue;
+      }
+
+      $slot->duration      = $slot->slot_length;
+      $slot->start_time_hm = substr($slot->start_time, 0, 5);
+      $slot->end_time_hm   = substr($slot->end_time, 0, 5);
     }
 
-    if ($start_all >= $end_all) {
-      $start_all = '08:00:00';
-      $end_all   = '16:00:00';
-    }
+    $day_settings['start_time_hm'] = substr($start_day, 0, 5);
+    $day_settings['end_time_hm']   = substr($end_day, 0, 5);
+  }
 
-    $daily_settings['start_time_hm'] = substr($start_all, 0, 5);
-    $daily_settings['end_time_hm']   = substr($end_all,   0, 5);
+  if ($start_all >= $end_all) {
+    $start_all = '08:00:00';
+    $end_all   = '16:00:00';
+  }
+
+  $daily_settings['start_time_hm'] = substr($start_all, 0, 5);
+  $daily_settings['end_time_hm']   = substr($end_all, 0, 5);
 }
 
 
+/**
+ *
+ */
 function booking_timeslots_filters_get_duration($view) {
 
   $granularity = $view->exposed_raw_input['duration'];
 
-  if (!$granularity)
+  if (!$granularity) {
     $granularity = NULL;
+  }
 
   return $granularity;
 }
 
+/**
+ *
+ */
 function booking_timeslots_week_to_start_end_date($week) {
 
   preg_match_all('/(\d+)\-W(\d+)/', $week, $matches);
@@ -1571,7 +1597,7 @@ function booking_timeslots_week_to_start_end_date($week) {
 
   $first_day_of_week = variable_get('date_first_day', 0);
 
-  $week_start->setTimezone(new DateTimeZone (variable_get ('date_default_timezone')));
+  $week_start->setTimezone(new DateTimeZone(variable_get('date_default_timezone')));
   $week_start->setISODate($year, $week);
   $week_start->sub(new DateInterval('P1D'));
   $week_start->add(new DateInterval('P' . $first_day_of_week . 'D'));
@@ -1579,22 +1605,29 @@ function booking_timeslots_week_to_start_end_date($week) {
   $time = strtotime($week_start->format('Y-m-d 00:00:00'));
 
   $time_start     = $week_start->format('Y-m-d 00:00:00');
-  $time_end       = $week_start->add (new DateInterval('P6D'))->format('Y-m-d 23:59:59');
+  $time_end       = $week_start->add(new DateInterval('P6D'))->format('Y-m-d 23:59:59');
 
   return array($time_start, $time_end);
 }
 
-function booking_timeslots_can_book_past_dates()
-{
+/**
+ *
+ */
+function booking_timeslots_can_book_past_dates() {
+
   return user_access('book past dates') || variable_get('booking_timeslots_enable_booking_for_past_dates', 1);
 }
 
-function booking_timeslots_check_configuration_validity ()
-{
+/**
+ *
+ */
+function booking_timeslots_check_configuration_validity () {
+
   static $already_checked_value;
 
-  if (isset($already_checked_value))
+  if (isset($already_checked_value)) {
     return $already_checked_value;
+  }
 
   $configuration = booking_timeslots_get_configuration();
 
@@ -1640,61 +1673,76 @@ function booking_timeslots_check_configuration_validity ()
     }
   }
 
-
   return $already_checked_value = TRUE;
 }
 
-function booking_timeslots_get_reservation_maximum_time_ahead($obj)
-{
+/**
+ *
+ */
+function booking_timeslots_get_reservation_maximum_time_ahead($obj) {
+
   if ($obj->original_instance_id) {
-    $obj = (object)db_query('SELECT notice FROM {opening_hours} WHERE instance_id = :id',  array('id' => $obj->original_instance_id))->fetchAssoc();
+    $obj = (object) db_query('SELECT notice FROM {opening_hours} WHERE instance_id = :id', array('id' => $obj->original_instance_id))->fetchAssoc();
   }
 
   $data = json_decode($obj->notice);
 
-  if (!isset($data->max_time_ahead_rsrv_weeks))
-    return 262800; // Half a year
-
+  if (!isset($data->max_time_ahead_rsrv_weeks)) {
+    // Half a year.
+    return 262800;
+  }
   $hours =
     $data->max_time_ahead_rsrv_weeks * 168 +
-    $data->max_time_ahead_rsrv_days  * 24 +
+    $data->max_time_ahead_rsrv_days * 24 +
     $data->max_time_ahead_rsrv_hours;
 
-  if ($hours == 0)
-    return 262800; // Half a year
-
+  if ($hours == 0) {
+    // Half a year.
+    return 262800;
+  }
   return booking_timeslots_get_reservation_minimum_time_ahead($obj) +
     $hours * 60;
 }
 
-function booking_timeslots_get_reservation_minimum_time_ahead($obj)
-{
+/**
+ *
+ */
+function booking_timeslots_get_reservation_minimum_time_ahead($obj) {
+
   if ($obj->original_instance_id) {
-    $obj = (object)db_query('SELECT notice FROM {opening_hours} WHERE instance_id = :id',  array('id' => $obj->original_instance_id))->fetchAssoc();
+    $obj = (object) db_query('SELECT notice FROM {opening_hours} WHERE instance_id = :id', array('id' => $obj->original_instance_id))->fetchAssoc();
   }
 
   $data = json_decode($obj->notice);
 
   if (!isset($data->min_time_ahead_rsrv_weeks)) {
-    return 1; // 1 hour
+    // 1 hour.
+    return 1;
   }
 
   $hours =
     $data->min_time_ahead_rsrv_weeks * 168 +
-    $data->min_time_ahead_rsrv_days  * 24 +
+    $data->min_time_ahead_rsrv_days * 24 +
     $data->min_time_ahead_rsrv_hours;
 
-  if ($hours <= 1)
+  if ($hours <= 1) {
     $hours = 1;
+  }
 
   return
     $hours * 60;
 }
 
+/**
+ *
+ */
 function booking_timeslots_get_server_time() {
-  return date_now(variable_get('date_default_timezone'))->format ('Y-m-d H:i:s');
+  return date_now(variable_get('date_default_timezone'))->format('Y-m-d H:i:s');
 }
 
+/**
+ *
+ */
 function booking_timeslots_helper_calculate_month_view_range($month) {
 
   if (!$month) {
@@ -1702,31 +1750,30 @@ function booking_timeslots_helper_calculate_month_view_range($month) {
   }
 
   $day_name = '';
-  $time_start     = date ('Y-m-d H:i:s', strtotime($month));
+  $time_start     = date('Y-m-d H:i:s', strtotime($month));
   $day_name = date('l', strtotime($time_start));
 
-  // look for first day to start
-  while($day_name != 'Sunday')
-  {
-    $time_start = date ('Y-m-d H:i:s', strtotime($time_start) - 86400);
+  // Look for first day to start.
+  while ($day_name != 'Sunday') {
+    $time_start = date('Y-m-d H:i:s', strtotime($time_start) - 86400);
     $day_name = date('l', strtotime($time_start));
   }
 
-  // count how many days in this month
+  // Count how many days in this month.
   $day_count = date('t', strtotime($time_start));
-  $time_end = date ('Y-m-d H:i:s', strtotime($month) + $day_count * 86400);
+  $time_end = date('Y-m-d H:i:s', strtotime($month) + $day_count * 86400);
 
-  // how much extra days we need to add at the end
+  // How much extra days we need to add at the end.
   $extra_days = (int) (abs(strtotime($time_start) - strtotime($month)) / 86400);
   $extra_days = (7 - ($extra_days + $day_count + 1) % 7);
 
-  $time_end = date ('Y-m-d H:i:s', strtotime($time_end) + $extra_days * 86400);
+  $time_end = date('Y-m-d H:i:s', strtotime($time_end) + $extra_days * 86400);
 
   return array($time_start, $time_end);
 }
 
 /**
- * Chooses on which content types the bt_schedule view will appear
+ * Chooses on which content types the bt_schedule view will appear.
  */
 function booking_timeslots_choose_schedule_content_type($content_type_name) {
   $calendar_view_name    = 'bt_schedule';

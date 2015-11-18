@@ -407,7 +407,6 @@ function booking_form($form, &$form_state, $entity, $input) {
  */
 function booking_timeslots_booking_form($form, &$form_state, $entity, $input) {
 
-  var_dump($input); var_dump(debug_backtrace()); exit;
   list($primary_id, $secondary_id, $tertiary_id, $cid, $datetime, $duration) = $input;
 
   $data       = booking_timeslots_get_form_data_matrix($tertiary_id ? $tertiary_id : $secondary_id, $datetime);
@@ -617,7 +616,6 @@ function booking_timeslots_booking_form_add($input) {
 
   // Since slot_time is separated from entity itself it needs to be assigned from the form.
   list($primary_id, $secondary_id, $tertiary_id, $cid, $datetime, $duration) = $input;
-  // var_dump($fid, $cid, $datetime, $entity);.
   $entity->slot_time = $datetime;
   $entity->cid = $cid;
   $entity->primary_id = $primary_id;
