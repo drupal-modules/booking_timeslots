@@ -407,24 +407,25 @@ function booking_form($form, &$form_state, $entity, $input) {
  */
 function booking_timeslots_booking_form($form, &$form_state, $entity, $input) {
 
-  list($primary_id, $secondary_id, $tertiary_id, $cid, $datetime, $duration) = $input;
-
-  $data       = booking_timeslots_get_form_data_matrix($tertiary_id ? $tertiary_id : $secondary_id, $datetime);
-  $price_data = json_decode($data['affected_settings']->notice);
-  $price_key  = 'members';
-  $price      = $price_data->price->type == 'regular' ? $price_data->price->regular->$price_key : $price_data->price->non_regular->{$duration}->$price_key;
+  if (is_array($input)) {
+    list($primary_id, $secondary_id, $tertiary_id, $cid, $datetime, $duration) = $input;
+    $data       = booking_timeslots_get_form_data_matrix($tertiary_id ? $tertiary_id : $secondary_id, $datetime);
+    $price_data = json_decode($data['affected_settings']->notice);
+    $price_key  = 'members';
+    $price      = $price_data->price->type == 'regular' ? $price_data->price->regular->$price_key : $price_data->price->non_regular->{$duration}->$price_key;
+  }
 
   $form['book_price'] = array(
     '#type'          => 'item',
     '#title'         => t('Booking price:'),
-    '#markup'        => '$' . $price,
+    '#markup'        => isset($price) ? '$' . $price : '', // @fixme: Hardcoded '$'.
     '#weight'        => 1,
   );
 
   $form['duration'] = array(
     '#type'          => 'item',
-    '#title'         => t('Duration:'),
-    '#markup'        => $duration . ' ' . t('minutes'),
+    '#title'         => t('Duration'),
+    '#markup'        => isset($duration) ? $duration . ' ' . t('minutes') : '',
     '#weight'        => 1,
   );
 
@@ -432,8 +433,8 @@ function booking_timeslots_booking_form($form, &$form_state, $entity, $input) {
     '#title'         => t('Booking date'),
     '#type'          => module_exists('date_popup') ? 'date_popup' : 'date_select',
     '#date_format'   => 'Y-m-d H:i',
-    '#default_value' => $datetime,
-    '#attributes'    => array('disabled' => 'disabled'),
+    '#default_value' => !empty($datetime) ? $datetime : time(),
+    '#attributes'    => !empty($datetime) ? array('disabled' => 'disabled') : array(),
   );
 
   $form['booking'] = array(
@@ -442,6 +443,30 @@ function booking_timeslots_booking_form($form, &$form_state, $entity, $input) {
   );
 
   field_attach_form('booking', $entity, $form, $form_state);
+
+  if (is_array($input)) {
+    // Setting primary content type reference.
+    $form['field_bt_ct_ref_1'][$form['field_bt_ct_ref_1']['#language']]['#default_value'] = $primary_id;
+    $form['field_bt_ct_ref_1'][$form['field_bt_ct_ref_1']['#language']]['#attributes']    = array('disabled' => 'disabled');
+
+    // Setting secondary content type reference.
+    $form['field_bt_ct_ref_2'][$form['field_bt_ct_ref_2']['#language']]['#default_value'] = $secondary_id;
+    $form['field_bt_ct_ref_2'][$form['field_bt_ct_ref_2']['#language']]['#attributes']    = array('disabled' => 'disabled');
+
+    // Setting tertiary content type reference.
+    $form['field_bt_ct_ref_3'][$form['field_bt_ct_ref_3']['#language']]['#value']      = $tertiary_id;
+    $form['field_bt_ct_ref_3'][$form['field_bt_ct_ref_3']['#language']]['#attributes'] = array('disabled' => 'disabled');
+
+    if (is_numeric($tertiary_id)) {
+      $form['field_bt_ct_ref_2'][$form['field_bt_ct_ref_2']['#language']]['#access'] = FALSE;
+    }
+    else {
+      $form['field_bt_ct_ref_3'][$form['field_bt_ct_ref_3']['#language']]['#access'] = FALSE;
+    }
+
+    $form['field_bt_ct_ref_4'][$form['field_bt_ct_ref_4']['#language']]['#access'] = FALSE;
+    $form['field_bt_number_of_people'][LANGUAGE_NONE][0]['value']['#description'] = t('Maximum of !num people.', array('!num' => $data['capacity']));
+  }
 
   global $user;
 
@@ -455,29 +480,6 @@ function booking_timeslots_booking_form($form, &$form_state, $entity, $input) {
   }
 
   $configuration = booking_timeslots_get_configuration();
-
-  // Setting primary content type reference.
-  $form['field_bt_ct_ref_1'][$form['field_bt_ct_ref_1']['#language']]['#default_value'] = $primary_id;
-  $form['field_bt_ct_ref_1'][$form['field_bt_ct_ref_1']['#language']]['#attributes']    = array('disabled' => 'disabled');
-
-  // Setting secondary content type reference.
-  $form['field_bt_ct_ref_2'][$form['field_bt_ct_ref_2']['#language']]['#default_value'] = $secondary_id;
-  $form['field_bt_ct_ref_2'][$form['field_bt_ct_ref_2']['#language']]['#attributes']    = array('disabled' => 'disabled');
-
-  // Setting tertiary content type reference.
-  $form['field_bt_ct_ref_3'][$form['field_bt_ct_ref_3']['#language']]['#value']      = $tertiary_id;
-  $form['field_bt_ct_ref_3'][$form['field_bt_ct_ref_3']['#language']]['#attributes'] = array('disabled' => 'disabled');
-
-  if (is_numeric($tertiary_id)) {
-    $form['field_bt_ct_ref_2'][$form['field_bt_ct_ref_2']['#language']]['#access'] = FALSE;
-  }
-  else {
-    $form['field_bt_ct_ref_3'][$form['field_bt_ct_ref_3']['#language']]['#access'] = FALSE;
-  }
-
-  $form['field_bt_ct_ref_4'][$form['field_bt_ct_ref_4']['#language']]['#access'] = FALSE;
-
-  $form['field_bt_number_of_people'][LANGUAGE_NONE][0]['value']['#description'] = t('Maximum of !num people.', array('!num' => $data['capacity']));
 
   $form['submit'] = array(
     '#type'    => 'submit',
